@@ -63,4 +63,7 @@ const userSchema = new mongoose.Schema({
   }
 }, { timestamps: true })
 
+userSchema.index({ verificationToken: 1 }) // quick lookup on if verified
+userSchema.index({ resetPasswordToken: 1 }) // quick lookup for password reset
+
 export default mongoose.model('User', userSchema)

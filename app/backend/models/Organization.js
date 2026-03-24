@@ -71,4 +71,7 @@ const organizationSchema = new mongoose.Schema({
   }
 }, { timestamps: true })
 
+organizationSchema.index({ verificationStatus: 1 }) // quick lookup for verification status
+organizationSchema.index({ name: 'text' }) // quick lookup for organization name
+
 export default mongoose.model('Organization', organizationSchema)

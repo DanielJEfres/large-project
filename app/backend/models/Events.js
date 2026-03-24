@@ -66,4 +66,8 @@ const eventSchema = new mongoose.Schema({
   }
 }, { timestamps: true })
 
+eventSchema.index({ status: 1, startDate: 1 }) // quick lookup for event status and start date
+eventSchema.index({ isRSO: 1 }) // quick lookup for RSO events
+eventSchema.index({ title: 'text', description: 'text' }) // quick lookup for event title and description
+
 export default mongoose.model('Event', eventSchema)
