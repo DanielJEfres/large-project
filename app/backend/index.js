@@ -38,7 +38,7 @@ mongoose.connect(process.env.MONGODB_URI)
       console.log('Shutting down server...')
       server.close(() => {
         console.log('Server closed')
-        mongoose.connection.close(false, () => {
+        mongoose.connection.close(false).then(() => {
           console.log('MongoDB connection closed')
           process.exit(0)
         })
