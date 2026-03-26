@@ -11,6 +11,25 @@ app.use(express.json());
 
 //Sign up endpoint
 app.post('/signup', (req, res) => {
+    /*
+    { 
+        firstName: 
+        lastName:
+        ucfEmail:
+        passwordHash:
+        role:
+        interests:
+        bio:
+        profilePicture:
+        isVerified:
+        verificationToken:
+        resetPasswordToken:
+        resetPasswordExpires:
+        isActive:
+        createdAt:
+        updatedAt:
+    }
+    */
     const user_info = req.body;
 
     console.log(user_info['username']);
@@ -18,6 +37,6 @@ app.post('/signup', (req, res) => {
 });
 
 
-app.listen(8000, () => {
-  console.log(`Example app listening on port ${8000}`)
-})
+app.listen(8000, () => {console.log(`Example app listening on port ${8000}`)})
+
+export default router
