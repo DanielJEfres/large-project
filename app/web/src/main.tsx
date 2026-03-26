@@ -13,7 +13,7 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       {
-        index: true, //this matches "website.com/" exactly
+        index: true,
         element: <Home />,
       },
       {
