@@ -12,12 +12,12 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
-if(process.env.NODE_ENV !== 'production') {
+if(process.env.NODE_ENV !== 'production') 
+{
   app.use((req, res, next) => {
     console.log(`${req.method} ${req.path}`)
     next()
   })
-
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec)) 
 }
 
