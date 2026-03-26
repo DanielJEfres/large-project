@@ -13,6 +13,8 @@ const memberSchema = new mongoose.Schema({
   }
 }, { _id: false })
 
+const urlRegex = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/
+
 const organizationSchema = new mongoose.Schema({
   name: { 
     type: String, 
@@ -36,7 +38,8 @@ const organizationSchema = new mongoose.Schema({
   },
   knightConnectUrl: { 
     type: String, 
-    default: null
+    default: null,
+    match: [urlRegex, 'Please fill a valid URL']
   },
   contactEmail: { 
     type: String, 
@@ -45,14 +48,15 @@ const organizationSchema = new mongoose.Schema({
   },
   logo: { 
     type: String, 
-    default: null 
+    default: null,
+    match: [urlRegex, 'Please fill a valid URL']
   },
   socialLinks: {
-    instagram: { type: String, default: null },
-    linkedin: { type: String, default: null },
-    discord: { type: String, default: null },
-    linktree: { type: String, default: null },
-    website: { type: String, default: null }
+    instagram: { type: String, default: null, match: [urlRegex, 'Please fill a valid URL'] },
+    linkedin: { type: String, default: null, match: [urlRegex, 'Please fill a valid URL'] },
+    discord: { type: String, default: null, match: [urlRegex, 'Please fill a valid URL'] },
+    linktree: { type: String, default: null, match: [urlRegex, 'Please fill a valid URL'] },
+    website: { type: String, default: null, match: [urlRegex, 'Please fill a valid URL'] }
   },
   createdBy: { 
     type: mongoose.Schema.Types.ObjectId, 

@@ -61,7 +61,11 @@ const userSchema = new mongoose.Schema({
     type: Boolean, 
     default: true 
   }
-}, { timestamps: true })
+}, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } })
+
+userSchema.virtual('fullName').get(function() {
+  return `${this.firstName} ${this.lastName}`;
+});
 
 userSchema.index({ verificationToken: 1 }) // quick lookup on if verified
 userSchema.index({ resetPasswordToken: 1 }) // quick lookup for password reset

@@ -22,7 +22,13 @@ const eventSchema = new mongoose.Schema({
   },
   endDate: { 
     type: Date, 
-    default: null
+    default: null,
+    validate: {
+      validator: function(v) {
+        return !v || !this.startDate || v >= this.startDate;
+      },
+      message: 'End date must be after start date'
+    }
   },
   organizationId: { 
     type: mongoose.Schema.Types.ObjectId, 
