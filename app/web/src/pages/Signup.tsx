@@ -33,7 +33,7 @@ export default function Signup() {
   };
 
   // Handle the form submission
-  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     setError("");
@@ -65,6 +65,35 @@ export default function Signup() {
 
     console.log("Final Data:", formData);
     // api call here vvvvvvvv
+
+    try {
+      const response = await fetch("http://localhost:5000/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        body: JSON.stringify({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          ucfEmail: formData.email,
+          password: formData.password,
+          interests: formData.interests,
+          bio: "",
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Something went wrong");
+      }
+
+      console.log("Success:", data);
+      alert("Signup successful wooo");
+    } catch (err: any) {
+      setError("Internal Server Error");
+    }
   };
 
   const isInvalid = (fieldName: string) => {
