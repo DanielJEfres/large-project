@@ -28,12 +28,8 @@ jobs:
         with:
           webhook_id: ${{ secrets.DISCORD_ID }}
           webhook_token: ${{ secrets.DISCORD_TOKEN }}
-          color: "#42f554"
           message: |
             **Deployment Successful to EC2!**
-            **Message:** ${{ github.event.head_commit.message }}
-            **Commit:** [`${{ github.sha }}`](https://github.com{{ github.repository }}/commit/${{ github.sha }})
-            **Health Check:** [View System Health](http://${{ secrets.EC2_HOST }}/health)
 
       - name: Notify Deployment Failure
         if: failure()
@@ -41,9 +37,5 @@ jobs:
         with:
           webhook_id: ${{ secrets.DISCORD_ID }}
           webhook_token: ${{ secrets.DISCORD_TOKEN }}
-          color: "#f54242"
           message: |
             **Deployment Failed**
-            **Message:** ${{ github.event.head_commit.message }}
-            **Commit:** [`${{ github.sha }}`](https://github.com{{ github.repository }}/commit/${{ github.sha }})
-            **Health Check:** [View System Health](http://${{ secrets.EC2_HOST }}/health)
