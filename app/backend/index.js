@@ -12,12 +12,21 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
-if(process.env.NODE_ENV !== 'production') {
+//Handle malformed inputs for debugging
+app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    console.error('Bad JSON received:', err.body); // Logs the actual malformed string
+    return res.status(400).json({ error: "Invalid JSON format" });
+  }
+  next();
+});
+
+if(process.env.NODE_ENV !== 'production') 
+{
   app.use((req, res, next) => {
     console.log(`${req.method} ${req.path}`)
     next()
   })
-
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec)) 
 }
 
