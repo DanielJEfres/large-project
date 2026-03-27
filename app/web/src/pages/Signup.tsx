@@ -67,7 +67,7 @@ export default function Signup() {
     // api call here vvvvvvvv
     
     try {
-      const response = await fetch("http://localhost:5000/signup", {
+      const response = await fetch("http://ec2-13-58-172-213.us-east-2.compute.amazonaws.com:5000/api/auth/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

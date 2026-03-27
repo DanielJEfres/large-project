@@ -46,7 +46,7 @@ export default function Login() {
     console.log("Final Data:", formData);
 
     try {
-      const response = await fetch("http://localhost:5000/login", {
+      const response = await fetch("http://ec2-13-58-172-213.us-east-2.compute.amazonaws.com:5000/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
