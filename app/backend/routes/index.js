@@ -3,10 +3,9 @@ import testRoutes from './test.js'
 import authRoutes from './auth.js'
 
 const router = express.Router()
-const app = express()
 
 // router.use('/', testRoutes)
-app.use('/', testRoutes)
-app.use('/api/auth', router)
+router.use('/', testRoutes)
+router.use('/api/auth', authRoutes)
 
 export default router
