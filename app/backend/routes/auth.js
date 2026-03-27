@@ -20,8 +20,7 @@
 import express from 'express'
 import dotenv from 'dotenv'
 import mongoose from 'mongoose'
-import userModel from '../models/User.js'
-import bcrypt from 'bcrypt'
+import User from '../models/User.js';
 
 dotenv.config();
 const router = express.Router();
@@ -30,7 +29,7 @@ const db = mongoose.connection;
 
 router.get('/', (req, res) => {
     res.status(200).json({
-    message: 'SIGNUP API is online',
+    message: 'SIGNUP & LOGIN API: ONLINE',
   })
 })
 
@@ -92,6 +91,8 @@ router.post('/signup', async (req, res) => {
                 //verification token: generateToken()
             });
 
+    //Save the newly created user
+    // await newUser.save(); <- redundant, create implicitly calls save()
 
             //success messages
             console.log(`Successfully created new user with the following info: ${JSON.stringify(req.body, null, 2)}`);
@@ -110,5 +111,37 @@ router.post('/signup', async (req, res) => {
     
 
 });
+
+router.post("/login", async (req, res) => {
+    const { ucfEmail, password } = req.body;
+    try {
+        // Check validity
+        if (!ucfEmail || !password){ // missing fields
+            return res
+                .status(400)
+                .json({message: "Not all fields are filled."})
+        }
+        // Retrieve first user matching email
+        const user = await User.findOne({ucfEmail});
+
+        if (!user){ // user not found
+            return res.status(400).json({message: "User does not exist with that email."})
+
+        } else { // email exists in DB
+            // match password
+            if (await user.matchPassword(password)){
+                res.status(200).json({
+                    message: `User with email ${ucfEmail} successfully logged in.`,
+                    userId: user._id,
+                })
+
+            } else { // password did not match
+                return res.status(401).json({message: "Invalid user credentials."})
+            }
+        }
+    } catch (err){
+        res.status(500).json({message:"Server error."})
+    }
+})
 
 export default router;
