@@ -1,14 +1,21 @@
-@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=League+Spartan:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
-
 @import "tailwindcss";
 
 @theme {
+
+  --breakpoint-xs: 320px;
+  --breakpoint-sm: 375px;
+  --breakpoint-ms: 425px; 
+  --breakpoint-md: 768px;
+
+
   --font-bebas: "Bebas Neue", sans-serif;
-  --font-league: "League Spartan", sans-serif;
-
-  --color-brand: #ffc527;
-
-  --color-lightgray: #f6f6f6;
-
-  --color-gray: #999999;
+  --font-spartan: "League Spartan", sans-serif;
+  --font-inter: "Inter", sans-serif;
 }
+
+@layer base {
+  body {
+    @apply m-0 p-0 overflow-x-hidden;
+  }
+}
+
