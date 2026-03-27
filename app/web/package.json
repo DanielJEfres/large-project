@@ -32,31 +32,3 @@
     "vite": "^8.0.1"
   }
 }
-<<<<<<< HEAD
-{
-  "name": "web",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.22.0"
-  },
-  "devDependencies": {
-    "@types/react": "^18.2.0",
-    "@types/react-dom": "^18.2.0",
-    "@vitejs/plugin-react": "^4.2.0",
-    "@tailwindcss/vite": "^4.0.0",
-    "tailwindcss": "^4.0.0",
-    "typescript": "^5.2.0",
-    "vite": "^5.4.0"
-  }
-}
-=======
->>>>>>> f0799c986d00a21f740cbf523447daf53d0d47c4
