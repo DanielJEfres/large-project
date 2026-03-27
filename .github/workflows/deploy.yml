@@ -30,6 +30,8 @@ jobs:
           webhook_token: ${{ secrets.DISCORD_TOKEN }}
           message: |
             **Deployment Successful to EC2!**
+            **Message:** ${{ github.event.head_commit.message }}
+            **Health Check:** [View System Health](http://${{ secrets.EC2_HOST }}/health)
 
       - name: Notify Deployment Failure
         if: failure()
@@ -39,3 +41,5 @@ jobs:
           webhook_token: ${{ secrets.DISCORD_TOKEN }}
           message: |
             **Deployment Failed**
+            **Message:** ${{ github.event.head_commit.message }}
+            **Health Check:** [View System Health](http://${{ secrets.EC2_HOST }}/health)
