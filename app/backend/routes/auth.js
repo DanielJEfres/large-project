@@ -21,6 +21,8 @@ import express from 'express'
 import dotenv from 'dotenv'
 import mongoose from 'mongoose'
 import User from '../models/User.js';
+import Tag from '../models/Tag.js';   
+import bcrypt from 'bcryptjs';
 
 dotenv.config();
 const router = express.Router();
@@ -41,7 +43,7 @@ router.post('/signup', async (req, res) => {
             const ucfEmail = req.body["ucfEmail"];
 
             //Then check if the user already exists
-            const existingUser = await userModel.findOne({ucfEmail});
+            const existingUser = await User.findOne({ucfEmail});
             if (existingUser){
                 return res.status(400).json({message: "User already exists with this email"});
             }
@@ -81,7 +83,7 @@ router.post('/signup', async (req, res) => {
             const hashedPassword = await bcrypt.hash(password, saltRounds)
 
             //Create the user entry in the database, then saves it to the database
-            const newUser = await userModel.create({
+            const newUser = await User.create({
                 firstName,
                 lastName,
                 ucfEmail,
