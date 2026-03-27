@@ -5,7 +5,6 @@
     { "path": "./tsconfig.node.json" }
   ]
 }
-<<<<<<< HEAD
 {
   "compilerOptions": {
     "target": "ES2020",
@@ -26,5 +25,3 @@
   },
   "include": ["src"]
 }
-=======
->>>>>>> f0799c986d00a21f740cbf523447daf53d0d47c4
