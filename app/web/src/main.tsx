@@ -1,21 +1,3 @@
-<<<<<<< HEAD
-import './index.css'
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import Login from './pages/Login'
-
-
-createRoot(document.getElementById('root')!).render( 
-  <StrictMode>
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Login />} />
-      </Routes>
-    </BrowserRouter>
-  </StrictMode>
-) 
-=======
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
@@ -51,4 +33,3 @@ createRoot(document.getElementById("root")!).render(
     <RouterProvider router={router} />
   </StrictMode>,
 );
->>>>>>> f0799c986d00a21f740cbf523447daf53d0d47c4
