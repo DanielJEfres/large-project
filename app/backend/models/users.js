@@ -1,3 +1,5 @@
+// Why does this file exist?
+
 import mongoose from 'mongoose'
 const { Schema, model } = mongoose;
 
