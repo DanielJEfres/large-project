@@ -1,0 +1,307 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100lvh;
+  background: #FFFFFF;
+  padding: 20px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.logo {
+  position: absolute;
+  top: 24px;
+  left: 40px;
+  font-family: 'League Spartan';
+  font-weight: 500;
+  font-size: clamp(18px, 1.8vw, 24px);
+  color: #FF0000;
+}
+
+.titleWrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: clamp(20px, 2.5vh, 40px);
+}
+
+.title {
+  font-family: 'Bebas Neue';
+  font-weight: 400;
+  font-size: clamp(40px, 5vw, 60px);
+  color: #000000;
+  margin: 0;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  width: clamp(300px, 90vw, 520px);
+  gap: 8px;
+}
+
+.label {
+  font-family: 'Inter';
+  font-weight: 400;
+  font-size: clamp(16px, 1.5vw, 18px);
+  color: #999999;
+  margin: 0;
+}
+
+.input {
+  width: 100%;
+  height: clamp(45px, 5vh, 52px);
+  background: #F6F6F6;
+  border-radius: 10px;
+  border: none;
+  padding-left: 14px;
+  font-family: 'Inter';
+  font-size: clamp(16px, 1.5vw, 18px);
+  color: #999999;
+  box-sizing: border-box;
+}
+
+.passwordRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: clamp(12px, 2vh, 20px);
+}
+
+.forgot {
+  font-family: 'Inter';
+  font-weight: 700;
+  font-size: clamp(15px, 1.4vw, 18px);
+  color: #999999;
+  cursor: pointer;
+}
+
+.loginButton {
+  width: clamp(180px, 18vw, 220px);
+  height: clamp(52px, 6vh, 65px);
+  background: #FFC527;
+  border-radius: 39px;
+  border: none;
+  cursor: pointer;
+  font-family: 'League Spartan';
+  font-weight: 700;
+  font-size: clamp(18px, 1.8vw, 22px);
+  color: #FFFFFF;
+  margin-top: clamp(20px, 3vh, 40px);
+  align-self: center;
+}
+
+.signupText {
+  font-family: 'Inter';
+  font-weight: 400;
+  font-size: clamp(15px, 1.4vw, 18px);
+  text-align: center;
+  color: #999999;
+  margin-top: clamp(16px, 2.5vh, 28px);
+}
+
+.signupLink {
+  font-weight: 700;
+  cursor: pointer;
+}
+
+
+@media (max-width: 375px) {
+  .form {
+    width: 90%;
+  }
+  .title {
+    font-size: 36px;
+  }
+}
+
+
+@media (min-width: 376px) and (max-width: 393px) {
+  .form {
+    width: 85%;
+  }
+  .title {
+    font-size: 38px;
+  }
+}
+
+
+@media (min-width: 394px) and (max-width: 428px) {
+  .form {
+    width: 80%;
+  }
+  .title {
+    font-size: 40px;
+  }
+}
+
+
+@media (min-width: 429px) and (max-width: 768px) {
+  .form {
+    width: 70%;
+  }
+  .title {
+    font-size: 44px;
+  }
+}
+
+
+@media (min-width: 769px) and (max-width: 1280px) {
+  .form {
+    width: 60%;
+    max-width: 480px;
+  }
+  .title {
+    font-size: 48px;
+  }
+  .loginButton {
+    width: 200px;
+    height: 60px;
+  }
+}
+
+
+@media (min-width: 1281px) and (max-width: 1920px) {
+  .form {
+    width: 45%;
+    max-width: 520px;
+  }
+  .title {
+    font-size: 60px;
+  }
+}
+
+
+@media (min-width: 1921px) {
+  .form {
+    width: 35%;
+    max-width: 600px;
+  }
+  .title {
+    font-size: 70px;
+  }
+}
+
+
+
+@media (width: 820px) and (height: 1180px) {
+  .page {
+    height: 70vh;          
+    justify-content: center;
+    align-items: center;
+  }
+  .form {
+    width: 60%;
+    max-width: 500px;
+  }
+  .title {
+    font-size: 50px;
+  }
+  .loginButton {
+    width: 200px;
+    height: 60px;
+  }
+}
+
+
+@media (width: 912px) and (height: 1368px) {
+  .page {
+    height: 70vh;
+    justify-content: center;
+    align-items: center;
+  }
+  .form {
+    width: 55%;
+    max-width: 520px;
+  }
+  .title {
+    font-size: 55px;
+  }
+  .loginButton {
+    width: 220px;
+    height: 65px;
+  }
+}
+
+
+@media (width: 1024px) and (height: 1366px) {
+  .page {
+    height: 70vh;
+    justify-content: center;
+    align-items: center;
+  }
+  .form {
+    width: 55%;
+    max-width: 540px;
+  }
+  .title {
+    font-size: 58px;
+  }
+  .loginButton {
+    width: 220px;
+    height: 65px;
+  }
+}
+
+
+@media (width: 820px) and (height: 1180px) {
+  .page {
+    height: 70vh;         
+    justify-content: center;
+    align-items: center;
+  }
+  .form {
+    width: 60%;
+    max-width: 500px;
+  }
+  .title {
+    font-size: 50px;
+  }
+  .loginButton {
+    width: 200px;
+    height: 60px;
+  }
+}
+
+
+@media (width: 912px) and (height: 1368px) {
+  .page {
+    height: 70vh;
+    justify-content: center;
+    align-items: center;
+  }
+  .form {
+    width: 55%;
+    max-width: 520px;
+  }
+  .title {
+    font-size: 55px;
+  }
+  .loginButton {
+    width: 220px;
+    height: 65px;
+  }
+}
+
+
+@media (width: 853px) and (height: 1280px) {
+  .page {
+    height: 70vh;
+    justify-content: center;
+    align-items: center;
+  }
+  .form {
+    width: 55%;
+    max-width: 540px;
+  }
+  .title {
+    font-size: 58px;
+  }
+  .loginButton {
+    width: 220px;
+    height: 65px;
+  }
+}
+
