@@ -65,7 +65,7 @@ export default function Signup() {
 
     console.log("Final Data:", formData);
     // api call here vvvvvvvv
-
+    
     try {
       const response = await fetch("http://localhost:5000/signup", {
         method: "POST",

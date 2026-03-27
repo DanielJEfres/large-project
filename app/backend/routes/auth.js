@@ -78,16 +78,13 @@ router.post('/signup', async (req, res) => {
                 
             }
 
-            //Password hashing
-            const saltRounds = 10;
-            const hashedPassword = await bcrypt.hash(password, saltRounds)
 
             //Create the user entry in the database, then saves it to the database
             const newUser = await User.create({
                 firstName,
                 lastName,
                 ucfEmail,
-                passwordHash: hashedPassword,
+                passwordHash: password,
                 interests: tagIDs,
                 bio,
                 //verification token: generateToken()
