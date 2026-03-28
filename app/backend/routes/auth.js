@@ -22,7 +22,7 @@ import dotenv from 'dotenv'
 import mongoose from 'mongoose'
 import User from '../models/User.js';
 import Tag from '../models/Tag.js';   
-import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
 
 dotenv.config();
@@ -130,13 +130,20 @@ router.post("/login", async (req, res) => {
         } else { // email exists in DB
             // match password
             if (await user.matchPassword(password)){
+                // user has been validated! JWT below
+                const payload = { id: user._id.toString() }
+                
+                // serialize our user id using access token in ENV
+                const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET)
                 res.status(200).json({
                     message: `User with email ${ucfEmail} successfully logged in.`,
                     userId: user._id,
+                    accessToken: accessToken
                 })
 
+
             } else { // password did not match
-                return res.status(401).json({message: "Invalid user credentials."})
+                return res.status(401).json({message: "Invalid user credentials.",})
             }
         }
     } catch (err){

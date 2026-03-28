@@ -8,4 +8,5 @@ const router = express.Router()
 router.use('/', testRoutes)
 router.use('/api/auth', authRoutes)
 
+
 export default router
