@@ -10,7 +10,9 @@ export default function Navbar() {
       {/* Nav */}
       <div className="[&_*]:cursor-pointer flex justify-between items-center py-3 px-20">
         <div className="flex gap-12">
-          <p className="font-league">Events</p>
+          <Link to="/events">
+            <p className="font-league">Events</p>
+          </Link>
           <p className="font-league">Organizations</p>
           <p className="font-league">Tickets</p>
         </div>

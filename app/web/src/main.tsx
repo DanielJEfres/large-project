@@ -6,6 +6,8 @@ import App from "./App.tsx";
 import Login from "./pages/Login.tsx";
 import Signup from "./pages/Signup.tsx";
 import Home from "./pages/Home.tsx";
+import Events from "./pages/Events.tsx";
+import Event from "./pages/Event.tsx";
 
 const router = createBrowserRouter([
   {
@@ -23,6 +25,14 @@ const router = createBrowserRouter([
       {
         path: "signup",
         element: <Signup />,
+      },
+      {
+        path: "events",
+        element: <Events />,
+      },
+      {
+        path: "event/:eventId",
+        element: <Event />,
       },
     ],
   },
