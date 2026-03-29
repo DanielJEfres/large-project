@@ -17,14 +17,32 @@ export default function Event() {
               <h2 className="text-xl mb-2 font-league">Event details</h2>
 
               <div className="flex flex-col gap-2">
-                <p className="font-medium">Date</p>
+                <div className="">
+                  <p className="font-medium">Date</p>
+                  <p>Date</p>
+                </div>
 
-                <p className="font-medium">Location</p>
+                <div className="">
+                  <p className="font-medium">Location</p>
+                  <p>Location</p>
+                </div>
 
-                <p className="font-medium">Category</p>
-                <p className="font-medium">Tags</p>
-                <p className="font-medium">External Links</p>
-                <p className="font-medium">Add to Calendar</p>
+                <div className="">
+                  <p className="font-medium">Category</p>
+                  <p>Category</p>
+                </div>
+                <div className="">
+                  <p className="font-medium">Tags</p>
+                  <p>Tags</p>
+                </div>
+                <div className="">
+                  <p className="font-medium">External Links</p>
+                  <p>External Links</p>
+                </div>
+                <div className="">
+                  <p className="font-medium">Add to Calendar</p>
+                  <p>Add to Calendar</p>
+                </div>
               </div>
             </div>
           </div>
