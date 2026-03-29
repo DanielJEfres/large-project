@@ -11,13 +11,11 @@
 }
 
 .logo {
-  position: absolute;
-  top: 24px;
-  left: 40px;
-  font-family: 'League Spartan';
+   font-family: 'League Spartan';
   font-weight: 500;
   font-size: clamp(18px, 1.8vw, 24px);
   color: #FF0000;
+  margin-bottom: 16px;
 }
 
 .titleWrapper {
@@ -40,6 +38,7 @@
   flex-direction: column;
   width: clamp(300px, 90vw, 520px);
   gap: 8px;
+  
 }
 
 .label {
