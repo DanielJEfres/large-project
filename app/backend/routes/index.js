@@ -4,6 +4,7 @@ import authRoutes from './auth.js'
 import getEventsRoutes from './getEvents.js'
 import eventRoutes from './eventRoutes.js'
 import organizationRoutes from './organizationRoutes.js'
+import getEventsRoutes from './getEvents.js'
 
 const router = express.Router()
 
@@ -14,4 +15,5 @@ router.use('/api/getEvents', getEventsRoutes)
 router.use('/events', eventRoutes)
 router.use('/organizations', organizationRoutes)
 
+router.use('/api/getEvents', getEventsRoutes)
 export default router
