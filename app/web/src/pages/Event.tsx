@@ -33,7 +33,9 @@ export default function Event() {
           <div className="w-full">
             {/* top half */}
             <div className=" h-87 flex flex-col">
-              <p className="font-bebas text-2xl font-thin">Organization Name</p>
+              <p className="font-bebas text-2xl font-thin tracking-wider">
+                Organization Name
+              </p>
               <h1 className=" text-4xl font-medium">Event Title </h1>
 
               <div className="mt-5">

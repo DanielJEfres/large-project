@@ -1,5 +1,6 @@
 import { ChevronRight, Image, MapPin, Calendar } from "lucide-react";
 import Navbar from "../components/Navbar";
+import { Link } from "react-router";
 
 interface UniversityEvent {
   id: string;
@@ -52,11 +53,11 @@ export default function Events() {
 
           {/* template */}
 
-          <div className="flex gap-5">
+          <div className="flex gap-10">
             {EVENTS.map((event) => (
               <div
                 key={event.id}
-                className="h-60 flex border-gray/30 border-1 rounded-2xl overflow-hidden"
+                className="h-60 min-w-fit flex border-gray/20 border-1 rounded-2xl overflow-hidden"
               >
                 {/* 2 sides */}
                 <div className="w-60 h-full bg-gray/30 flex items-center justify-center shrink-0">
@@ -65,7 +66,7 @@ export default function Events() {
                 </div>
 
                 <div className="w-60 px-5 py-3 relative flex flex-col">
-                  <p className="text-xs text-gray uppercase tracking-wider">
+                  <p className=" font-bebas text-sm uppercase tracking-wider">
                     {event.orgName}
                   </p>
 
@@ -74,41 +75,69 @@ export default function Events() {
                   </p>
 
                   {/* Date and location */}
-                  <div className="mt-2">
-                    <div className="flex items-center gap-2 text-sm text-gray/80">
+                  <div className="mt-2 space-y-1">
+                    <div className="flex items-center gap-2 text-sm">
                       <Calendar size={14} />
                       <span>{event.date}</span>
                     </div>
 
-                    <div className="flex items-center gap-2 text-sm text-gray/80">
+                    <div className="flex items-center gap-2 text-sm">
                       <MapPin size={14} />
                       <span>{event.location}</span>
                     </div>
                   </div>
 
                   {/* Tags */}
-                  <div className="flex flex-wrap gap-1 mt-2">
+                  <div className="flex flex-wrap gap-1 mt-3">
                     {event.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="text-[10px] bg-brand/40 px-2 py-0.5 rounded"
+                        className="flex items-center gap-1 px-3 py-1 bg-brand/40 text-[10px] font-bold uppercase tracking-wider text-black rounded-full"
                       >
-                        #{tag}
+                        {tag}
                       </span>
                     ))}
                   </div>
 
                   {/* Button */}
-                  <p className="ml-auto mt-auto font-semibold flex items-center gap-2 min-w-fit cursor-pointer">
+                  <Link
+                    to={`/event/${event.id}`}
+                    className="ml-auto mt-auto font-semibold flex items-center gap-2 min-w-fit cursor-pointer "
+                  >
                     Learn More
                     <ChevronRight width={17} />
-                  </p>
+                  </Link>
                 </div>
               </div>
             ))}
           </div>
 
           <h2 className="text-2xl font-league ">Trending</h2>
+
+          <div className="flex gap-10">
+            {EVENTS.map((event) => (
+              <div key={event.id} className="">
+                <div className="w-70 h-70 bg-gray/30 flex items-center justify-center shrink-0">
+                  {/* This is a placeholder */}
+                  <Image size={40} className="text-gray/70" />
+                </div>
+
+                {/* info */}
+
+                <div className="mt-1">
+                  <p className=" font-bebas text-sm uppercase tracking-wider">
+                    {event.orgName}
+                  </p>
+
+                  <p className="font-semibold text-lg leading-tight">
+                    {event.title}
+                  </p>
+
+                  <span className="text-sm ">{event.date}</span>
+                </div>
+              </div>
+            ))}
+          </div>
 
           <h2 className="text-2xl font-league ">Upcoming Events</h2>
         </div>
