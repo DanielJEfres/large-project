@@ -112,6 +112,15 @@ router.post('/signup', async (req, res) => {
 
 });
 
+// NOT SECURE METHOD OF STORING refreshTokens. FOR TESTING ONLY!
+let refreshTokens = [] // use DB in future
+
+function generateAccessToken(payload) {
+    // serialize our payload (user id) using access token in ENV.
+    // AccessToken expires in 15 seconds for testing, requires Refresh
+    return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "15s" })
+}
+
 router.post("/login", async (req, res) => {
     const { ucfEmail, password } = req.body;
     try {
@@ -133,12 +142,18 @@ router.post("/login", async (req, res) => {
                 // user has been validated! JWT below
                 const payload = { sub: user._id.toString() } // sub is standard "subject" claim for identity (user._id)
                 
-                // serialize our user id using access token in ENV
-                const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET)
+                // generate AccessToken which serializes our payload (user id as subject)
+                const accessToken = generateAccessToken(payload)
+                const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET)
+                
+                //REMOVE IN FUTURE:
+                refreshTokens.push(refreshToken)
+
                 res.status(200).json({
                     message: `User with email ${ucfEmail} successfully logged in.`,
                     userId: user._id,
-                    accessToken: accessToken
+                    accessToken: accessToken,
+                    refreshToken: refreshToken
                 })
 
 
@@ -149,6 +164,33 @@ router.post("/login", async (req, res) => {
     } catch (err){
         res.status(500).json({message:"Server error."})
     }
+})
+
+router.delete("/logout", (req, res) => {
+    // UNSAFE, MUST DELETE FROM DB! TEMP FOR TESTING ONLY.
+    refreshTokens = refreshTokens.filter(token => token != req.body.token)
+    
+    res.sendStatus(204)
+})
+
+router.post("/token", (req, res) => {
+    const refreshToken = req.body.token
+    if (refreshToken == null) return res.sendStatus(401)
+
+    // REMOVE IN FUTURE:
+    if (!refreshTokens.includes(refreshToken)) return res.sendStatus(403)
+    
+    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, payload) => {
+        if (err) return res.sendStatus(403)
+        
+        // payload now contains irrelevant data, extract only sub
+        const newPayload = ({ sub: payload.sub }) 
+
+        // new AccessToken using newPayload
+        const accessToken = generateAccessToken(newPayload)
+
+        res.json({ accessToken: accessToken })
+    })
 })
 
 export default router;

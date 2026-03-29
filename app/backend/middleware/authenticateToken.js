@@ -12,7 +12,7 @@ function authenticateToken(req, res, next) {
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
         return res.sendStatus(401);
     } 
-    
+
     const token = authHeader.split(" ")[1] // extract "Token" component
     
     // Check if header is malformed
