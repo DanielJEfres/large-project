@@ -34,6 +34,9 @@ const userSchema = new mongoose.Schema({
   //   ref: 'Tag' 
   // }],
   interests: [String],
+  user_events:[
+    {type: mongoose.Schema.Types.ObjectId, ref: 'Event'}
+  ],
   bio: { 
     type: String, 
     trim: true,
