@@ -4,30 +4,34 @@
   align-items: center;
   justify-content: center;
   height: 100lvh;
-  background: #FFFFFF;
+  background: #ffffff;
   padding: 20px;
   box-sizing: border-box;
   overflow: hidden;
 }
 
 .logo {
-   font-family: 'League Spartan';
+  font-family: "League Spartan";
   font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: clamp(18px, 1.8vw, 24px);
-  color: #FF0000;
+  color: #ff0000;
   margin-bottom: 16px;
 }
 
 .titleWrapper {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
-  margin-bottom: clamp(20px, 2.5vh, 40px);
 }
 
 .title {
-  font-family: 'Bebas Neue';
+  font-family: "Bebas Neue";
   font-weight: 400;
+  text-align: center;
   font-size: clamp(40px, 5vw, 60px);
   color: #000000;
   margin: 0;
@@ -38,11 +42,10 @@
   flex-direction: column;
   width: clamp(300px, 90vw, 520px);
   gap: 8px;
-  
 }
 
 .label {
-  font-family: 'Inter';
+  font-family: "Inter";
   font-weight: 400;
   font-size: clamp(16px, 1.5vw, 18px);
   color: #999999;
@@ -52,12 +55,12 @@
 .input {
   width: 100%;
   height: clamp(45px, 5vh, 52px);
-  background: #F6F6F6;
+  background: #f6f6f6;
   border-radius: 10px;
   border: none;
   padding-left: 14px;
   padding-right: 80px;
-  font-family: 'Inter';
+  font-family: "Inter";
   font-size: clamp(16px, 1.5vw, 18px);
   color: #999999;
   box-sizing: border-box;
@@ -71,7 +74,7 @@
 }
 
 .forgot {
-  font-family: 'Inter';
+  font-family: "Inter";
   font-weight: 700;
   font-size: clamp(15px, 1.4vw, 18px);
   color: #999999;
@@ -81,20 +84,20 @@
 .loginButton {
   width: clamp(180px, 18vw, 220px);
   height: clamp(52px, 6vh, 65px);
-  background: #FFC527;
+  background: #ffc527;
   border-radius: 39px;
   border: none;
   cursor: pointer;
-  font-family: 'League Spartan';
+  font-family: "League Spartan";
   font-weight: 700;
   font-size: clamp(18px, 1.8vw, 22px);
-  color: #FFFFFF;
+  color: #ffffff;
   margin-top: clamp(20px, 3vh, 40px);
   align-self: center;
 }
 
 .signupText {
-  font-family: 'Inter';
+  font-family: "Inter";
   font-weight: 400;
   font-size: clamp(15px, 1.4vw, 18px);
   text-align: center;
@@ -107,7 +110,6 @@
   cursor: pointer;
 }
 
-
 @media (max-width: 375px) {
   .form {
     width: 90%;
@@ -116,7 +118,6 @@
     font-size: 36px;
   }
 }
-
 
 @media (min-width: 376px) and (max-width: 393px) {
   .form {
@@ -127,7 +128,6 @@
   }
 }
 
-
 @media (min-width: 394px) and (max-width: 428px) {
   .form {
     width: 80%;
@@ -137,7 +137,6 @@
   }
 }
 
-
 @media (min-width: 429px) and (max-width: 768px) {
   .form {
     width: 70%;
@@ -146,7 +145,6 @@
     font-size: 44px;
   }
 }
-
 
 @media (min-width: 769px) and (max-width: 1280px) {
   .form {
@@ -162,7 +160,6 @@
   }
 }
 
-
 @media (min-width: 1281px) and (max-width: 1920px) {
   .form {
     width: 45%;
@@ -172,7 +169,6 @@
     font-size: 60px;
   }
 }
-
 
 @media (min-width: 1921px) {
   .form {
@@ -184,11 +180,9 @@
   }
 }
 
-
-
 @media (width: 820px) and (height: 1180px) {
   .page {
-    height: 70vh;          
+    height: 70vh;
     justify-content: center;
     align-items: center;
   }
@@ -204,7 +198,6 @@
     height: 60px;
   }
 }
-
 
 @media (width: 912px) and (height: 1368px) {
   .page {
@@ -224,7 +217,6 @@
     height: 65px;
   }
 }
-
 
 @media (width: 1024px) and (height: 1366px) {
   .page {
@@ -245,10 +237,9 @@
   }
 }
 
-
 @media (width: 820px) and (height: 1180px) {
   .page {
-    height: 70vh;         
+    height: 70vh;
     justify-content: center;
     align-items: center;
   }
@@ -264,7 +255,6 @@
     height: 60px;
   }
 }
-
 
 @media (width: 912px) and (height: 1368px) {
   .page {
@@ -285,7 +275,6 @@
   }
 }
 
-
 @media (width: 853px) and (height: 1280px) {
   .page {
     height: 70vh;
@@ -304,4 +293,3 @@
     height: 65px;
   }
 }
-
