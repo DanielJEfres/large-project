@@ -123,8 +123,8 @@ router.get('/verify-email/:token', async (req, res) => {
     }
 
     // Update user status and clear the token
-    user.isVerified = true; // Assuming you have this field
-    
+    user.isVerified = true; 
+    user.verificationToken = undefined; //Clear the token for security purposes
     await user.save();
 
     res.status(200).json({ message: "Email verified successfully! You can now log in." });
