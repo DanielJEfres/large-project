@@ -4,7 +4,6 @@ import authRoutes from './auth.js'
 import getEventsRoutes from './getEvents.js'
 import eventRoutes from './eventRoutes.js'
 import organizationRoutes from './organizationRoutes.js'
-import getEventsRoutes from './getEvents.js'
 
 const router = express.Router()
 

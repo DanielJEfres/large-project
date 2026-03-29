@@ -14,6 +14,7 @@ members
 import express from 'express'
 import Organization from '../models/Organization.js'
 import Event from '../models/Event.js'
+import pagination from './helpers/pagination.js'
 
 const router = express.Router()
 
@@ -54,34 +55,39 @@ router.post('/create', async(req, res) => {
     }
 })
 
-//Get all organizations OR partial search organizaitons (name, description, and category)
+//Get all organizations OR partial search organizaitons (name, description, and category) with pagination
 router.get('/', async (req, res) => {
 
     try {
 
-        const { name } = req.query
+            const { name } = req.query
 
-        let organizations = null
-        
+            //Pagination
+            let page, organizations = null
+
+            if( req.query.page ) {
+               page = await pagination(req.query.page, req.query.limit, Organization)
+            }
+            
         //Get Organizations by name
-        if(name){
+        if(name) {
 
             const regex = new RegExp(name, "i")
 
             organizations = await Organization.find({
                 name: {$regex: regex}
-            }).select('name description category')
+            }).select('name description category').skip(page.skip).limit(page.limit)
 
             return res.status(200).json({Organizations:organizations})
 
         //Get All Organizations
         } else {
 
-            organizations = await Organization.find().select('name description category')
+            organizations = await Organization.find().select('name description category').skip(page.skip).limit(page.limit)
 
             if(!organizations) return res.status(500).json({message:" Error Getting Organization"})
 
-            return res.status(200).json({Organizations: organizations})
+            return res.status(200).json({Organizations: organizations, pageInfo:{numberOfPages:page.numPages, hasPrevPage:Boolean(page.hasPrevPage), hasNextPage:Boolean(page.hasNextPage)}})
 
         }
 
