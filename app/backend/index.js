@@ -5,7 +5,6 @@ import dotenv from 'dotenv'
 import swaggerUi from 'swagger-ui-express'
 import swaggerSpec from './config/swagger.js'
 import routes from './routes/index.js'
-import eventRoutes from './routes/eventRoutes.js'
 
 dotenv.config()
 
@@ -32,7 +31,6 @@ if(process.env.NODE_ENV !== 'production')
 }
 
 app.use('/', routes)
-app.use('/events', eventRoutes)
 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok' })
