@@ -8,6 +8,7 @@ import Signup from "./pages/Signup.tsx";
 import Home from "./pages/Home.tsx";
 import Events from "./pages/Events.tsx";
 import Event from "./pages/Event.tsx";
+import Organizations from "./pages/Organizations.tsx";
 
 const router = createBrowserRouter([
   {
@@ -33,6 +34,11 @@ const router = createBrowserRouter([
       {
         path: "event/:eventId",
         element: <Event />,
+      },
+
+      {
+        path: "organizations",
+        element: <Organizations />,
       },
     ],
   },

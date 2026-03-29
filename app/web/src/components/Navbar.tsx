@@ -13,7 +13,9 @@ export default function Navbar() {
           <Link to="/events">
             <p className="font-league">Events</p>
           </Link>
-          <p className="font-league">Organizations</p>
+          <Link to="/organizations">
+            <p className="font-league">Organizations</p>
+          </Link>
           <p className="font-league">Tickets</p>
         </div>
 
