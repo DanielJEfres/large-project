@@ -26,7 +26,7 @@ router.get('/', (req, res) => {
  */
 router.get('/test', authenticateToken, (req, res) => {
   console.log(req.user)
-  res.status(200).json({ message: 'Swagger is working!' })
+  res.status(200).json({ message: 'Access Token Verified!' })
 })
 
 export default router
