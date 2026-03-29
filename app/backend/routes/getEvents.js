@@ -2,6 +2,7 @@ import express from 'express'
 import mongoose from 'mongoose'
 import eventModel from '../models/Event.js'
 import organizationModel from '../models/Organization.js'
+import RSVP from '../models/RSVP.js'
 
 const router = express.Router()
 
@@ -44,6 +45,46 @@ router.get('/getByTag{/:tagId}', async(req, res)=>
     }
 )
 
+router.get('/searchEvent', async(req, res)=>
+    {
+        try{
+            const { q } = req.query;
+            if(!q)
+            {
+                return res.status(400).json({error: 'Search query parameter "q" is required '})
+            }
 
+            const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+            const events = await eventModel.find({title: new RegExp(escaped, 'i')})
+            return res.status(200).json({events})
+
+        }catch(error){
+            res.status(500).json({message: "Could Not Search Events"})
+        }
+    }
+
+)
+router.get('/getTrending', async(req, res)=>
+    {
+        try
+        {
+            const trending = await RSVP.aggregate([
+            { $match: { status: 'going' } },
+            { $group: { _id: '$eventId', attendeeCount: { $sum: 1 } } },
+            { $sort: { attendeeCount: -1 } },
+            { $limit: 10 },
+            { $lookup: { from: 'events', localField: '_id', foreignField: '_id', as: 'event' } },
+            { $unwind: '$event' },
+            { $addFields: { 'event.attendeeCount': '$attendeeCount' } },
+            { $replaceRoot: { newRoot: '$event' } }
+        ])
+        return res.status(200).json({ events: trending })
+
+        }catch(error)
+        {
+            res.status(500).json({message : "Could Not Get Trending Events"})
+        }
+    }
+)
 
 export default router
