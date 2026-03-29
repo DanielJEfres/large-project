@@ -40,12 +40,12 @@ export default function Organizations() {
         <h1 className="text-5xl font-bebas mt-10 mb-8">Organizations</h1>
 
         {/* Searchbar */}
-        <div className="relative w-full text-gray mb-12">
+        <div className="relative w-full mb-12 text-gray">
           <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
             <Search size={20} />
           </div>
           <input
-            className="w-full rounded-2xl bg-lightgray py-3 pl-12 pr-4 outline-none focus:ring-1 focus:ring-brand transition-all"
+            className="font-league w-full rounded-2xl bg-lightgray py-3 pl-12 pr-4 outline-none text-black"
             placeholder="Search Organizations"
           />
         </div>
