@@ -10,8 +10,8 @@ const router = express.Router()
 // router.use('/', testRoutes)
 router.use('/', testRoutes)
 router.use('/api/auth', authRoutes)
-router.use('/events', eventRoutes)
-router.use('/organizations', organizationRoutes)
+router.use('/api/events', eventRoutes)
+router.use('/api/organizations', organizationRoutes)
 
 router.use('/api/getEvents', getEventsRoutes)
 export default router

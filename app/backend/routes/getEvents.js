@@ -2,7 +2,6 @@ import express from 'express'
 import mongoose from 'mongoose'
 import eventModel from '../models/Event.js'
 import organizationModel from '../models/Organization.js'
-import RSVP from '../models/RSVP.js'
 
 const router = express.Router()
 
@@ -68,17 +67,14 @@ router.get('/getTrending', async(req, res)=>
     {
         try
         {
-            const trending = await RSVP.aggregate([
-            { $match: { status: 'going' } },
-            { $group: { _id: '$eventId', attendeeCount: { $sum: 1 } } },
-            { $sort: { attendeeCount: -1 } },
-            { $limit: 10 },
-            { $lookup: { from: 'events', localField: '_id', foreignField: '_id', as: 'event' } },
-            { $unwind: '$event' },
-            { $addFields: { 'event.attendeeCount': '$attendeeCount' } },
-            { $replaceRoot: { newRoot: '$event' } }
-        ])
-        return res.status(200).json({ events: trending })
+            const today = new Date()
+            const trending = await eventModel.aggregate([
+                { $match: { startDate: { $gte: today } } },
+                { $addFields: { attendeeCount: { $size: '$attendees' } } },
+                { $sort: { attendeeCount: -1 } },
+                { $limit: 10 }
+            ])
+            return res.status(200).json({ events: trending })
 
         }catch(error)
         {
