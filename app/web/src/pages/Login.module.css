@@ -18,7 +18,8 @@
   justify-content: center;
   font-size: clamp(18px, 1.8vw, 24px);
   color: #ff0000;
-  margin-bottom: 16px;
+  margin-bottom: 4px;
+  justify-content: center;
 }
 
 .titleWrapper {
@@ -26,6 +27,8 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
+  margin-bottom: 8px;
+  justify-content: center;
 }
 
 .title {
@@ -115,7 +118,7 @@
     width: 90%;
   }
   .title {
-    font-size: 36px;
+    font-size: 25px;
   }
 }
 
@@ -124,7 +127,7 @@
     width: 85%;
   }
   .title {
-    font-size: 38px;
+    font-size: 33px;
   }
 }
 
@@ -133,7 +136,7 @@
     width: 80%;
   }
   .title {
-    font-size: 40px;
+    font-size: 35px;
   }
 }
 
@@ -142,7 +145,7 @@
     width: 70%;
   }
   .title {
-    font-size: 44px;
+    font-size: 35px;
   }
 }
 

@@ -1,6 +1,8 @@
 import { useState, type ChangeEvent } from "react";
 import { Link } from "react-router";
 import { X, Eye, EyeOff, Info } from "lucide-react";
+import Logo from '../components/Logo'
+import styles from './Login.module.css'
 
 type FormData = {
   firstName: string;
@@ -65,23 +67,26 @@ export default function Signup() {
 
     console.log("Final Data:", formData);
     // api call here vvvvvvvv
-    
-    try {
-      const response = await fetch("http://ec2-13-58-172-213.us-east-2.compute.amazonaws.com:5000/api/auth/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
 
-        body: JSON.stringify({
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          ucfEmail: formData.email,
-          password: formData.password,
-          interests: formData.interests,
-          bio: "",
-        }),
-      });
+    try {
+      const response = await fetch(
+        "http://ec2-13-58-172-213.us-east-2.compute.amazonaws.com:5000/api/auth/signup",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+
+          body: JSON.stringify({
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            ucfEmail: formData.email,
+            password: formData.password,
+            interests: formData.interests,
+            bio: "",
+          }),
+        },
+      );
 
       const data = await response.json();
 
@@ -116,24 +121,19 @@ export default function Signup() {
   `;
 
   return (
-    <div className="[&_button]:cursor-pointer fixed inset-0 bg-white flex flex-col justify-center items-center z-50">
-      <Link
-        to="/"
-        className="absolute top-6 left-6 w-10 h-10 rounded-full bg-black flex items-center justify-center text-white text-xl"
-      ></Link>
+    <div className={styles.page}>
+      <div className={styles.logo}>
+        <Logo />
+      </div>
+      <div className={styles.titleWrapper}>
+        <h2 className={styles.title}>Sign up to find your next event</h2>
+      </div>
 
-      <div className="w-95">
-        <h2 className="font-bebas text-5xl text-center">
-          Sign up to find your next event
-        </h2>
-
-        <form
-          onSubmit={handleSubmit}
-          className="flex flex-col gap-4 mx-3 [&>div>label]:font-league [&>div>label]:text-gray"
-        >
+      <div className={styles.form}>
+        <form id="signup-form" onSubmit={handleSubmit}>
           {/* FIRST NAME */}
-          <div className="flex flex-col pt-10 relative">
-            <label htmlFor="firstName">First Name</label>
+          <div className="flex flex-col  relative mb-3">
+            <label className={styles.label}>First Name</label>
             <div className="relative flex items-center">
               <input
                 name="firstName"
@@ -155,8 +155,8 @@ export default function Signup() {
           </div>
 
           {/* LAST NAME */}
-          <div className="flex flex-col relative">
-            <label htmlFor="lastName">Last Name</label>
+          <div className="flex flex-col relative mb-3">
+            <label className={styles.label}>Last Name</label>
             <div className="relative flex items-center">
               <input
                 name="lastName"
@@ -178,8 +178,8 @@ export default function Signup() {
           </div>
 
           {/* EMAIL */}
-          <div className="flex flex-col relative">
-            <label htmlFor="email">Email</label>
+          <div className="flex flex-col relative mb-3">
+            <label className={styles.label}>Email</label>
             <div className="relative flex items-center">
               <input
                 name="email"
@@ -201,8 +201,8 @@ export default function Signup() {
           </div>
 
           {/* PASSWORD */}
-          <div className="flex flex-col relative">
-            <label htmlFor="password">Password</label>
+          <div className="flex flex-col relative mb-3">
+            <label className={styles.label}>Password</label>
             <div className="relative flex items-center">
               <input
                 id="password"
@@ -221,31 +221,26 @@ export default function Signup() {
               </button>
             </div>
           </div>
-
-          {/* error message! */}
-          {error && (
-            <div className="flex items-center justify-center gap-2 mt-2 text-red-500 animate-in fade-in slide-in-from-top-1">
-              <Info size={16} className="shrink-0" />
-              <p className="text-sm font-medium">{error}</p>
-            </div>
-          )}
-
-          <button
-            type="submit"
-            className="rounded-4xl font-bold self-center bg-brand text-white w-40 px-8 py-2 mt-4 hover:brightness-110 active:scale-95 transition-all"
-          >
-            Sign Up
-          </button>
         </form>
 
-        <div className="pt-8 text-center text-gray">
-          <p>
-            Already have an account?{" "}
-            <Link to="/login" className="font-bold hover:underline">
-              Log in
-            </Link>
-          </p>
-        </div>
+        {/* error message! */}
+        {error && (
+          <div className="flex items-center justify-center gap-2 mt-2 text-red-500 animate-in fade-in slide-in-from-top-1">
+            <Info size={16} className="shrink-0" />
+            <p className="text-sm font-medium">{error}</p>
+          </div>
+        )}
+
+        <button type="submit" form="signup-form" className={styles.loginButton}>
+          Sign Up
+        </button>
+
+        <p className={styles.signupText}>
+          Already have an account?{" "}
+          <Link to="/login">
+            <span className={styles.signupLink}>Log in</span>
+          </Link>
+        </p>
       </div>
     </div>
   );
