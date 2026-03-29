@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema({
     unique: true, 
     trim: true,
     lowercase: true,
-    match: [/^[^\s@]+@ucf\.edu$/, 'Must be a valid UCF email']
+    //match: [/^[^\s@]+@ucf\.edu$/, 'Must be a valid UCF email']
   },
   passwordHash: { 
     type: String, 
