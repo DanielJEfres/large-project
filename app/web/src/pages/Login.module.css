@@ -4,13 +4,18 @@
   align-items: center;
   justify-content: center;
   height: 100lvh;
+<<<<<<< HEAD
   background: #ffffff;
+=======
+  background: #FFFFFF;
+>>>>>>> d8c500a (feat: add EventKnight logo to login page and responsiveness)
   padding: 20px;
   box-sizing: border-box;
   overflow: hidden;
 }
 
 .logo {
+<<<<<<< HEAD
   font-family: "League Spartan";
   font-weight: 500;
   display: flex;
@@ -20,11 +25,19 @@
   color: #ff0000;
   margin-bottom: 4px;
   justify-content: center;
+=======
+   font-family: 'League Spartan';
+  font-weight: 500;
+  font-size: clamp(18px, 1.8vw, 24px);
+  color: #FF0000;
+  margin-bottom: 16px;
+>>>>>>> d8c500a (feat: add EventKnight logo to login page and responsiveness)
 }
 
 .titleWrapper {
   display: flex;
   align-items: center;
+<<<<<<< HEAD
   justify-content: center;
   gap: 10px;
   margin-bottom: 8px;
@@ -35,6 +48,15 @@
   font-family: "Bebas Neue";
   font-weight: 400;
   text-align: center;
+=======
+  gap: 10px;
+  margin-bottom: clamp(20px, 2.5vh, 40px);
+}
+
+.title {
+  font-family: 'Bebas Neue';
+  font-weight: 400;
+>>>>>>> d8c500a (feat: add EventKnight logo to login page and responsiveness)
   font-size: clamp(40px, 5vw, 60px);
   color: #000000;
   margin: 0;
@@ -45,10 +67,18 @@
   flex-direction: column;
   width: clamp(300px, 90vw, 520px);
   gap: 8px;
+<<<<<<< HEAD
 }
 
 .label {
   font-family: "Inter";
+=======
+  
+}
+
+.label {
+  font-family: 'Inter';
+>>>>>>> d8c500a (feat: add EventKnight logo to login page and responsiveness)
   font-weight: 400;
   font-size: clamp(16px, 1.5vw, 18px);
   color: #999999;
@@ -58,12 +88,20 @@
 .input {
   width: 100%;
   height: clamp(45px, 5vh, 52px);
+<<<<<<< HEAD
   background: #f6f6f6;
   border-radius: 10px;
   border: none;
   padding-left: 14px;
   padding-right: 80px;
   font-family: "Inter";
+=======
+  background: #F6F6F6;
+  border-radius: 10px;
+  border: none;
+  padding-left: 14px;
+  font-family: 'Inter';
+>>>>>>> d8c500a (feat: add EventKnight logo to login page and responsiveness)
   font-size: clamp(16px, 1.5vw, 18px);
   color: #999999;
   box-sizing: border-box;
@@ -77,7 +115,11 @@
 }
 
 .forgot {
+<<<<<<< HEAD
   font-family: "Inter";
+=======
+  font-family: 'Inter';
+>>>>>>> d8c500a (feat: add EventKnight logo to login page and responsiveness)
   font-weight: 700;
   font-size: clamp(15px, 1.4vw, 18px);
   color: #999999;
@@ -87,6 +129,7 @@
 .loginButton {
   width: clamp(180px, 18vw, 220px);
   height: clamp(52px, 6vh, 65px);
+<<<<<<< HEAD
   background: #ffc527;
   border-radius: 39px;
   border: none;
@@ -95,12 +138,26 @@
   font-weight: 700;
   font-size: clamp(18px, 1.8vw, 22px);
   color: #ffffff;
+=======
+  background: #FFC527;
+  border-radius: 39px;
+  border: none;
+  cursor: pointer;
+  font-family: 'League Spartan';
+  font-weight: 700;
+  font-size: clamp(18px, 1.8vw, 22px);
+  color: #FFFFFF;
+>>>>>>> d8c500a (feat: add EventKnight logo to login page and responsiveness)
   margin-top: clamp(20px, 3vh, 40px);
   align-self: center;
 }
 
 .signupText {
+<<<<<<< HEAD
   font-family: "Inter";
+=======
+  font-family: 'Inter';
+>>>>>>> d8c500a (feat: add EventKnight logo to login page and responsiveness)
   font-weight: 400;
   font-size: clamp(15px, 1.4vw, 18px);
   text-align: center;
@@ -113,42 +170,78 @@
   cursor: pointer;
 }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> d8c500a (feat: add EventKnight logo to login page and responsiveness)
 @media (max-width: 375px) {
   .form {
     width: 90%;
   }
   .title {
+<<<<<<< HEAD
     font-size: 25px;
   }
 }
 
+=======
+    font-size: 36px;
+  }
+}
+
+
+>>>>>>> d8c500a (feat: add EventKnight logo to login page and responsiveness)
 @media (min-width: 376px) and (max-width: 393px) {
   .form {
     width: 85%;
   }
   .title {
+<<<<<<< HEAD
     font-size: 33px;
   }
 }
 
+=======
+    font-size: 38px;
+  }
+}
+
+
+>>>>>>> d8c500a (feat: add EventKnight logo to login page and responsiveness)
 @media (min-width: 394px) and (max-width: 428px) {
   .form {
     width: 80%;
   }
   .title {
+<<<<<<< HEAD
     font-size: 35px;
   }
 }
 
+=======
+    font-size: 40px;
+  }
+}
+
+
+>>>>>>> d8c500a (feat: add EventKnight logo to login page and responsiveness)
 @media (min-width: 429px) and (max-width: 768px) {
   .form {
     width: 70%;
   }
   .title {
+<<<<<<< HEAD
     font-size: 35px;
   }
 }
 
+=======
+    font-size: 44px;
+  }
+}
+
+
+>>>>>>> d8c500a (feat: add EventKnight logo to login page and responsiveness)
 @media (min-width: 769px) and (max-width: 1280px) {
   .form {
     width: 60%;
@@ -163,6 +256,10 @@
   }
 }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> d8c500a (feat: add EventKnight logo to login page and responsiveness)
 @media (min-width: 1281px) and (max-width: 1920px) {
   .form {
     width: 45%;
@@ -173,6 +270,10 @@
   }
 }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> d8c500a (feat: add EventKnight logo to login page and responsiveness)
 @media (min-width: 1921px) {
   .form {
     width: 35%;
@@ -183,9 +284,17 @@
   }
 }
 
+<<<<<<< HEAD
 @media (width: 820px) and (height: 1180px) {
   .page {
     height: 70vh;
+=======
+
+
+@media (width: 820px) and (height: 1180px) {
+  .page {
+    height: 70vh;          
+>>>>>>> d8c500a (feat: add EventKnight logo to login page and responsiveness)
     justify-content: center;
     align-items: center;
   }
@@ -202,6 +311,10 @@
   }
 }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> d8c500a (feat: add EventKnight logo to login page and responsiveness)
 @media (width: 912px) and (height: 1368px) {
   .page {
     height: 70vh;
@@ -221,6 +334,10 @@
   }
 }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> d8c500a (feat: add EventKnight logo to login page and responsiveness)
 @media (width: 1024px) and (height: 1366px) {
   .page {
     height: 70vh;
@@ -240,9 +357,16 @@
   }
 }
 
+<<<<<<< HEAD
 @media (width: 820px) and (height: 1180px) {
   .page {
     height: 70vh;
+=======
+
+@media (width: 820px) and (height: 1180px) {
+  .page {
+    height: 70vh;         
+>>>>>>> d8c500a (feat: add EventKnight logo to login page and responsiveness)
     justify-content: center;
     align-items: center;
   }
@@ -259,6 +383,10 @@
   }
 }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> d8c500a (feat: add EventKnight logo to login page and responsiveness)
 @media (width: 912px) and (height: 1368px) {
   .page {
     height: 70vh;
@@ -278,6 +406,10 @@
   }
 }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> d8c500a (feat: add EventKnight logo to login page and responsiveness)
 @media (width: 853px) and (height: 1280px) {
   .page {
     height: 70vh;
@@ -296,3 +428,7 @@
     height: 65px;
   }
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> d8c500a (feat: add EventKnight logo to login page and responsiveness)
