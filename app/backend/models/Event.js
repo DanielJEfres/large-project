@@ -44,6 +44,9 @@ const eventSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'Tag' 
   }],
+  attendees: [{ 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'User' }],
   isRSO: { 
     type: Boolean, 
     required: true,

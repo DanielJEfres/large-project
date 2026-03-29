@@ -1,6 +1,7 @@
 import { useState, type ChangeEvent } from "react";
 import { Link } from "react-router";
 import { X, Eye, EyeOff, Info } from "lucide-react";
+import { LOCAL_IP, SERVER_IP } from "../config";
 
 type FormData = {
   firstName: string;
@@ -21,6 +22,8 @@ export default function Signup() {
   });
 
   const [error, setError] = useState<string>("");
+
+
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -50,10 +53,12 @@ export default function Signup() {
     }
 
     // uni email check
+    /*
     if (!formData.email.toLowerCase().endsWith(".edu")) {
       setError("Please use a valid university email (.edu).");
       return;
     }
+    */
 
     // check password length
     if (formData.password.length < 8) {
@@ -67,7 +72,7 @@ export default function Signup() {
     // api call here vvvvvvvv
     
     try {
-      const response = await fetch("http://ec2-13-58-172-213.us-east-2.compute.amazonaws.com:5000/api/auth/signup", {
+      const response = await fetch(`${LOCAL_IP}/api/auth/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

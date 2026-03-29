@@ -10,7 +10,6 @@ import Tag from '../models/Tag.js'
 import User from '../models/User.js'
 import Organization from '../models/Organization.js'
 import Event from '../models/Event.js'
-import RSVP from '../models/RSVP.js'
 
 // ── Seed ─────────────────────────────────────────────────────────────────────
 
@@ -25,7 +24,6 @@ async function seed() {
     User.deleteMany({}),
     Organization.deleteMany({}),
     Event.deleteMany({}),
-    RSVP.deleteMany({}),
   ])
   console.log('Cleared existing data')
 
@@ -355,6 +353,7 @@ async function seed() {
       status: 'upcoming',
       isPublic: true,
       rsvpEnabled: true,
+      attendees: [users[2]._id, users[1]._id, users[8]._id, users[12]._id],
     },
     {
       title: 'Marine Life of Florida: Awareness Night',
@@ -369,6 +368,7 @@ async function seed() {
       status: 'upcoming',
       isPublic: true,
       rsvpEnabled: true,
+      attendees: [users[5]._id],
     },
     {
       title: 'SHPEtinas Pilates',
@@ -383,6 +383,7 @@ async function seed() {
       status: 'upcoming',
       isPublic: true,
       rsvpEnabled: true,
+      attendees: [],
     },
     {
       title: 'Spring Runway Show: Timebomb — "The Moment Before"',
@@ -397,6 +398,7 @@ async function seed() {
       status: 'upcoming',
       isPublic: true,
       rsvpEnabled: true,
+      attendees: [users[11]._id, users[9]._id],
     },
     {
       title: 'Project Launch Checkpoint #1',
@@ -411,25 +413,23 @@ async function seed() {
       status: 'completed',
       isPublic: true,
       rsvpEnabled: true,
+      attendees: [users[11]._id, users[7]._id, users[12]._id, users[8]._id],
     },
   ])
   console.log('Events seeded')
 
-  // RSVPs
-  await RSVP.insertMany([
-    { userId: users[2]._id,  eventId: events[0]._id, status: 'going', attended: false },
-    { userId: users[1]._id,  eventId: events[0]._id, status: 'going', attended: false },
-    { userId: users[8]._id,  eventId: events[0]._id, status: 'going', attended: false },
-    { userId: users[12]._id, eventId: events[0]._id, status: 'going', attended: false },
-    { userId: users[11]._id, eventId: events[3]._id, status: 'going', attended: false },
-    { userId: users[9]._id,  eventId: events[3]._id, status: 'going', attended: false },
-    { userId: users[5]._id,  eventId: events[1]._id, status: 'going', attended: false },
-    { userId: users[11]._id, eventId: events[4]._id, status: 'going', attended: true },
-    { userId: users[7]._id,  eventId: events[4]._id, status: 'going', attended: true },
-    { userId: users[12]._id, eventId: events[4]._id, status: 'going', attended: true },
-    { userId: users[8]._id,  eventId: events[4]._id, status: 'going', attended: true },
+  // User events
+  await Promise.all([
+    User.updateOne({ _id: users[1]._id },  { $set: { user_events: [events[0]._id] } }),
+    User.updateOne({ _id: users[2]._id },  { $set: { user_events: [events[0]._id] } }),
+    User.updateOne({ _id: users[5]._id },  { $set: { user_events: [events[1]._id] } }),
+    User.updateOne({ _id: users[7]._id },  { $set: { user_events: [events[4]._id] } }),
+    User.updateOne({ _id: users[8]._id },  { $set: { user_events: [events[0]._id, events[4]._id] } }),
+    User.updateOne({ _id: users[9]._id },  { $set: { user_events: [events[3]._id] } }),
+    User.updateOne({ _id: users[11]._id }, { $set: { user_events: [events[3]._id, events[4]._id] } }),
+    User.updateOne({ _id: users[12]._id }, { $set: { user_events: [events[0]._id, events[4]._id] } }),
   ])
-  console.log('RSVPs seeded')
+  console.log('User events seeded')
 
   console.log('Seed complete!')
   await mongoose.disconnect()
