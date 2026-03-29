@@ -80,7 +80,7 @@ export default function Organizations() {
                   {org.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="flex items-center gap-1 px-3 py-1 bg-brand/10 text-xs font-bold uppercase tracking-wider text-black rounded-full"
+                      className="flex items-center gap-1 px-3 py-1 bg-brand/40 text-xs font-bold uppercase tracking-wider text-black rounded-full"
                     >
                       {tag}
                     </span>

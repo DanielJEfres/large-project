@@ -56,7 +56,7 @@ export default function Events() {
             {EVENTS.map((event) => (
               <div
                 key={event.id}
-                className="h-60 flex bg-lightgray rounded-2xl overflow-hidden"
+                className="h-60 flex border-gray/30 border-1 rounded-2xl overflow-hidden"
               >
                 {/* 2 sides */}
                 <div className="w-60 h-full bg-gray/30 flex items-center justify-center shrink-0">
@@ -91,7 +91,7 @@ export default function Events() {
                     {event.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="text-[10px] bg-white/50 px-2 py-0.5 rounded"
+                        className="text-[10px] bg-brand/40 px-2 py-0.5 rounded"
                       >
                         #{tag}
                       </span>
