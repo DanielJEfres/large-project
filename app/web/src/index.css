@@ -1,5 +1,4 @@
 @import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=League+Spartan:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
-
 @import "tailwindcss";
 
 @utility scrollbar-hide {
@@ -12,6 +11,7 @@
 
 @theme {
   --font-bebas: "Bebas Neue", sans-serif;
+  --font-inter: "Inter", sans-serif;
   --font-league: "League Spartan", sans-serif;
 
   --color-brand: #ffc527;
