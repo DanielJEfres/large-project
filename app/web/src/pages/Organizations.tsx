@@ -89,8 +89,8 @@ export default function Organizations() {
               </div>
 
               {/* Buttons */}
-              <div className="flex ml-auto">
-                <div className="flex mt-auto mr-10 gap-5">
+              <div className="flex ml-auto mr-10">
+                <div className="flex mt-auto  gap-5">
                   <button className="font-bold rounded-4xl my-3 py-2 font-league flex gap-2 min-w-fit">
                     More Events
                     <ChevronRight width={17} />
