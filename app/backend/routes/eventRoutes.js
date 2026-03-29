@@ -16,9 +16,7 @@ timestamps
 */
 
 import  express from 'express'
-import mongoose from 'mongoose'
-import eventModel from '../models/Event.js'
-import organizationModel from '../models/Organization.js'
+import Event from '../models/Event.js'
 
 const router = express.Router();
 
@@ -27,30 +25,15 @@ router.get('/:eventId', async (req, res) => {
 
     try {
 
-        const event = await eventModel.findById(req.params.eventId)
+        const event = await Event.findById(req.params.eventId)
        
         if(!event) return res.json(500).json({message: "No Event Found"})
         
         return res.status(200).json({event:event})
 
     } catch (error) {
-        res.status(500).json({message:" Could Not Get Event"})
-    }
-})
-
-//Get All Events Created By An Organization
-router.get('/org/:organizationId', async (req, res) => {
-    try {
-
-        const orgEvents = await eventModel.find(
-            {
-                organizationId: new organizationModel.base.Types.ObjectId(req.params.organizationId)
-            })
-        
-        return res.status(200).json({org_events:orgEvents})
-
-    } catch (error) {
         console.log(error)
+        res.status(500).json({message:" Could Not Get Event"})
     }
 })
 
@@ -60,7 +43,7 @@ router.post('/', async (req, res) => {
     try {
         
         const { title, description, location, startDate, endDate, organizationId,
-                createdBy, tags, isRSO, /*flyer,*/ status, isPublic, rsvpEnabled } = req.body
+                createdBy, tags, isRSO, flyer, status, isPublic, rsvpEnabled } = req.body
         
             
         //Check for required fields        
@@ -69,16 +52,16 @@ router.post('/', async (req, res) => {
         //Check for create Date
         if( endDate && (startDate == null || new Date(endDate) <= new Date(startDate)) ) return res.status(400).json({error:"End date must be after start date"})
         
-        const event = await eventModel.create({
+        const event = await Event.create({
             title, description, location, 
             startDate, endDate, organizationId, 
             createdBy, tags, isRSO, status, isPublic, 
-            rsvpEnabled
+            flyer, rsvpEnabled
         })
 
-        if(!event) return res.json({event: "Could Not Add Event"})
+        if(!event) return res.json({message: "Could Not Add Event"})
         
-        return res.status(201).json({event:event})
+        return res.status(201).json({Event:event})
 
     } catch(error) {
 
@@ -92,7 +75,7 @@ router.put('/:eventId', async (req, res) => {
 
     try {
         
-        const updatedEvent = await eventModel.findByIdAndUpdate(
+        const updatedEvent = await Event.findByIdAndUpdate(
             {_id: req.params.eventId},
             req.body,
             {returnDocument: 'after'}
@@ -100,7 +83,7 @@ router.put('/:eventId', async (req, res) => {
 
         if(!updatedEvent) return res.status(500).json({message:"Could Not Update Event"})
 
-        return res.status(200).json({event:updatedEvent})
+        return res.status(200).json({Event:updatedEvent})
 
     } catch(error) {
 
@@ -114,7 +97,7 @@ router.delete('/:eventId', async (req, res) => {
 
     try {
 
-        const event = await eventModel.findByIdAndDelete({_id: req.params.eventId})
+        const event = await Event.findByIdAndDelete({_id: req.params.eventId})
 
         if(!event) return res.status(500).json({message:"Could Not Delete Event"})
 
