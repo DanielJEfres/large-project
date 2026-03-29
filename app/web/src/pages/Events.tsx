@@ -269,12 +269,12 @@ export default function Events() {
                     key={event._id}
                     className="shrink-0 group cursor-pointer"
                   >
-                    <div className="w-90 h-90 bg-gray/30 flex items-center justify-center rounded-2xl overflow-hidden group-hover:brightness-95 transition-all">
+                    <div className="w-80 h-80 bg-gray/30 flex items-center justify-center rounded-2xl overflow-hidden group-hover:brightness-95 transition-all">
                       {/* Fallback Icon since 'flyer' is null in your JSON */}
                       <Image size={40} className="text-gray/70" />
                     </div>
 
-                    <div className="mt-2">
+                    <div className="mt-2 max-w-80">
                       <div className="flex justify-between items-center">
                         <p className="font-bebas text-sm uppercase tracking-wider text-brand">
                           {event.isRSO ? "RSO Event" : "Community"}
