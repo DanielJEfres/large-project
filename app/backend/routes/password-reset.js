@@ -76,6 +76,7 @@ router.post("/password-reset", async (req, res) =>{
                     <a href="${url}" class="button">Reset My Password</a>
                 </div>
                 <p class="warning">Note: This link will expire in 5 minutes.</p>
+                <p>Hi ${user.firstName}, you may reset your EventKnight password with the following link: ${passwordResetURL}</p>
                 <p>If you did not request this, you can safely ignore this email.</p>
                 <div class="footer">
                     <p>&copy; 2026 EventKnight Team | UCF</p>
