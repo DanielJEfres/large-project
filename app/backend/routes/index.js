@@ -15,5 +15,4 @@ router.use('/api/getEvents', getEventsRoutes)
 router.use('/events', eventRoutes)
 router.use('/organizations', organizationRoutes)
 
-router.use('/api/getEvents', getEventsRoutes)
 export default router

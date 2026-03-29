@@ -67,10 +67,10 @@ router.get('/', async (req, res) => {
         if(name){
 
             const regex = new RegExp(name, "i")
+
             organizations = await Organization.find({
                 name: {$regex: regex}
             }).select('name description category')
-
 
             return res.status(200).json({Organizations:organizations})
 
