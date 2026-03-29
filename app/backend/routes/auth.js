@@ -73,9 +73,7 @@ router.post('/signup', async (req, res) => {
                         {upsert: true, new: true}
                     );
                     tagIDs.push(tag._id);
-                }
-
-                
+                }   
             }
 
 
@@ -87,11 +85,7 @@ router.post('/signup', async (req, res) => {
                 passwordHash: password,
                 interests: tagIDs,
                 bio,
-                //verification token: generateToken()
             });
-
-    //Save the newly created user
-    // await newUser.save(); <- redundant, create implicitly calls save()
 
             //success messages
             console.log(`Successfully created new user with the following info: ${JSON.stringify(req.body, null, 2)}`);
