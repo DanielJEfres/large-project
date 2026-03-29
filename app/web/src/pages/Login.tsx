@@ -3,6 +3,7 @@ import { Link } from "react-router";
 import { X, Eye, EyeOff, Info } from "lucide-react";
 import styles from "./Login.module.css";
 import Logo from "../components/Logo.tsx";
+import { LOCAL_IP, SERVER_IP } from "../config";
 
 interface LoginFormData {
   email: string;
@@ -48,20 +49,17 @@ export default function Login() {
     console.log("Final Data:", formData);
 
     try {
-      const response = await fetch(
-        "http://ec2-13-58-172-213.us-east-2.compute.amazonaws.com:5000/api/auth/login",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-
-          body: JSON.stringify({
-            ucfEmail: formData.email,
-            password: formData.password,
-          }),
+      const response = await fetch(`${LOCAL_IP}/api/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+
+        body: JSON.stringify({
+          ucfEmail: formData.email,
+          password: formData.password,
+        }),
+      });
 
       const data = await response.json();
 
