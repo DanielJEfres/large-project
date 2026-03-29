@@ -143,7 +143,7 @@ router.post("/login", async (req, res) => {
 
                 // generate AccessToken which serializes our payload (user id as subject)
                 const payload = { sub: user_id.toString() }; // sub is standard "subject" claim for identity (user._id)
-                const accessToken = generateAccessToken(payload); // All tokens are hashed using middleware in User.js!
+                const accessToken = generateAccessToken(payload);
                 
                 // add identifier to refreshToken for lookup (refer to /logout)
                 const id = crypto.randomUUID(); // 36 char string with negligible collision probability
@@ -151,7 +151,7 @@ router.post("/login", async (req, res) => {
                     ...payload,
                     tokenId: id
                 };
-                const refreshToken = jwt.sign(refresh_payload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: "7d" });
+                const refreshToken = jwt.sign(refresh_payload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: "7d" }); // refreshToken is hashed using schema middleware.
                 
                 // Extract expiry timestamp for aligned DB insert
                 const decoded = jwt.decode(refreshToken);
@@ -276,7 +276,7 @@ router.post("/token", async (req, res) => {
         }
 
         // Issue new access token
-        const newPayload = { sub };
+        const newPayload = { sub }; // only w/ subject (id)
         const accessToken = generateAccessToken(newPayload);
 
         res.json({ accessToken });
