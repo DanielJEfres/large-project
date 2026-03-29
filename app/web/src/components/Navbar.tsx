@@ -1,4 +1,4 @@
-import { useAuth } from '../context/AuthContext.tsx';
+import { useAuth } from "../context/AuthContext.tsx";
 import { Link } from "react-router";
 import { Bell, Plus } from "lucide-react";
 
@@ -20,26 +20,28 @@ export default function Navbar() {
         </div>
         {isLoggedIn ? (
           <div className="flex gap-5 items-center">
-            <button className="rounded-[20px] bg-[#F6F6F6] text-black px-4 py-2 font-inter font-medium flex items-center gap-2">
-              <Plus size={18} />
-              Create Event
-            </button>
+            <Link to="/create">
+              <button className="rounded-[20px] bg-[#F6F6F6] text-black px-4 py-2 font-inter font-medium flex items-center gap-2">
+                <Plus size={18} />
+                Create Event
+              </button>
+            </Link>
             <Bell size={22} />
             <div className="w-9 h-9 rounded-full bg-gray-300" />
           </div>
         ) : (
-        <div className="flex gap-5">
-          <Link to="/signup">
-            <button className="rounded-[20px] font-league bg-gray-100 px-4 py-2">
-              Sign up
-            </button>
-          </Link>
-          <Link to="/login">
-            <button className="rounded-[20px] font-league bg-black text-white px-4 py-2">
-              Log in
-            </button>
-          </Link>
-        </div>
+          <div className="flex gap-5">
+            <Link to="/signup">
+              <button className="rounded-[20px] font-league bg-gray-100 px-4 py-2">
+                Sign up
+              </button>
+            </Link>
+            <Link to="/login">
+              <button className="rounded-[20px] font-league bg-black text-white px-4 py-2">
+                Log in
+              </button>
+            </Link>
+          </div>
         )}
       </div>
     </>
