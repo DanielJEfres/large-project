@@ -52,6 +52,10 @@ const router = createBrowserRouter([
         path: "verify",
         element: <VerifyEmail />,
       },
+      {
+        path: "verify-email/:token",
+        element: <VerifyEmail />,
+      },
     ],
   },
 ]);

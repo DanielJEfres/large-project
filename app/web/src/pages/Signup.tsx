@@ -1,5 +1,5 @@
 import { useState, type ChangeEvent } from "react";
-import { Link } from "react-router";
+import { useNavigate, Link } from "react-router";
 import { X, Eye, EyeOff, Info } from "lucide-react";
 import Logo from "../components/Logo";
 import styles from "./Login.module.css";
@@ -14,6 +14,7 @@ type FormData = {
 };
 
 export default function Signup() {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     firstName: "",
@@ -95,9 +96,9 @@ export default function Signup() {
       }
 
       console.log("Success:", data);
-      alert("Signup successful wooo");
+      navigate("/verify");
     } catch (err: any) {
-      setError("Internal Server Error");
+      setError(err?.message || "Internal Server Error");
     }
   };
 

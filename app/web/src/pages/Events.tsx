@@ -9,7 +9,17 @@ import {
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { Link } from "react-router";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
+
+interface TrendingEvent {
+  _id: string;
+  title: string;
+  location: string;
+  startDate: string;
+  attendeeCount: number;
+  isRSO: boolean;
+  tags: string[];
+}
 
 interface UniversityEvent {
   id: string;
@@ -65,6 +75,7 @@ const EVENTS: UniversityEvent[] = [
   },
 ];
 export default function Events() {
+  const [trendingEvents, setTrendingEvents] = useState<TrendingEvent[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
 
   // Create Refs for the scrollable containers
@@ -95,6 +106,29 @@ export default function Events() {
     if (ref.current) {
       setScrolled(ref.current.scrollLeft > 20);
     }
+  };
+
+  useEffect(() => {
+    const fetchTrending = async () => {
+      try {
+        const response = await fetch(
+          "http://ec2-13-58-172-213.us-east-2.compute.amazonaws.com:5000/api/getEvents/getTrending",
+        );
+        const data = await response.json();
+        setTrendingEvents(data.events);
+      } catch (err) {
+        console.error("Failed to fetch trending:", err);
+      }
+    };
+    fetchTrending();
+  }, []);
+
+  const formatDate = (isoString: string) => {
+    return new Date(isoString).toLocaleDateString("en-US", {
+      weekday: "long",
+      month: "short",
+      day: "numeric",
+    });
   };
 
   return (
@@ -207,17 +241,20 @@ export default function Events() {
             <div className="flex flex-col gap-4 mt-12 group/carousel relative">
               <h2 className="text-2xl font-league">Trending</h2>
 
+              {/* Left Arrow */}
               {scrolledTrending && (
                 <button
                   onClick={() => scroll(trendingRef, "left")}
-                  className="absolute left-[-50px] top-1/2 bg-white p-2 rounded-full shadow-md z-20 hover:scale-110 transition-all"
+                  className="absolute left-[-50px] top-1/2 -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-20 hover:scale-110 transition-all cursor-pointer"
                 >
                   <ChevronLeft size={24} />
                 </button>
               )}
+
+              {/* Right Arrow */}
               <button
                 onClick={() => scroll(trendingRef, "right")}
-                className="absolute right-[-50px] top-1/2 bg-white p-2 rounded-full shadow-md z-20 hover:scale-110 transition-all"
+                className="absolute right-[-50px] top-1/2 -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-20 hover:scale-110 transition-all cursor-pointer"
               >
                 <ChevronRight size={24} />
               </button>
@@ -227,19 +264,32 @@ export default function Events() {
                 onScroll={() => handleScroll(trendingRef, setScrolledTrending)}
                 className="flex gap-10 overflow-x-auto scrollbar-hide scroll-smooth py-2"
               >
-                {EVENTS.map((event) => (
-                  <div key={event.id} className="shrink-0 group cursor-pointer">
-                    <div className="w-70 h-70 bg-gray/30 flex items-center justify-center rounded-2xl overflow-hidden group-hover:brightness-95 transition-all">
+                {trendingEvents.map((event) => (
+                  <div
+                    key={event._id}
+                    className="shrink-0 group cursor-pointer"
+                  >
+                    <div className="w-90 h-90 bg-gray/30 flex items-center justify-center rounded-2xl overflow-hidden group-hover:brightness-95 transition-all">
+                      {/* Fallback Icon since 'flyer' is null in your JSON */}
                       <Image size={40} className="text-gray/70" />
                     </div>
+
                     <div className="mt-2">
-                      <p className="font-bebas text-sm uppercase tracking-wider text-gray">
-                        {event.orgName}
-                      </p>
-                      <p className="font-semibold text-lg leading-tight">
+                      <div className="flex justify-between items-center">
+                        <p className="font-bebas text-sm uppercase tracking-wider text-brand">
+                          {event.isRSO ? "RSO Event" : "Community"}
+                        </p>
+                        <span className="text-[10px] font-bold text-gray-400">
+                          {event.attendeeCount} ATTENDING
+                        </span>
+                      </div>
+
+                      <p className="font-semibold text-lg leading-tight mt-1 h-12 line-clamp-2">
                         {event.title}
                       </p>
-                      <span className="text-sm text-gray">{event.date}</span>
+                      <span className="text-sm text-gray">
+                        {formatDate(event.startDate)}
+                      </span>
                     </div>
                   </div>
                 ))}

@@ -1,5 +1,5 @@
 import React, { useState, type ChangeEvent } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { X, Eye, EyeOff, Info } from "lucide-react";
 import styles from "./Login.module.css";
 import Logo from "../components/Logo.tsx";
@@ -11,6 +11,7 @@ interface LoginFormData {
 }
 
 export default function Login() {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string>("");
   const [formData, setFormData] = useState<LoginFormData>({
@@ -64,13 +65,22 @@ export default function Login() {
       const data = await response.json();
 
       if (!response.ok) {
+        if (response.status === 403) {
+          setError(data.message || "Email not verified.");
+          navigate("/verify");
+          return;
+        }
         throw new Error(data.message || "Something went wrong");
       }
 
       console.log("Success:", data);
-      alert("Login successful wooo");
+      if (data.isVerified) {
+        navigate("/events");
+      } else {
+        navigate("/verify");
+      }
     } catch (err: any) {
-      setError("Internal Server Error");
+      setError(err?.message || "Internal Server Error");
     }
   };
 
