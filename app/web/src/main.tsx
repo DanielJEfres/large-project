@@ -11,6 +11,7 @@ import Event from "./pages/Event.tsx";
 import Organizations from "./pages/Organizations.tsx";
 import { AuthProvider } from "./context/AuthContext";
 import CreateEvent from "./pages/CreateEvent.tsx";
+import VerifyEmail from "./pages/VerifyEmail.tsx";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -43,8 +44,13 @@ const router = createBrowserRouter([
       },
 
       {
-        path:"create",
+        path: "create",
         element: <CreateEvent />,
+      },
+
+      {
+        path: "verify",
+        element: <VerifyEmail />,
       },
     ],
   },
