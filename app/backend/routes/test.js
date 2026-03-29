@@ -1,8 +1,10 @@
 import express from 'express'
+import authenticateToken from '../middleware/authenticateToken.js'
 
 const router = express.Router()
 
-router.get('/', (req, res) => {
+router.get('/', authenticateToken, (req, res) => {
+  console.log(req.user.sub)
   res.status(200).json({
     message: 'API is online',
     docs: '/api-docs',

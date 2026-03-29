@@ -131,7 +131,7 @@ router.post("/login", async (req, res) => {
             // match password
             if (await user.matchPassword(password)){
                 // user has been validated! JWT below
-                const payload = { id: user._id.toString() }
+                const payload = { sub: user._id.toString() } // sub is standard "subject" claim for identity (user._id)
                 
                 // serialize our user id using access token in ENV
                 const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET)
