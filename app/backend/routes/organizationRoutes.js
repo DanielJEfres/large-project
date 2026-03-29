@@ -54,16 +54,36 @@ router.post('/create', async(req, res) => {
     }
 })
 
-//Get All Organization (name, description, and category)
+//Get all organizations OR partial search organizaitons (name, description, and category)
 router.get('/', async (req, res) => {
 
     try {
 
-        const organizations = await Organization.find().select('name description category')
+        const { name } = req.query
 
-        if(!organizations) return res.status(500).json({message:" Error Getting Organization"})
+        let organizations = null
+        
+        //Get Organizations by name
+        if(name){
 
-        return res.status(200).json({Organizations: organizations})
+            const regex = new RegExp(name, "i")
+            organizations = await Organization.find({
+                name: {$regex: regex}
+            }).select('name description category')
+
+
+            return res.status(200).json({Organizations:organizations})
+
+        //Get All Organizations
+        } else {
+
+            organizations = await Organization.find().select('name description category')
+
+            if(!organizations) return res.status(500).json({message:" Error Getting Organization"})
+
+            return res.status(200).json({Organizations: organizations})
+
+        }
 
     } catch(error) {
         console.log(error)
