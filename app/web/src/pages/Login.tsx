@@ -75,8 +75,8 @@ export default function Login() {
     }
   };
 
-  /*const isFieldError = (fieldKeyword: string) =>
-    error.toLowerCase().includes(fieldKeyword.toLowerCase()); */
+  const isFieldError = (fieldKeyword: string) =>
+    error.toLowerCase().includes(fieldKeyword.toLowerCase()); 
 
   return (
     <>

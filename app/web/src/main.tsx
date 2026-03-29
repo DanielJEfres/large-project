@@ -9,7 +9,8 @@ import Home from "./pages/Home.tsx";
 import Events from "./pages/Events.tsx";
 import Event from "./pages/Event.tsx";
 import Organizations from "./pages/Organizations.tsx";
-
+import { AuthProvider } from "./context/AuthContext";
+import CreateEvent from "./pages/CreateEvent.tsx";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -40,12 +41,19 @@ const router = createBrowserRouter([
         path: "organizations",
         element: <Organizations />,
       },
+
+      {
+        path:"create",
+        element: <CreateEvent />,
+      },
     ],
   },
 ]);
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   </StrictMode>,
 );

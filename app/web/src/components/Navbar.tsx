@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useAuth } from '../context/AuthContext.tsx';
 import { Link } from "react-router";
+import { Bell, Plus } from "lucide-react";
 
 export default function Navbar() {
-  const [showSignup, setShowSignup] = useState(false);
+  const { isLoggedIn } = useAuth();
 
-  // add some logic to not show sign up + log in when user is logged in (prolly thru context hook)
   return (
     <>
       {/* Nav */}
@@ -18,7 +18,16 @@ export default function Navbar() {
           </Link>
           <p className="font-league">Tickets</p>
         </div>
-
+        {isLoggedIn ? (
+          <div className="flex gap-5 items-center">
+            <button className="rounded-[20px] bg-[#F6F6F6] text-black px-4 py-2 font-inter font-medium flex items-center gap-2">
+              <Plus size={18} />
+              Create Event
+            </button>
+            <Bell size={22} />
+            <div className="w-9 h-9 rounded-full bg-gray-300" />
+          </div>
+        ) : (
         <div className="flex gap-5">
           <Link to="/signup">
             <button className="rounded-[20px] font-league bg-gray-100 px-4 py-2">
@@ -31,6 +40,7 @@ export default function Navbar() {
             </button>
           </Link>
         </div>
+        )}
       </div>
     </>
   );
