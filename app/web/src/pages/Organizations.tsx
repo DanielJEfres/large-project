@@ -1,6 +1,7 @@
 import { ChevronRight, Image, Search, Tag } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { Link } from "react-router";
+import { useState } from "react";
 
 interface Organization {
   id: string;
@@ -34,6 +35,7 @@ const ORGS: Organization[] = [
 ];
 
 export default function Organizations() {
+  const [organizations, setOrganizations] = useState([]);
   return (
     <>
       <Navbar />

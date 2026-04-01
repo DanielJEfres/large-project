@@ -11,72 +11,50 @@ import Navbar from "../components/Navbar";
 import { Link } from "react-router";
 import { useRef, useState, useEffect } from "react";
 import { SERVER_IP } from "../config";
-
-interface TrendingEvent {
-  _id: string;
-  title: string;
-  location: string;
-  startDate: string;
-  attendeeCount: number;
-  isRSO: boolean;
-  tags: string[];
-}
-
-interface UniversityEvent {
-  id: string;
-  orgName: string;
-  title: string;
-  date: string;
-  location: string;
-  tags: string[];
-}
+import type { UniversityEvent } from "../types/UniversityEvent";
 
 const EVENTS: UniversityEvent[] = [
   {
-    id: "e1",
-    orgName: "TECH BUILDERS",
+    _id: "e1",
     title: "Hackathon 2026",
-    date: "Tomorrow, 10:00 AM",
+    description: "A 24-hour coding marathon.",
     location: "Student Union Hall",
-    tags: ["Coding", "Free Food"],
+    startDate: "2026-04-01T10:00:00Z",
+    endDate: "2026-04-02T10:00:00Z",
+    organizationId: "org123",
+    createdBy: "user456",
+    tags: ["65d1a...", "65d1b..."], // These would be Tag ObjectIds
+    attendees: [],
+    isRSO: true,
+    flyer: null,
+    status: "upcoming",
+    isPublic: true,
+    rsvpEnabled: true,
+    rsvpLimit: 100,
   },
   {
-    id: "e2",
-    orgName: "DESIGN COLLECTIVE",
+    _id: "e2",
     title: "Figma Workshop",
-    date: "Friday, 4:00 PM",
+    description: "Learn the basics of UI/UX design.",
     location: "Design Lab B",
-    tags: ["UI/UX", "Workshop"],
-  },
-  {
-    id: "e3",
-    orgName: "DESIGN COLLECTIVE",
-    title: "Figma Workshop",
-    date: "Friday, 4:00 PM",
-    location: "Design Lab B",
-    tags: ["UI/UX", "Workshop"],
-  },
-
-  {
-    id: "e3",
-    orgName: "DESIGN COLLECTIVE",
-    title: "Figma Workshop",
-    date: "Friday, 4:00 PM",
-    location: "Design Lab B",
-    tags: ["UI/UX", "Workshop"],
-  },
-
-  {
-    id: "e3",
-    orgName: "DESIGN COLLECTIVE",
-    title: "Figma Workshop",
-    date: "Friday, 4:00 PM",
-    location: "Design Lab B",
-    tags: ["UI/UX", "Workshop"],
+    startDate: "2026-04-03T16:00:00Z",
+    endDate: null,
+    organizationId: "org789",
+    createdBy: "user456",
+    tags: ["65d1c..."],
+    attendees: [],
+    isRSO: false,
+    flyer: null,
+    status: "upcoming",
+    isPublic: true,
+    rsvpEnabled: false,
+    rsvpLimit: null,
   },
 ];
+
 export default function Events() {
-  const [trendingEvents, setTrendingEvents] = useState<TrendingEvent[]>([]);
+  const [trendingEvents, setTrendingEvents] = useState<UniversityEvent[]>([]);
+  const [upcomingEvents, setUpcomingEvents] = useState<UniversityEvent[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
 
   // Create Refs for the scrollable containers
@@ -120,6 +98,22 @@ export default function Events() {
       }
     };
     fetchTrending();
+  }, []);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const upcomingRes = await fetch(
+          `${SERVER_IP}/api/getEvents/getUpcoming`,
+        );
+        const upcomingData = await upcomingRes.json();
+        setUpcomingEvents(upcomingData.events);
+      } catch (err) {
+        console.error("Failed to fetch events:", err);
+      }
+    };
+
+    fetchEvents();
   }, []);
 
   const formatDate = (isoString: string) => {
@@ -192,33 +186,33 @@ export default function Events() {
                 onScroll={() => handleScroll(forYouRef, setScrolledForYou)}
                 className="flex gap-10 overflow-x-auto scrollbar-hide scroll-smooth py-2"
               >
-                {EVENTS.map((event) => (
+                {upcomingEvents.map((event) => (
                   <div
-                    key={event.id}
-                    className="h-60 min-w-fit flex border-gray/20 border-1 rounded-2xl overflow-hidden bg-white shrink-0 hover:shadow-md transition-shadow"
+                    key={event._id}
+                    className="h-max-fit min-w-fit flex border-gray/20 border-1 rounded-2xl overflow-hidden bg-white shrink-0 hover:shadow-md transition-shadow"
                   >
                     <div className="w-60 h-full bg-gray/30 flex items-center justify-center shrink-0">
                       <Image size={40} className="text-gray/70" />
                     </div>
                     <div className="w-60 px-5 py-3 relative flex flex-col">
                       <p className="font-bebas text-sm uppercase tracking-wider">
-                        {event.orgName}
+                        {event.organizationId}
                       </p>
-                      <p className="font-semibold text-lg leading-tight mt-1">
+                      <p className="font-semibold text-lg leading-tight mt-1 line-clamp-2 ">
                         {event.title}
                       </p>
                       <div className="mt-2 space-y-1 text-gray-700">
                         <div className="flex items-center gap-2 text-sm">
                           <Calendar size={14} />
-                          <span>{event.date}</span>
+                          <span>{formatDate(event.startDate)}</span>
                         </div>
                         <div className="flex items-center gap-2 text-sm">
                           <MapPin size={14} />
-                          <span>{event.location}</span>
+                          <span>{event.location || "Location TBD"}</span>
                         </div>
                       </div>
                       <div className="flex flex-wrap gap-1 mt-3">
-                        {event.tags.map((tag) => (
+                        {event.tags?.slice(0, 2).map((tag) => (
                           <span
                             key={tag}
                             className="px-3 py-1 bg-brand/40 text-[10px] font-bold uppercase text-black rounded-full"
@@ -228,8 +222,8 @@ export default function Events() {
                         ))}
                       </div>
                       <Link
-                        to={`/event/${event.id}`}
-                        className="ml-auto mt-auto font-semibold flex items-center gap-2 hover:text-brand transition-colors"
+                        to={`/event/${event._id}`}
+                        className="pt-6 mt-auto  font-semibold flex items-center justify-end gap-2 text-black hover:text-brand transition-colors"
                       >
                         Learn More <ChevronRight width={17} />
                       </Link>
@@ -243,7 +237,6 @@ export default function Events() {
             <div className="flex flex-col gap-4 mt-12 group/carousel relative">
               <h2 className="text-2xl font-league">Trending</h2>
 
-              {/* Left Arrow */}
               {scrolledTrending && (
                 <button
                   onClick={() => scroll(trendingRef, "left")}
@@ -253,7 +246,6 @@ export default function Events() {
                 </button>
               )}
 
-              {/* Right Arrow */}
               <button
                 onClick={() => scroll(trendingRef, "right")}
                 className="absolute right-[-50px] top-1/2 -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-20 hover:scale-110 transition-all cursor-pointer"
@@ -272,21 +264,19 @@ export default function Events() {
                     className="shrink-0 group cursor-pointer"
                   >
                     <div className="w-80 h-80 bg-gray/30 flex items-center justify-center rounded-2xl overflow-hidden group-hover:brightness-95 transition-all">
-                      {/* Fallback Icon since 'flyer' is null in your JSON */}
                       <Image size={40} className="text-gray/70" />
                     </div>
 
                     <div className="mt-2 max-w-80">
                       <div className="flex justify-between items-center">
                         <p className="font-bebas text-sm uppercase tracking-wider text-brand">
-                          {event.isRSO ? "RSO Event" : "Community"}
+                          {event.organizationId}
                         </p>
                         <span className="text-[10px] font-bold text-gray-400">
-                          {event.attendeeCount} ATTENDING
+                          {event.attendees.length} ATTENDING
                         </span>
                       </div>
 
-                      {/* h-12 if i wanna match it all */}
                       <p className="font-semibold text-lg leading-tight mt-1 line-clamp-2">
                         {event.title}
                       </p>
@@ -303,20 +293,18 @@ export default function Events() {
               <h2 className="text-2xl font-league">Upcoming Events</h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-                {EVENTS.map((event) => (
+                {upcomingEvents.map((event) => (
                   <div
-                    key={event.id}
+                    key={event._id}
                     className="flex flex-col border-gray/20 border-1 rounded-2xl overflow-hidden bg-white hover:shadow-lg transition-all"
                   >
-                    {/* Image on Top */}
                     <div className="w-full h-48 bg-gray/30 flex items-center justify-center shrink-0">
                       <Image size={40} className="text-gray/70" />
                     </div>
 
-                    {/* Text Content */}
                     <div className="p-5 flex flex-col flex-1">
                       <p className="font-bebas text-sm uppercase tracking-wider ">
-                        {event.orgName}
+                        {event.organizationId}
                       </p>
 
                       <p className="font-semibold text-lg leading-tight mt-1">
@@ -326,17 +314,18 @@ export default function Events() {
                       <div className="mt-3 space-y-1 text-gray-700">
                         <div className="flex items-center gap-2 text-sm">
                           <Calendar size={14} className="shrink-0" />
-                          <span>{event.date}</span>
+                          <span>{formatDate(event.startDate)}</span>
                         </div>
                         <div className="flex items-center gap-2 text-sm">
                           <MapPin size={14} className="shrink-0" />
-                          <span className="line-clamp-1">{event.location}</span>
+                          <span className="line-clamp-1">
+                            {event.location || "Location TBD"}
+                          </span>
                         </div>
                       </div>
 
-                      {/* Tags */}
                       <div className="flex flex-wrap gap-1 mt-4">
-                        {event.tags.slice(0, 2).map((tag) => (
+                        {event.tags?.slice(0, 2).map((tag) => (
                           <span
                             key={tag}
                             className="px-3 py-1 bg-brand/40 text-[10px] font-bold uppercase text-black rounded-full"
@@ -346,10 +335,9 @@ export default function Events() {
                         ))}
                       </div>
 
-                      {/* Button */}
                       <Link
-                        to={`/event/${event.id}`}
-                        className="mt-6 font-semibold flex items-center justify-end gap-2 text-black hover:text-brand transition-colors"
+                        to={`/event/${event._id}`}
+                        className="mt-auto pt-6 font-semibold flex items-center justify-end gap-2 text-black hover:text-brand transition-colors"
                       >
                         Learn More <ChevronRight width={17} />
                       </Link>
@@ -364,68 +352,68 @@ export default function Events() {
             <div className="mt-12">
               <h2 className="text-2xl font-league mb-6">Search Results</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-                {EVENTS.filter(
-                  (event) =>
-                    event.title
-                      .toLowerCase()
-                      .includes(searchQuery.toLowerCase()) ||
-                    event.orgName
-                      .toLowerCase()
-                      .includes(searchQuery.toLowerCase()),
-                ).map((event) => (
-                  /* ... Use the same Vertical Card layout here ... */
-                  <div
-                    key={event.id}
-                    className="flex flex-col border-gray/20 border-1 rounded-2xl overflow-hidden bg-white hover:shadow-lg transition-all"
-                  >
-                    {/* Image on Top */}
-                    <div className="w-full h-48 bg-gray/30 flex items-center justify-center shrink-0">
-                      <Image size={40} className="text-gray/70" />
-                    </div>
-
-                    {/* Text Content */}
-                    <div className="p-5 flex flex-col flex-1">
-                      <p className="font-bebas text-sm uppercase tracking-wider ">
-                        {event.orgName}
-                      </p>
-
-                      <p className="font-semibold text-lg leading-tight mt-1">
-                        {event.title}
-                      </p>
-
-                      <div className="mt-3 space-y-1 text-gray-700">
-                        <div className="flex items-center gap-2 text-sm">
-                          <Calendar size={14} className="shrink-0" />
-                          <span>{event.date}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm">
-                          <MapPin size={14} className="shrink-0" />
-                          <span className="line-clamp-1">{event.location}</span>
-                        </div>
+                {upcomingEvents
+                  .filter(
+                    (event) =>
+                      event.title
+                        .toLowerCase()
+                        .includes(searchQuery.toLowerCase()) ||
+                      (event.description &&
+                        event.description
+                          .toLowerCase()
+                          .includes(searchQuery.toLowerCase())),
+                  )
+                  .map((event) => (
+                    <div
+                      key={event._id}
+                      className="flex flex-col border-gray/20 border-1 rounded-2xl overflow-hidden bg-white hover:shadow-lg transition-all"
+                    >
+                      <div className="w-full h-48 bg-gray/30 flex items-center justify-center shrink-0">
+                        <Image size={40} className="text-gray/70" />
                       </div>
 
-                      {/* Tags */}
-                      <div className="flex flex-wrap gap-1 mt-4">
-                        {event.tags.slice(0, 2).map((tag) => (
-                          <span
-                            key={tag}
-                            className="px-3 py-1 bg-brand/40 text-[10px] font-bold uppercase text-black rounded-full"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
+                      <div className="p-5 flex flex-col flex-1">
+                        <p className="font-bebas text-sm uppercase tracking-wider ">
+                          {event.organizationId}
+                        </p>
 
-                      {/* Button */}
-                      <Link
-                        to={`/event/${event.id}`}
-                        className="mt-6 font-semibold flex items-center justify-end gap-2 text-black hover:text-brand transition-colors"
-                      >
-                        Learn More <ChevronRight width={17} />
-                      </Link>
+                        <p className="font-semibold text-lg leading-tight mt-1">
+                          {event.title}
+                        </p>
+
+                        <div className="mt-3 space-y-1 text-gray-700">
+                          <div className="flex items-center gap-2 text-sm">
+                            <Calendar size={14} className="shrink-0" />
+                            <span>{formatDate(event.startDate)}</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-sm">
+                            <MapPin size={14} className="shrink-0" />
+                            <span className="line-clamp-1">
+                              {event.location || "Location TBD"}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-wrap gap-1 mt-4">
+                          {event.tags?.slice(0, 2).map((tag) => (
+                            <span
+                              key={tag}
+                              className="px-3 py-1 bg-brand/40 text-[10px] font-bold uppercase text-black rounded-full"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+
+                        <Link
+                          to={`/event/${event._id}`}
+                          className="mt-6 font-semibold flex items-center justify-end gap-2 text-black hover:text-brand transition-colors"
+                        >
+                          Learn More <ChevronRight width={17} />
+                        </Link>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
               </div>
             </div>
           </>
