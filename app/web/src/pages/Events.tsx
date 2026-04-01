@@ -12,6 +12,7 @@ import { Link } from "react-router";
 import { useRef, useState, useEffect } from "react";
 import { SERVER_IP } from "../config";
 import type { UniversityEvent } from "../types/UniversityEvent";
+import { formatStackedDate } from "../utils/date";
 
 const EVENTS: UniversityEvent[] = [
   {
@@ -116,14 +117,6 @@ export default function Events() {
     fetchEvents();
   }, []);
 
-  const formatDate = (isoString: string) => {
-    return new Date(isoString).toLocaleDateString("en-US", {
-      weekday: "long",
-      month: "short",
-      day: "numeric",
-    });
-  };
-
   return (
     <>
       <Navbar />
@@ -204,7 +197,11 @@ export default function Events() {
                       <div className="mt-2 space-y-1 text-gray-700">
                         <div className="flex items-center gap-2 text-sm">
                           <Calendar size={14} />
-                          <span>{formatDate(event.startDate)}</span>
+                          <span>
+                            {formatStackedDate(event.startDate).day +
+                              ", " +
+                              formatStackedDate(event.startDate).date}
+                          </span>
                         </div>
                         <div className="flex items-center gap-2 text-sm">
                           <MapPin size={14} />
@@ -282,7 +279,11 @@ export default function Events() {
                           {event.title}
                         </p>
                         <span className="text-sm text-gray">
-                          {formatDate(event.startDate)}
+                          <span>
+                            {formatStackedDate(event.startDate).day +
+                              ", " +
+                              formatStackedDate(event.startDate).date}
+                          </span>
                         </span>
                       </div>
                     </div>
@@ -316,7 +317,11 @@ export default function Events() {
                       <div className="mt-3 space-y-1 text-gray-700">
                         <div className="flex items-center gap-2 text-sm">
                           <Calendar size={14} className="shrink-0" />
-                          <span>{formatDate(event.startDate)}</span>
+                          <span>
+                            {formatStackedDate(event.startDate).day +
+                              ", " +
+                              formatStackedDate(event.startDate).date}
+                          </span>
                         </div>
                         <div className="flex items-center gap-2 text-sm">
                           <MapPin size={14} className="shrink-0" />
@@ -386,7 +391,11 @@ export default function Events() {
                         <div className="mt-3 space-y-1 text-gray-700">
                           <div className="flex items-center gap-2 text-sm">
                             <Calendar size={14} className="shrink-0" />
-                            <span>{formatDate(event.startDate)}</span>
+                            <span>
+                              {formatStackedDate(event.startDate).day +
+                                ", " +
+                                formatStackedDate(event.startDate).date}
+                            </span>
                           </div>
                           <div className="flex items-center gap-2 text-sm">
                             <MapPin size={14} className="shrink-0" />

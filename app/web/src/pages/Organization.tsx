@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import type { Organization } from "../types/Organizations";
 import { SERVER_IP } from "../config";
 import type { UniversityEvent } from "../types/UniversityEvent";
+import { formatStackedDate } from "../utils/date";
 
 export default function Organization() {
   const { orgId } = useParams();
@@ -85,9 +86,26 @@ export default function Organization() {
 
               <div className="flex gap-4">
                 {/* external link + socials */}
-                <div className="h-10 w-10 bg-lightgray rounded flex items-center justify-center cursor-pointer hover:bg-brand/20 transition-colors"></div>
-                <div className="h-10 w-10 bg-lightgray rounded flex items-center justify-center cursor-pointer hover:bg-brand/20 transition-colors"></div>
-                <div className="h-10 w-10 bg-lightgray rounded flex items-center justify-center cursor-pointer hover:bg-brand/20 transition-colors"></div>
+
+                {org.socialLinks.website && (
+                  <div className="h-10 w-10 bg-lightgray rounded flex items-center justify-center cursor-pointer hover:bg-brand/20 transition-colors"></div>
+                )}
+
+                {org.socialLinks.instagram && (
+                  <div className="h-10 w-10 bg-lightgray rounded flex items-center justify-center cursor-pointer hover:bg-brand/20 transition-colors"></div>
+                )}
+
+                {org.socialLinks.discord && (
+                  <div className="h-10 w-10 bg-lightgray rounded flex items-center justify-center cursor-pointer hover:bg-brand/20 transition-colors"></div>
+                )}
+
+                {org.socialLinks.linkedin && (
+                  <div className="h-10 w-10 bg-lightgray rounded flex items-center justify-center cursor-pointer hover:bg-brand/20 transition-colors"></div>
+                )}
+
+                {org.socialLinks.linktree && (
+                  <div className="h-10 w-10 bg-lightgray rounded flex items-center justify-center cursor-pointer hover:bg-brand/20 transition-colors"></div>
+                )}
               </div>
             </div>
 
@@ -123,9 +141,13 @@ export default function Organization() {
 
                     <div className="flex-col px-6 py-4 flex relative w-full">
                       <div className="text-xs bg-white  relative w-fit flex gap-2 px-2.5 py-1  rounded-full -left-2.25">
-                        <p className="font-bold ">March 17</p>
+                        <p className="font-bold ">
+                          {formatStackedDate(event.startDate).date}
+                        </p>
 
-                        <p className="text-gray font-semibold ">Tomorrow</p>
+                        <p className="text-gray font-semibold ">
+                          {formatStackedDate(event.startDate).day}
+                        </p>
                       </div>
                       <h3 className="font-semibold text-lg leading-tight mt-2">
                         {event.title}

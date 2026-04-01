@@ -4,6 +4,7 @@ import { Link, useParams } from "react-router";
 import { useEffect, useState } from "react";
 import { SERVER_IP } from "../config";
 import type { UniversityEvent } from "../types/UniversityEvent";
+import { formatStackedDate } from "../utils/date";
 
 export default function Event() {
   const { eventId } = useParams();
@@ -27,15 +28,6 @@ export default function Event() {
 
   if (loading) return <div className="p-20 font-league">Loading...</div>;
   if (!event) return <div className="p-20 font-league">Event not found.</div>;
-
-  const formatDate = (isoString: string) => {
-    return new Date(isoString).toLocaleDateString("en-US", {
-      weekday: "long",
-      month: "long",
-      day: "numeric",
-      year: "numeric",
-    });
-  };
 
   return (
     <>
@@ -72,7 +64,9 @@ export default function Event() {
                       Date
                     </p>
                     <p className=" font-medium text-black">
-                      {formatDate(event.startDate)}
+                      {formatStackedDate(event.startDate).day +
+                        ", " +
+                        formatStackedDate(event.startDate).date}
                     </p>
                   </div>
 
