@@ -1,62 +1,42 @@
 import { Calendar, ChevronRight, MapPin, Share } from "lucide-react";
 import Navbar from "../components/Navbar";
-import { Link } from "react-router";
-
-interface UniversityEvent {
-  id: string;
-  orgName: string;
-  title: string;
-  date: string;
-  location: string;
-  tags: string[];
-}
-
-const EVENTS: UniversityEvent[] = [
-  {
-    id: "e1",
-    orgName: "TECH BUILDERS",
-    title: "Hackathon 2026",
-    date: "Tomorrow, 10:00 AM",
-    location: "Student Union Hall",
-    tags: ["Coding", "Free Food"],
-  },
-  {
-    id: "e2",
-    orgName: "DESIGN COLLECTIVE",
-    title: "Figma Workshop",
-    date: "Friday, 4:00 PM",
-    location: "Design Lab B",
-    tags: ["UI/UX", "Workshop"],
-  },
-  {
-    id: "e3",
-    orgName: "DESIGN COLLECTIVE",
-    title: "Figma Workshop",
-    date: "Friday, 4:00 PM",
-    location: "Design Lab B",
-    tags: ["UI/UX", "Workshop"],
-  },
-
-  {
-    id: "e3",
-    orgName: "DESIGN COLLECTIVE",
-    title: "Figma Workshop",
-    date: "Friday, 4:00 PM",
-    location: "Design Lab B",
-    tags: ["UI/UX", "Workshop"],
-  },
-
-  {
-    id: "e3",
-    orgName: "DESIGN COLLECTIVE",
-    title: "Figma Workshop",
-    date: "Friday, 4:00 PM",
-    location: "Design Lab B",
-    tags: ["UI/UX", "Workshop"],
-  },
-];
+import { Link, useParams } from "react-router";
+import { useEffect, useState } from "react";
+import type { Organization } from "../types/Organizations";
+import { SERVER_IP } from "../config";
+import type { UniversityEvent } from "../types/UniversityEvent";
 
 export default function Organization() {
+  const { orgId } = useParams();
+  const [org, setOrg] = useState<Organization | null>(null);
+  const [events, setEvents] = useState<UniversityEvent[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchOrgAndEvents = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`${SERVER_IP}/api/organizations/${orgId}`);
+        const data = await response.json();
+
+        if (data.Organization) {
+          setOrg(data.Organization);
+          setEvents(data.Events || []);
+        }
+      } catch (err) {
+        console.error("Error fetching organization details:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (orgId) fetchOrgAndEvents();
+  }, [orgId]);
+
+  if (loading) return <div className="p-20 font-league">Loading...</div>;
+  if (!org)
+    return <div className="p-20 font-league">Organization not found.</div>;
+
   return (
     <>
       <Navbar />
@@ -84,16 +64,14 @@ export default function Organization() {
 
             {/* org title */}
             <h1 className="text-5xl font-bebas mt-6 tracking-wide">
-              Organization Title
+              {org.name}
             </h1>
 
             {/* description */}
 
             <div className="mt-4 max-w-3xl">
               <p className="font-league text-lg text-gray-700 leading-relaxed">
-                This organization is dedicated to promoting civic engagement and
-                education on various social topics to the UCF student body
-                through educational and service projects.{" "}
+                {org.description}
                 <span className="text-black font-semibold cursor-pointer">
                   ...more
                 </span>
@@ -131,9 +109,9 @@ export default function Organization() {
               {/* events go here */}
 
               <div className="p-10 flex flex-col gap-6">
-                {EVENTS.map((event) => (
+                {events.map((event) => (
                   <div
-                    key={event.id}
+                    key={event._id}
                     className="w-full h-56  rounded-2xl flex overflow-hidden  bg-gray-100 "
                   >
                     {/* bg img */}
@@ -182,7 +160,7 @@ export default function Organization() {
                         </div>
 
                         <Link
-                          to={`/event/${event.id}`}
+                          to={`/event/${event._id}`}
                           className="ml-auto mt-auto font-semibold flex items-center gap-2 hover:text-brand transition-colors"
                         >
                           <button className="flex gap-2 cursor-pointer">

@@ -259,32 +259,34 @@ export default function Events() {
                 className="flex gap-10 overflow-x-auto scrollbar-hide scroll-smooth py-2"
               >
                 {trendingEvents.map((event) => (
-                  <div
-                    key={event._id}
-                    className="shrink-0 group cursor-pointer"
-                  >
-                    <div className="w-80 h-80 bg-gray/30 flex items-center justify-center rounded-2xl overflow-hidden group-hover:brightness-95 transition-all">
-                      <Image size={40} className="text-gray/70" />
-                    </div>
-
-                    <div className="mt-2 max-w-80">
-                      <div className="flex justify-between items-center">
-                        <p className="font-bebas text-sm uppercase tracking-wider text-brand">
-                          {event.organizationId}
-                        </p>
-                        <span className="text-[10px] font-bold text-gray-400">
-                          {event.attendees.length} ATTENDING
-                        </span>
+                  <Link to={`/event/${event._id}`}>
+                    <div
+                      key={event._id}
+                      className="shrink-0 group cursor-pointer"
+                    >
+                      <div className="w-80 h-80 bg-gray/30 flex items-center justify-center rounded-2xl overflow-hidden group-hover:brightness-95 transition-all">
+                        <Image size={40} className="text-gray/70" />
                       </div>
 
-                      <p className="font-semibold text-lg leading-tight mt-1 line-clamp-2">
-                        {event.title}
-                      </p>
-                      <span className="text-sm text-gray">
-                        {formatDate(event.startDate)}
-                      </span>
+                      <div className="mt-2 max-w-80">
+                        <div className="flex justify-between items-center">
+                          <p className="font-bebas text-sm uppercase tracking-wider text-brand">
+                            {event.organizationId}
+                          </p>
+                          <span className="text-[10px] font-bold text-gray-400">
+                            {event.attendees.length} ATTENDING
+                          </span>
+                        </div>
+
+                        <p className="font-semibold text-lg leading-tight mt-1 line-clamp-2">
+                          {event.title}
+                        </p>
+                        <span className="text-sm text-gray">
+                          {formatDate(event.startDate)}
+                        </span>
+                      </div>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </div>

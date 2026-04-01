@@ -1,41 +1,48 @@
-import { ChevronRight, Image, Search, Tag } from "lucide-react";
+import { ChevronRight, Image, Search } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { Link } from "react-router";
-import { useState } from "react";
-
-interface Organization {
-  id: string;
-  name: string;
-  description: string;
-  tags: string[];
-}
-
-// Hardcoded Data
-const ORGS: Organization[] = [
-  {
-    id: "1",
-    name: "Tech Builders",
-    description:
-      "A community for student developers to build cool projects together.",
-    tags: ["Coding", "Project-Based"],
-  },
-  {
-    id: "2",
-    name: "Design Collective",
-    description: "Exploring UI/UX and graphic design through weekly workshops.",
-    tags: ["Creative", "Design"],
-  },
-  {
-    id: "3",
-    name: "Business Bond",
-    description:
-      "Networking and professional development for future entrepreneurs.",
-    tags: ["Networking", "Professional"],
-  },
-];
+import { useEffect, useState } from "react";
+import { SERVER_IP } from "../config";
+import type { Organization } from "../types/Organizations";
 
 export default function Organizations() {
-  const [organizations, setOrganizations] = useState([]);
+  const [organizations, setOrganizations] = useState<Organization[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  const fetchOrganizations = async (name = "") => {
+    try {
+      setLoading(true);
+      // Using your backend route: GET /api/organizations?name=...
+      const url = name
+        ? `${SERVER_IP}/api/organizations?name=${encodeURIComponent(name)}`
+        : `${SERVER_IP}/api/organizations`;
+
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (data.Organizations) {
+        setOrganizations(data.Organizations);
+      }
+    } catch (err) {
+      console.error("Failed to fetch organizations:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch all on mount
+  useEffect(() => {
+    fetchOrganizations();
+  }, []);
+
+  // Handle search with a simple trigger (or you could debounce this)
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    fetchOrganizations(value);
+  };
+
   return (
     <>
       <Navbar />
@@ -50,66 +57,81 @@ export default function Organizations() {
           <input
             className="font-league w-full rounded-2xl bg-lightgray py-3 pl-12 pr-4 outline-none text-black"
             placeholder="Search Organizations"
+            value={searchQuery}
+            onChange={handleSearchChange}
           />
         </div>
 
         {/* The Grid Layout */}
-        <div className="grid grid-row-1  gap-6">
-          {ORGS.map((org) => (
-            <div
-              key={org.id}
-              className="rounded-2xl bg-white border border-lightgray hover:border-gray-300 transition-all overflow-hidden flex h-50"
-            >
-              {/* Image */}
-              <div className="w-70 bg-gray/30 flex items-center justify-center shrink-0">
-                {/* This is a placeholder */}
-                <Image size={40} className="text-gray/70" />
-              </div>
-
-              {/* The Content (Right Side) */}
-              <div className="p-6 w-2/3 flex flex-col justify-between">
-                <div>
-                  <h2 className="text-2xl font-bebas mb-2 line-clamp-1">
-                    {org.name}
-                  </h2>
-                  <p className="text-gray text-sm mb-4 line-clamp-3">
-                    {org.description}
-                  </p>
+        <div className="grid grid-row-1 gap-6">
+          {loading && organizations.length === 0 ? (
+            <div className="font-league p-10">Loading organizations...</div>
+          ) : (
+            organizations.map((org) => (
+              <div
+                key={org._id}
+                className="rounded-2xl bg-white border border-lightgray hover:border-gray-300 transition-all overflow-hidden flex h-50"
+              >
+                {/* Image */}
+                <div className="w-70 bg-gray/30 flex items-center justify-center shrink-0">
+                  {org.logo ? (
+                    <img
+                      src={org.logo}
+                      alt={org.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <Image size={40} className="text-gray/70" />
+                  )}
                 </div>
 
-                {/* Tags */}
+                {/* The Content (Right Side) */}
+                <div className="p-6 w-2/3 flex flex-col justify-between">
+                  <div>
+                    <h2 className="text-2xl font-bebas mb-2 line-clamp-1">
+                      {org.name}
+                    </h2>
+                    <p className="text-gray text-sm mb-4 line-clamp-3">
+                      {org.description || "No description provided."}
+                    </p>
+                  </div>
 
-                <div className="flex flex-wrap gap-2 pt-2">
-                  {org.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="flex items-center gap-1 px-3 py-1 bg-brand/40 text-xs font-bold uppercase tracking-wider text-black rounded-full"
+                  {/* Tags / Category */}
+                  <div className="flex flex-wrap gap-2 pt-2">
+                    {org.category && (
+                      <span className="flex items-center gap-1 px-3 py-1 bg-brand/40 text-xs font-bold uppercase tracking-wider text-black rounded-full">
+                        {org.category}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Buttons */}
+                <div className="flex ml-auto mr-10">
+                  <div className="flex mt-auto gap-5">
+                    <Link
+                      className="font-semibold rounded-4xl my-3 py-2 font-league flex min-w-fit "
+                      to={`/organization/${org._id}`}
                     >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              {/* Buttons */}
-              <div className="flex ml-auto mr-10">
-                <div className="flex mt-auto  gap-5">
-                  <Link
-                    className="font-semibold rounded-4xl my-3 py-2 font-league flex min-w-fit "
-                    to={`/organization/${org.id}`}
-                  >
-                    <button className="flex cursor-pointer gap-2 ">
-                      More Events
-                      <ChevronRight width={17} />
+                      <button className="flex cursor-pointer gap-2 ">
+                        More Events
+                        <ChevronRight width={17} />
+                      </button>
+                    </Link>
+                    <button className="font-bold px-14 rounded-4xl text-white bg-black my-3 py-2 font-league cursor-pointer active:scale-95 transition-transform">
+                      Join
                     </button>
-                  </Link>
-                  <button className="font-bold  px-14 rounded-4xl text-white bg-black my-3 py-2 font-league">
-                    Join
-                  </button>
+                  </div>
                 </div>
               </div>
+            ))
+          )}
+
+          {!loading && organizations.length === 0 && (
+            <div className="font-league p-10 text-gray-400">
+              No organizations found.
             </div>
-          ))}
+          )}
         </div>
       </div>
     </>
