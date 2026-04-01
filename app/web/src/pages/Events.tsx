@@ -10,6 +10,7 @@ import {
 import Navbar from "../components/Navbar";
 import { Link } from "react-router";
 import { useRef, useState, useEffect } from "react";
+import { SERVER_IP } from "../config";
 
 interface TrendingEvent {
   _id: string;
@@ -111,9 +112,7 @@ export default function Events() {
   useEffect(() => {
     const fetchTrending = async () => {
       try {
-        const response = await fetch(
-          "http://ec2-13-58-172-213.us-east-2.compute.amazonaws.com:5000/api/getEvents/getTrending",
-        );
+        const response = await fetch(`${SERVER_IP}/api/getEvents/getTrending`);
         const data = await response.json();
         setTrendingEvents(data.events);
       } catch (err) {
