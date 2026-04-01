@@ -1,5 +1,6 @@
 import { ChevronRight, Image, Search, Tag } from "lucide-react";
 import Navbar from "../components/Navbar";
+import { Link } from "react-router";
 
 interface Organization {
   id: string;
@@ -91,10 +92,15 @@ export default function Organizations() {
               {/* Buttons */}
               <div className="flex ml-auto mr-10">
                 <div className="flex mt-auto  gap-5">
-                  <button className="font-semibold rounded-4xl my-3 py-2 font-league flex gap-2 min-w-fit">
-                    More Events
-                    <ChevronRight width={17} />
-                  </button>
+                  <Link
+                    className="font-semibold rounded-4xl my-3 py-2 font-league flex min-w-fit "
+                    to={`/organization/${org.id}`}
+                  >
+                    <button className="flex cursor-pointer gap-2 ">
+                      More Events
+                      <ChevronRight width={17} />
+                    </button>
+                  </Link>
                   <button className="font-bold  px-14 rounded-4xl text-white bg-black my-3 py-2 font-league">
                     Join
                   </button>

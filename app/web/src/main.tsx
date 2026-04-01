@@ -12,6 +12,7 @@ import Organizations from "./pages/Organizations.tsx";
 import { AuthProvider } from "./context/AuthContext";
 import CreateEvent from "./pages/CreateEvent.tsx";
 import VerifyEmail from "./pages/VerifyEmail.tsx";
+import Organization from "./pages/Organization.tsx";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -42,6 +43,8 @@ const router = createBrowserRouter([
         path: "organizations",
         element: <Organizations />,
       },
+
+      { path: "organization/:orgId", element: <Organization /> },
 
       {
         path: "create",

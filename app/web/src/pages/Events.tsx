@@ -137,12 +137,15 @@ export default function Events() {
       <div className="px-20 pb-20">
         <h1 className="text-5xl font-bebas mt-10 mb-8">Events</h1>
         {/* Tab Header */}
-        <div className="flex">
-          <h2 className="font-semibold text-black ml-0.5 mb-0.5">RSO Events</h2>
+        <div className="flex gap-10 items-center mb-0.5 mt-3 ">
+          <h2 className="font-bold text-black ml-0.5 ">RSO Events</h2>
+
+          <h2 className="font-bold text-gray-400 ml-0.5 ">Student Events</h2>
         </div>
+
         <div className="relative">
-          <div className="w-22 h-0.5 bg-black absolute z-10"> </div>
-          <div className="w-full h-0.5 bg-brand "> </div>
+          <div className="w-22 h-0.5 bg-brand absolute z-10"> </div>
+          <div className="w-full h-0.5 bg-gray-200 "> </div>
         </div>
         {/* Search Bar */}
         <div className="mt-9 flex items-center gap-3">
@@ -284,7 +287,8 @@ export default function Events() {
                         </span>
                       </div>
 
-                      <p className="font-semibold text-lg leading-tight mt-1 h-12 line-clamp-2">
+                      {/* h-12 if i wanna match it all */}
+                      <p className="font-semibold text-lg leading-tight mt-1 line-clamp-2">
                         {event.title}
                       </p>
                       <span className="text-sm text-gray">
