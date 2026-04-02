@@ -13,6 +13,7 @@ import { AuthProvider } from "./context/AuthContext";
 import CreateEvent from "./pages/CreateEvent.tsx";
 import VerifyEmail from "./pages/VerifyEmail.tsx";
 import Organization from "./pages/Organization.tsx";
+import Tickets from "./pages/Tickets.tsx";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -58,6 +59,10 @@ const router = createBrowserRouter([
       {
         path: "verify-email/:token",
         element: <VerifyEmail />,
+      },
+      {
+        path: "tickets",
+        element: <Tickets />,
       },
     ],
   },

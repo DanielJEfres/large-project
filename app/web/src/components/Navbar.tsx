@@ -16,7 +16,10 @@ export default function Navbar() {
           <Link to="/organizations">
             <p className="font-league">Organizations</p>
           </Link>
-          <p className="font-league">Tickets</p>
+
+          <Link to="/tickets">
+            <p className="font-league">Tickets</p>
+          </Link>
         </div>
         {isLoggedIn ? (
           <div className="flex gap-5 items-center">

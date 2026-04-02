@@ -41,7 +41,9 @@ export default function CreateEvent() {
   ]);
   const [image, setImage] = useState<string | null>(null);
 
-  const [startDate, setStartDate] = useState<string>("2026-03-28T20:00");
+  const [startDate, setStartDate] = useState<string>(
+    new Date().toISOString().slice(0, 16),
+  );
   const [endDate, setEndDate] = useState<string>("");
 
   const startInputRef = useRef<HTMLInputElement>(null);
