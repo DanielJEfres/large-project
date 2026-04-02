@@ -5,11 +5,13 @@ import { useEffect, useState } from "react";
 import { SERVER_IP } from "../config";
 import type { UniversityEvent } from "../types/UniversityEvent";
 import { formatStackedDate } from "../utils/date";
+import { useOrganizations } from "../hooks/useOrganization";
 
 export default function Event() {
   const { eventId } = useParams();
   const [event, setEvent] = useState<UniversityEvent | null>(null);
   const [loading, setLoading] = useState(true);
+  const { orgLookup, fetchOrgDetails } = useOrganizations();
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -25,6 +27,14 @@ export default function Event() {
     };
     if (eventId) fetchEvent();
   }, [eventId]);
+
+  useEffect(() => {
+    if (event?.organizationId) {
+      fetchOrgDetails([event.organizationId]);
+    }
+  }, [event, fetchOrgDetails]);
+
+  const hostOrg = event ? orgLookup[event.organizationId] : null;
 
   if (loading) return <div className="p-20 font-league">Loading...</div>;
   if (!event) return <div className="p-20 font-league">Event not found.</div>;
@@ -128,7 +138,7 @@ export default function Event() {
             {/* top half */}
             <div className=" h-87 flex flex-col">
               <p className="font-bebas text-2xl font-thin tracking-wider">
-                {event.organizationId}
+                {hostOrg?.name || "Loading..."}
               </p>
               <h1 className=" text-4xl font-medium">{event.title}</h1>
 
@@ -138,7 +148,7 @@ export default function Event() {
                 <div className="mt-2">
                   <div className="flex items-center gap-2">
                     <div className="h-7 w-7 bg-gray rounded-full"></div>
-                    <p>{event.organizationId || "Anonymous Host"}</p>
+                    <p>{"Random ahh organizer"}</p>
                   </div>
                 </div>
               </div>
@@ -176,10 +186,10 @@ export default function Event() {
                   {/* second */}
                   <div className="px-8 pt-8 flex flex-col w-full">
                     <p className="text-2xl font-bold font-league text-black leading-tight">
-                      {event.organizationId || "Organization Name"}
+                      {hostOrg?.name || "Loading..."}
                     </p>
                     <p className="text-gray-600">
-                      View organization details and other upcoming events.
+                      {hostOrg?.description || "Loading..."}
                     </p>
 
                     {/* buttons */}

@@ -13,6 +13,7 @@ import { useRef, useState, useEffect } from "react";
 import { SERVER_IP } from "../config";
 import type { UniversityEvent } from "../types/UniversityEvent";
 import { formatStackedDate } from "../utils/date";
+import { useOrganizations } from "../hooks/useOrganization";
 
 const EVENTS: UniversityEvent[] = [
   {
@@ -57,6 +58,7 @@ export default function Events() {
   const [trendingEvents, setTrendingEvents] = useState<UniversityEvent[]>([]);
   const [upcomingEvents, setUpcomingEvents] = useState<UniversityEvent[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const { orgLookup, fetchOrgDetails } = useOrganizations();
 
   // Create Refs for the scrollable containers
   const forYouRef = useRef<HTMLDivElement>(null);
@@ -116,6 +118,13 @@ export default function Events() {
 
     fetchEvents();
   }, []);
+
+  useEffect(() => {
+    if (upcomingEvents.length > 0) {
+      const ids = upcomingEvents.map((e) => e.organizationId);
+      fetchOrgDetails(ids);
+    }
+  }, [upcomingEvents, fetchOrgDetails]);
 
   return (
     <>
@@ -189,7 +198,7 @@ export default function Events() {
                     </div>
                     <div className="w-60 px-5 py-3 relative flex flex-col">
                       <p className="font-bebas text-sm uppercase tracking-wider">
-                        {event.organizationId}
+                        {orgLookup[event.organizationId]?.name || "Loading..."}
                       </p>
                       <p className="font-semibold text-lg leading-tight mt-1 line-clamp-2 ">
                         {event.title}
@@ -268,7 +277,8 @@ export default function Events() {
                       <div className="mt-2 max-w-80">
                         <div className="flex justify-between items-center">
                           <p className="font-bebas text-sm uppercase tracking-wider text-brand">
-                            {event.organizationId}
+                            {orgLookup[event.organizationId]?.name ||
+                              "Loading..."}
                           </p>
                           <span className="text-[10px] font-bold text-gray-400">
                             {event.attendees.length} ATTENDING
@@ -307,7 +317,7 @@ export default function Events() {
 
                     <div className="p-5 flex flex-col flex-1">
                       <p className="font-bebas text-sm uppercase tracking-wider ">
-                        {event.organizationId}
+                        {orgLookup[event.organizationId]?.name || "Loading..."}
                       </p>
 
                       <p className="font-semibold text-lg leading-tight mt-1">
@@ -381,7 +391,8 @@ export default function Events() {
 
                       <div className="p-5 flex flex-col flex-1">
                         <p className="font-bebas text-sm uppercase tracking-wider ">
-                          {event.organizationId}
+                          {orgLookup[event.organizationId]?.name ||
+                            "Loading..."}
                         </p>
 
                         <p className="font-semibold text-lg leading-tight mt-1">
