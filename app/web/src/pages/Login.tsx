@@ -4,6 +4,7 @@ import { X, Eye, EyeOff, Info } from "lucide-react";
 import styles from "./Login.module.css";
 import Logo from "../components/Logo.tsx";
 import { LOCAL_IP, SERVER_IP } from "../config";
+import { useAuth } from "../context/AuthContext.tsx";
 
 interface LoginFormData {
   email: string;
@@ -11,6 +12,8 @@ interface LoginFormData {
 }
 
 export default function Login() {
+  const { setUser } = useAuth();
+
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string>("");
@@ -72,6 +75,17 @@ export default function Login() {
         }
         throw new Error(data.message || "Something went wrong");
       }
+
+      // saves jwt token
+      localStorage.setItem("accessToken", data.accessToken);
+
+      // updates auth context
+      setUser({
+        firstName: data.user.firstName,
+        lastName: data.user.lastName,
+        email: data.user.ucfEmail,
+        pfp: data.user.profilePicture,
+      });
 
       console.log("Success:", data);
       if (data.isVerified) {
