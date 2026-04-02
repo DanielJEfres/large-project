@@ -53,7 +53,7 @@ export default function Login() {
     console.log("Final Data:", formData);
 
     try {
-      const response = await fetch(`${LOCAL_IP}/api/auth/login`, {
+      const response = await fetch(`${SERVER_IP}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
