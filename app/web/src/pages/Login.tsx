@@ -12,7 +12,7 @@ interface LoginFormData {
 }
 
 export default function Login() {
-  const { setUser } = useAuth();
+  const { setUser, login } = useAuth();
 
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
@@ -58,7 +58,8 @@ export default function Login() {
         headers: {
           "Content-Type": "application/json",
         },
-
+        // this allows cookies to be sent/received
+        credentials: "include",
         body: JSON.stringify({
           ucfEmail: formData.email,
           password: formData.password,
@@ -74,20 +75,21 @@ export default function Login() {
           return;
         }
         throw new Error(data.message || "Something went wrong");
+        return;
       }
 
-      // saves jwt token
-      localStorage.setItem("accessToken", data.accessToken);
-
-      // updates auth context
-      setUser({
-        firstName: data.user.firstName,
-        lastName: data.user.lastName,
-        email: data.user.ucfEmail,
-        pfp: data.user.profilePicture,
-      });
+      login(
+        {
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.ucfEmail,
+          pfp: data.profilePicture,
+        },
+        data.accessToken,
+      );
 
       console.log("Success:", data);
+
       if (data.isVerified) {
         navigate("/events");
       } else {
