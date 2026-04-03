@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => HomeScreen(),  // Home screen is the initial route
         '/login': (context) => LoginScreen(),  // Login screen route
         '/signup': (context) => SignUpScreen(),
-        '/verification': (context) => verificationScreen(),
+        '/verification': (context) => VerificationScreen(),
         '/reccomendations': (context) => reccomendations(), // Sign Up screen route
         '/events':(context)=> eventsScreen(),
       },

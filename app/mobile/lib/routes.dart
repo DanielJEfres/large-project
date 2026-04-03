@@ -17,7 +17,7 @@ class Routes {
     LOGIN: (context) => LoginScreen(),
     SIGNUP: (context) => SignUpScreen(),
     HOME: (context) => HomeScreen(),
-    VERIFICATION: (context) => verificationScreen(),
+    VERIFICATION: (context) => VerificationScreen(),
     RECCOMENDATIONS: (context)=> reccomendations(),
     EVENTS: (context)=> eventsScreen(),
   };

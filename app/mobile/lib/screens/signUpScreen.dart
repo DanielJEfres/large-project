@@ -1,8 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import '../utils/GlobalData.dart';
 import '../utils/getAPI.dart';
-import '../screens/verificationScreen.dart';
+
 
 class SignUpScreen extends StatefulWidget {
   @override
@@ -15,7 +14,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(212, 255, 255, 255),
+      backgroundColor: Colors.white,
       body: MainPage(),
     );
   }
@@ -27,10 +26,10 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  String message = '', newMessageText = '';
   String loginName = '', password = '';
   String firstName = '', lastName = '';
-  String emailError = ''; // Tracks the validation message
+  String emailError = '';
+  bool _isLoading = false; //for web
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +73,7 @@ class _MainPageState extends State<MainPage> {
               const Text(
                 'Sign up with your UCF email to get started',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.normal),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.normal, color: Colors.grey),
               ),
               const SizedBox(height: 30),
 
@@ -83,16 +82,14 @@ class _MainPageState extends State<MainPage> {
               buildTextField('Last Name', (text) => lastName = text),
               const SizedBox(height: 16),
 
-              // Email Field
               buildTextField(
                 'Email (.edu)',
                     (text) {
                   setState(() {
                     loginName = text;
                     if (text.isNotEmpty && !text.trim().toLowerCase().endsWith('.edu')) {
-                      emailError = 'Wrong format must be a UCF email (.edu)';
-                    }
-                    else {
+                      emailError = 'Must be a UCF email (.edu)';
+                    } else {
                       emailError = '';
                     }
                   });
@@ -106,22 +103,60 @@ class _MainPageState extends State<MainPage> {
 
               SizedBox(
                 width: 150,
-                child: ElevatedButton(
+                child: _isLoading
+                    ? const Center(child: CircularProgressIndicator(color: myYellow))
+                    : ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: myYellow,
                     foregroundColor: Colors.black,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
                   ),
-                  onPressed: () {
-                    // Check
-                    if (loginName.trim().toLowerCase().endsWith('.edu')) {
-                      Navigator.pushNamed(context, '/verification');
+                  onPressed: () async {
+                    // 1. Frontend Checks
+                    if (firstName.isEmpty || lastName.isEmpty || loginName.isEmpty || password.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Please fill in all fields')),
+                      );
+                      return;
                     }
-                    else {
+
+                    if (!loginName.trim().toLowerCase().endsWith('.edu')) {
                       setState(() {
                         emailError = 'Please enter a valid UCF email';
                       });
+                      return;
+                    }
+
+                    setState(() => _isLoading = true);
+
+                    // 2. Backend Call
+                    try {
+                      var response = await getAPI.signUp(
+                          firstName.trim(),
+                          lastName.trim(),
+                          loginName.trim(),
+                          password
+                      );
+
+                      if (response['success'] == true) {
+                        // Send verification
+                        Navigator.pushNamed(context, '/verification');
+                      }
+                      else {
+                        // The user exist
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(response['message'] ?? 'Sign up failed')),
+                        );
+                      }
+                    }
+                    catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Could not connect to server')),
+                      );
+                    }
+                    finally {
+                      setState(() => _isLoading = false);
                     }
                   },
                   child: const Text('Continue', style: TextStyle(fontWeight: FontWeight.bold)),
@@ -134,7 +169,6 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
-  // Updated helper method to accept and display error text
   Widget buildTextField(String label, Function(String) onChanged, {bool isPassword = false, String error = ''}) {
     return TextField(
       obscureText: isPassword,
@@ -142,7 +176,6 @@ class _MainPageState extends State<MainPage> {
       decoration: InputDecoration(
         labelText: label,
         errorText: error.isEmpty ? null : error,
-
         floatingLabelBehavior: FloatingLabelBehavior.always,
         filled: true,
         fillColor: Colors.grey[100],

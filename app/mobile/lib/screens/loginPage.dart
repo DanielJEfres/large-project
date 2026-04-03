@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
+import '../utils/getAPI.dart';
 
 const Color myYellow = Color(0xFFFFC527);
 
@@ -22,7 +23,7 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   String loginName = '', password = '';
-  String emailError = ''; // 1. Added String type here
+  String emailError = '';
 
   late TapGestureRecognizer _signUpRecognizer;
 
@@ -146,22 +147,42 @@ class _MainPageState extends State<MainPage> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
                   ),
                   onPressed: () async {
+                    //  Basic Validation
                     if (loginName.isEmpty || password.isEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Please fill in all fields')),
                       );
                       return;
                     }
-                    if (!loginName.trim().toLowerCase().endsWith('.edu')) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Must be a UCF email')),
-                      );
-                      return;
-                    }
+
+                    //  Call the getAPI login method
                     try {
-                      Navigator.pushNamed(context, '/events');
+                      var response = await getAPI.login(loginName.trim(), password);
+
+                      if (response['success'] == true) {
+                        // 3. Check if the user is verified
+                        if (response['isVerified'] == false) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Please verify your email first.')),
+                          );
+                          // Send them to the verification screen instead of the events page
+                          Navigator.pushNamed(context, '/verification');
+                        } else {
+                          // 4. Success! Save token (optional) and go to Events
+                          print("Login Successful! Token: ${response['accessToken']}");
+                          Navigator.pushNamed(context, '/events');
+                        }
+                      } else {
+                        // 5. Show error from backend (e.g., "Invalid credentials")
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(response['message'] ?? 'Login failed')),
+                        );
+                      }
                     } catch (e) {
-                      print("Error: $e");
+                      // Handling network/server issues
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Server unreachable. Are you online?')),
+                      );
                     }
                   },
                   child: const Text('Log In', style: TextStyle(fontWeight: FontWeight.bold)),

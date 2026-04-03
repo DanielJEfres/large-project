@@ -1,134 +1,127 @@
 import 'package:flutter/material.dart';
-import '../screens/signUpScreen.dart';
+//import 'package:http/http.dart' as http;
+import '../utils/getAPI.dart';
 
-class verificationScreen extends StatelessWidget {
-  String loginName = '', password= '';
+class VerificationScreen extends StatefulWidget {
   @override
+  _VerificationScreenState createState() => _VerificationScreenState();
+}
 
+class _VerificationScreenState extends State<VerificationScreen> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _codeController = TextEditingController();
+  bool _isLoading = false;
+
+
+  Future<void> _verifyEmail() async {
+    if (_emailController.text.isEmpty || _codeController.text.isEmpty) {
+      _showSnackBar("Please fill in all fields");
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      // calling get apis
+      var response = await getAPI.verifyEmail(
+          _emailController.text.trim(),
+          _codeController.text.trim()
+      );
+
+      if (response['success'] == true) {
+        _showSnackBar("Email Verified! You can now log in.");
+        Navigator.pushNamed(context, '/login');
+      }
+      else {
+        _showSnackBar(response['message'] ?? "Verification failed");
+      }
+    }
+    catch (e) {
+      _showSnackBar("Connection error. Check if your Node.js server is running!");
+    }
+    finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        elevation:0,
+        elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.pop(context),
         ),
       ),
-
       body: SafeArea(
-        child: Padding( // Added 'child:' here
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
-          child: SingleChildScrollView(
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const Text(
-                    'Check your Inbox',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 30,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    'We sent a code to your email',
-                    style: TextStyle(
-                      fontWeight: FontWeight.normal,
-                      fontSize: 15,
-                    ),
-                  ),
-                  const SizedBox(height: 40), // Added a little space
-                  Container(
-                    width: 300,
-                    height: 300,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      image: DecorationImage(
-                        image: AssetImage('assets/img.png'),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 50),
-                  TextField(
-                    onChanged: (text) => loginName = text,
-                    decoration: InputDecoration(
-                      labelText: 'UCF email (.edu)',
-                      filled: true,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                  ),
+          child: Column(
+            children: [
+              const Text('Check your Inbox',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30)),
+              const SizedBox(height: 10),
+              const Text('Enter the code sent to your UCF email',
+                  style: TextStyle(fontSize: 15, color: Colors.grey)),
+              const SizedBox(height: 40),
 
-                  const SizedBox(height:16),
-
-                  TextField(
-                    obscureText: true,
-                    onChanged: (text) => password = text,
-                    decoration: InputDecoration(
-                      labelText: 'Password',
-                      filled: true,
-                      fillColor: Colors.grey[200],
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-                  SizedBox(
-                    width: 150,
-                    child: ElevatedButton(
-
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: myYellow,
-                        foregroundColor: Colors.black,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
-
-                      ),
-                      onPressed: () async {
-                        if (loginName.isEmpty || password.isEmpty) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Please fill in all fields')),
-                          );
-                          return;
-                        }
-                        if (!loginName.trim().toLowerCase().endsWith('.edu')) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Must be a UCF email')),
-                          );
-                          return;
-                        }
-                        try {
-                          Navigator.pushNamed(context, '/events');
-                        }
-                        catch (e) {
-                          print("Error: $e");
-                        }
-                      },
-                      child: const Text('Log In', style: TextStyle(fontWeight: FontWeight.bold)),
-                    ),
-                  ),
-
-                  const SizedBox(height: 40),
-                  const Text(
-                    'Event Knight is a Student-built app and is not affiliated with UCF',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 12, color: Colors.grey),
-                  ),
-
-                ],
+              // Image placeholder
+              CircleAvatar(
+                radius: 80,
+                backgroundColor: Colors.grey[200],
+                backgroundImage: const AssetImage('assets/img.png'),
               ),
-            ),
+
+              const SizedBox(height: 40),
+
+              // Email Field
+              TextField(
+                controller: _emailController,
+                decoration: InputDecoration(
+                  labelText: 'UCF Email',
+                  filled: true,
+                  fillColor: Colors.grey[100],
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Code Field
+              TextField(
+                controller: _codeController,
+                decoration: InputDecoration(
+                  labelText: 'Verification Code',
+                  hintText: 'Enter token',
+                  filled: true,
+                  fillColor: Colors.grey[100],
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                ),
+              ),
+
+              const SizedBox(height: 30),
+
+              _isLoading
+                  ? const CircularProgressIndicator()
+                  : SizedBox(
+                width: 200,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFFFD700),
+                    foregroundColor: Colors.black,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
+                  ),
+                  onPressed: _verifyEmail,
+                  child: const Text('Verify Email', style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+              ),
+            ],
           ),
         ),
       ),
