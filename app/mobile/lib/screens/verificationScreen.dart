@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../screens/signUpScreen.dart';
 
 class verificationScreen extends StatelessWidget {
-  String loginName = '';
+  String loginName = '', password= '';
   @override
 
   Widget build(BuildContext context) {
@@ -68,7 +68,22 @@ class verificationScreen extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height:30),
+                  const SizedBox(height:16),
+
+                  TextField(
+                    obscureText: true,
+                    onChanged: (text) => password = text,
+                    decoration: InputDecoration(
+                      labelText: 'Password',
+                      filled: true,
+                      fillColor: Colors.grey[200],
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 30),
                   SizedBox(
                     width: 150,
                     child: ElevatedButton(
@@ -80,13 +95,30 @@ class verificationScreen extends StatelessWidget {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
 
                       ),
-                      onPressed: () {
-
-                        Navigator.pushNamed(context, '/login');
+                      onPressed: () async {
+                        if (loginName.isEmpty || password.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Please fill in all fields')),
+                          );
+                          return;
+                        }
+                        if (!loginName.trim().toLowerCase().endsWith('.edu')) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Must be a UCF email')),
+                          );
+                          return;
+                        }
+                        try {
+                          Navigator.pushNamed(context, '/events');
+                        }
+                        catch (e) {
+                          print("Error: $e");
+                        }
                       },
                       child: const Text('Log In', style: TextStyle(fontWeight: FontWeight.bold)),
                     ),
                   ),
+
                   const SizedBox(height: 40),
                   const Text(
                     'Event Knight is a Student-built app and is not affiliated with UCF',

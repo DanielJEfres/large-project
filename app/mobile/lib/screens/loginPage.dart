@@ -22,14 +22,13 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   String loginName = '', password = '';
+  String emailError = ''; // 1. Added String type here
 
-  // 1. Define the recognizer here
   late TapGestureRecognizer _signUpRecognizer;
 
   @override
   void initState() {
     super.initState();
-    // 2. Initialize it once in initState
     _signUpRecognizer = TapGestureRecognizer()
       ..onTap = () {
         Navigator.pushNamed(context, '/signup');
@@ -38,9 +37,27 @@ class _MainPageState extends State<MainPage> {
 
   @override
   void dispose() {
-
     _signUpRecognizer.dispose();
     super.dispose();
+  }
+
+  // 2. Added the missing helper function
+  Widget buildTextField(String label, Function(String) onChanged,
+      {bool isPassword = false, String error = ''}) {
+    return TextField(
+      obscureText: isPassword,
+      onChanged: onChanged,
+      decoration: InputDecoration(
+        labelText: label,
+        errorText: error.isEmpty ? null : error,
+        filled: true,
+        fillColor: Colors.grey[200],
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+      ),
+    );
   }
 
   @override
@@ -68,9 +85,8 @@ class _MainPageState extends State<MainPage> {
               Container(
                 width: 200,
                 height: 200,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   shape: BoxShape.circle,
-
                   image: DecorationImage(
                     image: AssetImage('assets/img.png'),
                     fit: BoxFit.cover,
@@ -90,17 +106,20 @@ class _MainPageState extends State<MainPage> {
                 style: TextStyle(fontSize: 14, color: Colors.grey),
               ),
               const SizedBox(height: 40),
-              TextField(
-                onChanged: (text) => loginName = text,
-                decoration: InputDecoration(
-                  labelText: 'UCF email (.edu)',
-                  filled: true,
-                  fillColor: Colors.grey[200],
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
+              buildTextField(
+                'Email (.edu)',
+                    (text) {
+                  setState(() {
+                    loginName = text;
+                    if (text.isNotEmpty && !text.trim().toLowerCase().endsWith('.edu')) {
+                      emailError = 'Wrong format must be a UCF email (.edu)';
+                    }
+                    else {
+                      emailError = '';
+                    }
+                  });
+                },
+                error: emailError,
               ),
               const SizedBox(height: 16),
               TextField(
@@ -126,10 +145,24 @@ class _MainPageState extends State<MainPage> {
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
                   ),
-                  onPressed: () {
-                    //enter page events not login just temporarily here
-
-                    Navigator.pushNamed(context, '/login');
+                  onPressed: () async {
+                    if (loginName.isEmpty || password.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Please fill in all fields')),
+                      );
+                      return;
+                    }
+                    if (!loginName.trim().toLowerCase().endsWith('.edu')) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Must be a UCF email')),
+                      );
+                      return;
+                    }
+                    try {
+                      Navigator.pushNamed(context, '/events');
+                    } catch (e) {
+                      print("Error: $e");
+                    }
                   },
                   child: const Text('Log In', style: TextStyle(fontWeight: FontWeight.bold)),
                 ),
@@ -143,7 +176,6 @@ class _MainPageState extends State<MainPage> {
                     TextSpan(
                       text: 'SignUp',
                       style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
-                      // 4. Reference the persistent recognizer here
                       recognizer: _signUpRecognizer,
                     ),
                   ],

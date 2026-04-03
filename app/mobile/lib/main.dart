@@ -4,6 +4,7 @@ import 'package:mobile/screens/signUpScreen.dart';
 import 'package:mobile/screens/loginPage.dart';
 import 'package:mobile/screens/verificationScreen.dart';
 import 'package:mobile/screens/reccomendations.dart';
+import 'package:mobile/screens/events.dart';
 
 void main() {
   runApp(MyApp());
@@ -20,7 +21,8 @@ class MyApp extends StatelessWidget {
         '/login': (context) => LoginScreen(),  // Login screen route
         '/signup': (context) => SignUpScreen(),
         '/verification': (context) => verificationScreen(),
-        '/reccomendations': (context) => reccomendations() // Sign Up screen route
+        '/reccomendations': (context) => reccomendations(), // Sign Up screen route
+        '/events':(context)=> eventsScreen(),
       },
     );
   }
