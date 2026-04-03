@@ -11,9 +11,12 @@ const router = express.Router()
 // router.use('/', testRoutes)
 router.use('/', testRoutes)
 router.use('/api/auth', authRoutes)
+// middleware: router.use('/api/users', authenticateToken, userRoutes)
+// authenticateToken as middleware protects entire route
 router.use('/api/verifyEmail', verifyEmail)
 router.use('/api/events', eventRoutes)
 router.use('/api/organizations', organizationRoutes)
 
 router.use('/api/getEvents', getEventsRoutes)
+
 export default router
