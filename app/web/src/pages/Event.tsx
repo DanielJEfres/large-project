@@ -2,7 +2,7 @@ import { ChevronRight, Share } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { Link, useParams } from "react-router";
 import { useEffect, useState } from "react";
-import { SERVER_IP } from "../config";
+import { LOCAL_IP, SERVER_IP } from "../config";
 import type { UniversityEvent } from "../types/UniversityEvent";
 import { formatStackedDate } from "../utils/date";
 import { useOrganizations } from "../hooks/useOrganization";
@@ -16,7 +16,7 @@ export default function Event() {
   useEffect(() => {
     const fetchEvent = async () => {
       try {
-        const response = await fetch(`${SERVER_IP}/api/events/${eventId}`);
+        const response = await fetch(`${LOCAL_IP}/api/events/${eventId}`);
         const data = await response.json();
         setEvent(data.event);
       } catch (err) {

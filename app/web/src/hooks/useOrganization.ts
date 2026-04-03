@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { SERVER_IP } from "../config";
+import { LOCAL_IP, SERVER_IP } from "../config";
 import type { Organization } from "../types/Organizations";
 
 export function useOrganizations() {
@@ -16,7 +16,7 @@ export function useOrganizations() {
 
       for (const id of idsToFetch) {
         try {
-          const res = await fetch(`${SERVER_IP}/api/organizations/${id}`);
+          const res = await fetch(`${LOCAL_IP}/api/organizations/${id}`);
           const data = await res.json();
           const org: Organization = data.Organization;
 

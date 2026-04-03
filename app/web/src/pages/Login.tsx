@@ -12,7 +12,8 @@ interface LoginFormData {
 }
 
 export default function Login() {
-  const { setUser, login } = useAuth();
+  // 1. Updated destructuring to match your new AuthContext
+  const { login } = useAuth();
 
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
@@ -22,44 +23,30 @@ export default function Login() {
     password: "",
   });
 
-  // Change handler
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle the form submission
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
 
-    // uni email check
     if (!formData.email || !formData.password) {
       setError("Please enter both email and password.");
       return;
     }
 
-    // uni email check
     if (!formData.email.toLowerCase().endsWith(".edu")) {
       setError("Please use a valid university email (.edu).");
       return;
     }
 
-    // validation passed!
-
-    console.log("Final Data:", formData);
-
     try {
-      const response = await fetch(`${SERVER_IP}/api/auth/login`, {
+      const response = await fetch(`${LOCAL_IP}/api/auth/login`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        // this allows cookies to be sent/received
-        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include", // Essential for cookies
         body: JSON.stringify({
           ucfEmail: formData.email,
           password: formData.password,
@@ -75,22 +62,22 @@ export default function Login() {
           return;
         }
         throw new Error(data.message || "Something went wrong");
-        return;
       }
 
       login(
         {
-          firstName: data.firstName,
-          lastName: data.lastName,
-          email: data.ucfEmail,
-          pfp: data.profilePicture,
+          firstName: data.user.firstName,
+          lastName: data.user.lastName,
+          email: data.user.email,
+          pfp: data.user.pfp,
+          isVerified: data.user.isVerified,
         },
         data.accessToken,
       );
 
-      console.log("Success:", data);
+      console.log("Login Successful");
 
-      if (data.isVerified) {
+      if (data.user.isVerified) {
         navigate("/events");
       } else {
         navigate("/verify");
@@ -102,7 +89,6 @@ export default function Login() {
 
   const isFieldError = (fieldKeyword: string) =>
     error.toLowerCase().includes(fieldKeyword.toLowerCase());
-
   return (
     <>
       <div className="[&_button]:cursor-pointer fixed inset-0 bg-white flex flex-col justify-center items-center z-50">

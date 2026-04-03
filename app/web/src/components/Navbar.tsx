@@ -1,6 +1,7 @@
 import { useAuth } from "../context/AuthContext.tsx";
 import { Link } from "react-router";
 import { Bell, Plus } from "lucide-react";
+import UserMenu from "./UseMenu.tsx";
 
 export default function Navbar() {
   const { isLoggedIn } = useAuth();
@@ -30,7 +31,9 @@ export default function Navbar() {
               </button>
             </Link>
             <Bell size={22} />
-            <div className="w-9 h-9 rounded-full bg-gray-300" />
+
+            {/* JUST PLUG IT IN HERE */}
+            <UserMenu />
           </div>
         ) : (
           <div className="flex gap-5">
