@@ -16,7 +16,9 @@ timestamps
 */
 
 import  express from 'express'
+import mongoose from 'mongoose'
 import Event from '../models/Event.js'
+import User from '../models/User.js'
 
 const router = express.Router();
 
@@ -36,6 +38,72 @@ router.get('/:eventId', async (req, res) => {
         res.status(500).json({message:" Could Not Get Event"})
     }
 })
+
+// Add event to user and add attendee to Event (onclick button)
+router.patch('/attendEvent/:eventId', async(req, res)=>
+    {
+        try {
+            const userId = req.body.userId
+            const eventId = req.params.eventId
+
+            if(!userId) return res.status(400).json({ message: "userId is required" })
+
+            const event = await Event.findById(eventId)
+            if(!event) return res.status(404).json({ message: "Event not found" })
+
+            if(event.rsvpEnabled && event.rsvpLimit !== null && event.attendees.length >= event.rsvpLimit)
+                return res.status(400).json({ message: "Event is full" })
+
+            if(event.attendees.includes(userId))
+                return res.status(400).json({ message: "User already attending this event" })
+
+            await Event.updateOne({ _id: eventId }, { $push: { attendees: new mongoose.Types.ObjectId(userId) } })
+            await User.updateOne({ _id: userId }, { $push: { user_events: new mongoose.Types.ObjectId(eventId) } })
+
+            return res.status(200).json({ message: "RSVP successful" })
+
+        } catch(error) {
+            console.log(error)
+            res.status(500).json({ message: "Could not RSVP" })
+        }
+    }
+)
+
+router.patch('/unattendEvent/:eventId', async(req, res)=>
+    {
+        try
+        {
+            const userId = req.body.userId
+            const eventId = req.params.eventId
+
+            if(!userId) return res.status(400).json({ message: "userId is required" })
+
+            const event = await Event.findById(eventId)
+            if(!event) return res.status(404).json({ message: "Event not found" })
+            
+            if(event.attendees.length==0)
+            {
+                return res.status(400).json({message: "Event does not have any attendees"})
+            }
+            if (!(event.attendees.includes(userId)))
+            {
+                return res.status(400).json({message: "User is not in attendees list"})
+            }
+
+            await Event.updateOne({ _id: eventId }, { $pull: { attendees: new mongoose.Types.ObjectId(userId) } })
+            await User.updateOne({ _id: userId }, { $pull: { user_events: new mongoose.Types.ObjectId(eventId) } })
+            return res.status(200).json({ message: "Successful update of RSVP" })
+
+        }
+        catch(error)
+        {
+            console.log(error)
+            res.status(500).json({message:"could not Update attendance"})
+        }
+    }
+
+)
+//delete event from an user history and attendee from event
 
 //Create Event
 router.post('/', async (req, res) => {

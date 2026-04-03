@@ -5,12 +5,19 @@ import dotenv from 'dotenv'
 import swaggerUi from 'swagger-ui-express'
 import swaggerSpec from './config/swagger.js'
 import routes from './routes/index.js'
+import cookieParser from 'cookie-parser';
 
 dotenv.config()
 
 const app = express()
-app.use(cors())
+
+// Without config (origin), cookies will NOT be sent.
+app.use(cors({
+    origin: process.env.CLIENT_URL, // e.g. 'http://localhost:3000'
+    credentials: true               // allows cookies to be sent cross-origin
+}));
 app.use(express.json())
+app.use(cookieParser());
 
 //Handle malformed inputs for debugging
 app.use((err, req, res, next) => {

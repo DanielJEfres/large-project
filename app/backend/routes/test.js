@@ -1,8 +1,12 @@
 import express from 'express'
+import authenticateToken from '../middleware/authenticateToken.js'
 
 const router = express.Router()
 
 router.get('/', (req, res) => {
+  const authHeader = req.headers['authorization']
+  const token = authHeader.split(" ")[1]
+  console.log(token)
   res.status(200).json({
     message: 'API is online',
     docs: '/api-docs',
@@ -20,8 +24,9 @@ router.get('/', (req, res) => {
  *       200:
  *         description: Server is working
  */
-router.get('/test', (req, res) => {
-  res.status(200).json({ message: 'Swagger is working!' })
+router.get('/test', authenticateToken, (req, res) => {
+  console.log(req.user)
+  res.status(200).json({ message: 'Access Token Verified!' })
 })
 
 export default router
