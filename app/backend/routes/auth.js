@@ -93,11 +93,18 @@ router.post('/signup', async (req, res) => {
             //verification token: generateToken()
         });
 
-        //Save the newly created user
-        // await newUser.save(); <- redundant, create implicitly calls save()
+            //Create the user entry in the database, then saves it to the database
+            const newUser = await User.create({
+                firstName,
+                lastName,
+                ucfEmail,
+                passwordHash: password,
+                interests: tagIDs,
+                bio,
+            });
 
-        //success messages
-        console.log(`Successfully created new user with the following info: ${JSON.stringify(req.body, null, 2)}`);
+            //success messages
+            console.log(`Successfully created new user with the following info: ${JSON.stringify(req.body, null, 2)}`);
 
         res.status(201).json({
             message:`User registered successfully, ucfEmail = ${ucfEmail}`,
