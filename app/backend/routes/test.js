@@ -5,7 +5,7 @@ const router = express.Router()
 
 router.get('/', (req, res) => {
   const authHeader = req.headers['authorization']
-  const token = authHeader.split(" ")[1]
+  const token = authHeader && authHeader.split(" ")[1] // fixed since token can be undefined which causes crash
   console.log(token)
   res.status(200).json({
     message: 'API is online',
