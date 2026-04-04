@@ -1,8 +1,8 @@
-import { useState } from "react";
 import Navbar from "../components/Navbar";
 
 export default function Home() {
-  const [count, setCount] = useState(0);
+  // const [count, setCount] = useState(0);
+  // commented out for now to fix typescript errors
 
   return (
     <>
