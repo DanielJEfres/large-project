@@ -1,10 +1,10 @@
-import { useState } from "react";
 import Navbar from "../components/Navbar";
 import { Image } from "lucide-react";
 import { Link } from "react-router";
 
 export default function Home() {
-  const [count, setCount] = useState(0);
+  // const [count, setCount] = useState(0);
+  // commented out for now to fix typescript errors
 
   return (
     <>

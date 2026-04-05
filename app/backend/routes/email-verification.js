@@ -25,7 +25,8 @@ router.post('/request-verification', async (req, res) => {
     console.log(`Sender email is: ${process.env.FROM_EMAIL}`);
     
 
-    try{
+    try
+    {
         const user = await User.findOne({ucfEmail});
         if(!user) return res.status(404).json({message: "Email verification: user with this email is not found"});
 
@@ -36,10 +37,10 @@ router.post('/request-verification', async (req, res) => {
         user.verificationToken = token;
         await user.save();
 
-        const recipient = user.email || user.ucfEmail;
+        const recipient = user.ucfEmail;
         console.log(`Attempting to send mail to: ${recipient}`);
 
-        const verificationUrl = `${process.env.CLIENT_URL}/verify-email/${token}`;
+        const verificationUrl = `${process.env.CLIENT_URL}/verifyEmail/verify-email/${token}`;
 
         const emailTemplate = (verificationUrl, firstName) => `
         <!DOCTYPE html>
@@ -89,6 +90,7 @@ router.post('/request-verification', async (req, res) => {
         </body>
         </html>
         `;
+
         const htmlContent = emailTemplate(verificationUrl, user.firstName || 'Knight');
 
         await transporter.sendMail({

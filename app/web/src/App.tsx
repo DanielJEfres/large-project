@@ -1,9 +1,9 @@
-import { useState } from "react";
 import "./App.css";
 import { Outlet } from "react-router";
 
 function App() {
-  const [count, setCount] = useState(0);
+  // const [count, setCount] = useState(0);
+  // commented out for now to fix typescript errors
 
   return (
     <>

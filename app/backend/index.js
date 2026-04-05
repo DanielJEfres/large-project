@@ -13,9 +13,13 @@ const app = express()
 
 // Without config (origin), cookies will NOT be sent.
 app.use(cors({
-    origin: process.env.CLIENT_URL, // e.g. 'http://localhost:3000'
-    credentials: true               // allows cookies to be sent cross-origin
-}));
+    origin: [
+      process.env.CLIENT_URL,
+      'http://localhost:5173',
+      'http://localhost:3000'
+    ],
+    credentials: true
+}))
 app.use(express.json())
 app.use(cookieParser());
 
