@@ -118,7 +118,7 @@ export default function Organizations() {
                         <ChevronRight width={17} />
                       </button>
                     </Link>
-                    <button className="font-bold px-14 rounded-4xl text-white bg-black my-3 mr-3 font-league cursor-pointer active:scale-95 transition-all hover:bg-brand duration-100 ">
+                    <button className="font-bold px-9 rounded-4xl text-white bg-black my-3 mr-3 font-league cursor-pointer active:scale-95 transition-all hover:bg-brand duration-100 ">
                       Join
                     </button>
                   </div>

@@ -129,13 +129,13 @@ export default function Events() {
   return (
     <>
       <Navbar />
-      <div className="px-20 pb-20">
+      <div className="px-20 pb-20 ">
         <h1 className="text-5xl font-bebas mt-10 mb-8">Events</h1>
         {/* Tab Header */}
         <div className="flex gap-10 items-center mb-0.5 mt-3 ">
           <h2 className="font-bold text-black ml-0.5 ">RSO Events</h2>
 
-          <h2 className="font-bold text-gray-400 ml-0.5 ">Student Events</h2>
+          <h2 className="font-bold text-gray-400 ml-0.5  ">Student Events</h2>
         </div>
 
         <div className="relative">
@@ -194,7 +194,7 @@ export default function Events() {
                     to={`/event/${event._id}`}
                     className="h-max-fit min-w-fit flex border-gray/20 border-1 rounded-2xl overflow-hidden bg-white shrink-0 cursor-pointer"
                   >
-                    <div className="w-60 h-full bg-gray/30 flex items-center justify-center shrink-0">
+                    <div className="w-80 min-h-80 bg-gray/30 flex items-center justify-center shrink-0">
                       <Image size={40} className="text-gray/70" />
                     </div>
                     <div className="w-60 px-5 py-3 relative flex flex-col">
@@ -222,7 +222,7 @@ export default function Events() {
                         {event.tags?.slice(0, 2).map((tag) => (
                           <span
                             key={tag}
-                            className="px-3 py-1 bg-brand/40 text-[10px] font-bold uppercase text-black rounded-full"
+                            className="px-3 py-1 bg-brand text-[10px] font-bold uppercase text-white rounded-full"
                           >
                             {tag}
                           </span>
@@ -344,7 +344,7 @@ export default function Events() {
                         {event.tags?.slice(0, 2).map((tag) => (
                           <span
                             key={tag}
-                            className="px-3 py-1 bg-brand/40 text-[10px] font-bold uppercase text-black rounded-full"
+                            className="px-3 py-1 bg-brand text-[10px] font-bold uppercase text-white rounded-full"
                           >
                             {tag}
                           </span>
@@ -416,7 +416,7 @@ export default function Events() {
                           {event.tags?.slice(0, 2).map((tag) => (
                             <span
                               key={tag}
-                              className="px-3 py-1 bg-brand/40 text-[10px] font-bold uppercase text-black rounded-full"
+                              className="px-3 py-1 bg-brand text-[10px] font-bold uppercase text-white rounded-full"
                             >
                               {tag}
                             </span>

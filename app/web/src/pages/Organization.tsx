@@ -5,13 +5,26 @@ import { useEffect, useState } from "react";
 import type { Organization } from "../types/Organizations";
 import { LOCAL_IP, SERVER_IP } from "../config";
 import type { UniversityEvent } from "../types/UniversityEvent";
-import { formatStackedDate } from "../utils/date";
+import { formatStackedDate, formatTime } from "../utils/date";
 
 export default function Organization() {
   const { orgId } = useParams();
   const [org, setOrg] = useState<Organization | null>(null);
   const [events, setEvents] = useState<UniversityEvent[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // creates a dict that groups events together based on their dates (dateKey)
+  const groupedEvents = events.reduce(
+    (groups: { [key: string]: UniversityEvent[] }, event) => {
+      const dateKey = formatStackedDate(event.startDate).date;
+      if (!groups[dateKey]) {
+        groups[dateKey] = [];
+      }
+      groups[dateKey].push(event);
+      return groups;
+    },
+    {},
+  );
 
   useEffect(() => {
     const fetchOrgAndEvents = async () => {
@@ -70,8 +83,8 @@ export default function Organization() {
 
             {/* description */}
 
-            <div className="mt-4 max-w-3xl">
-              <p className="font-league text-lg text-gray-700 leading-relaxed">
+            <div className="mt-4 ">
+              <p className="font-inter text-md text-gray-700 leading-relaxed ">
                 {org.description}
                 <span className="text-black font-semibold cursor-pointer">
                   ...more
@@ -110,7 +123,7 @@ export default function Organization() {
             </div>
 
             {/* events header! */}
-            <div className="mt-10">
+            <div className="mt-10 ">
               <h2 className="font-bebas text-4xl mb-4">Events</h2>
 
               <div className="flex gap-10 items-center mb-0.5 mt-3 ">
@@ -126,70 +139,99 @@ export default function Organization() {
 
               {/* events go here */}
 
-              <div className="p-10 flex flex-col gap-6">
-                {events.map((event) => (
-                  <div
-                    key={event._id}
-                    className="w-full h-56  rounded-2xl flex overflow-hidden  bg-gray-100 "
-                  >
-                    {/* bg img */}
-                    <div className="w-76 h-full  bg-gray/30  relative">
-                      <div className="text-xs font-bold absolute px-2.5 py-1 text-sm bg-white rounded-full top-3 left-3">
-                        <p>6:00 PM</p>
-                      </div>
+              <div className="p-10 flex flex-col gap-10">
+                {Object.keys(groupedEvents).map((dateKey) => (
+                  <div key={dateKey} className="flex flex-col gap-4">
+                    {/* Date Header for the Group */}
+                    <div className="text-lg bg-white relative w-fit flex gap-2 py-1 rounded-full -left-2.25">
+                      <p className="font-bold">{dateKey}</p>
+                      <p className="text-gray font-semibold">
+                        {
+                          formatStackedDate(groupedEvents[dateKey][0].startDate)
+                            .day
+                        }
+                      </p>
                     </div>
 
-                    <div className="flex-col px-6 py-4 flex relative w-full">
-                      <div className="text-xs bg-white  relative w-fit flex gap-2 px-2.5 py-1  rounded-full -left-2.25">
-                        <p className="font-bold ">
-                          {formatStackedDate(event.startDate).date}
-                        </p>
+                    {/* Events for this Date */}
+                    <div className="flex flex-col gap-6">
+                      {groupedEvents[dateKey].map((event) => (
+                        <div
+                          key={event._id}
+                          className="w-full h-56 rounded-2xl flex overflow-hidden bg-gray-50"
+                        >
+                          {/* Left Image Section */}
+                          <div className="w-76 h-full bg-gray/30 relative"></div>
 
-                        <p className="text-gray font-semibold ">
-                          {formatStackedDate(event.startDate).day}
-                        </p>
-                      </div>
-                      <h3 className="font-semibold text-lg leading-tight mt-2">
-                        {event.title}
-                      </h3>
+                          {/* Content Section */}
 
-                      <p className="text-gray-500 text-sm font-league line-clamp-3 mt-1">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                        Esse, ducimus maxime aperiam, corporis inventore fugit
-                        quae perferendis, voluptates at quia aut sed
-                        exercitationem! Deleniti soluta nesciunt repellendus
-                        asperiores possimus nostrum?
-                      </p>
+                          <div className="flex-col px-6 py-5 flex relative w-full ">
+                            <div className="font-inter flex text-sm gap-1  relative font-semibold  text-gray-500  rounded-full ">
+                              <p>{formatTime(event.startDate)}</p>
+                              {event.endDate && (
+                                <>
+                                  <p>-</p>
+                                  {
+                                    <>
+                                      {formatStackedDate(event.startDate)
+                                        .date !=
+                                        formatStackedDate(event.endDate)
+                                          .date && (
+                                        <p className="text-brand">
+                                          {
+                                            formatStackedDate(event.endDate)
+                                              .date
+                                          }
+                                        </p>
+                                      )}
+                                    </>
+                                  }
+                                  <p className="text-brand">
+                                    {formatTime(event.endDate)}
+                                  </p>
+                                </>
+                              )}
+                            </div>
+                            <h3 className="font-inter font-semibold text-lg leading-tight mt-2">
+                              {event.title}
+                            </h3>
 
-                      {/* tags */}
-                      <div className="flex flex-wrap gap-2 mt-auto">
-                        {event.tags.map((tag) => (
-                          <span
-                            key={tag}
-                            className="px-3 py-1 bg-brand/40 text-[10px] font-bold uppercase tracking-wider text-black rounded-full"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
+                            <p className="text-gray-500 text-sm font-inter line-clamp-3 mt-1">
+                              {event.description || "No description provided."}
+                            </p>
 
-                      <div className="mt-2 flex items-center justify-between">
-                        <div className="flex items-center gap-4 text-gray-600 text-sm">
-                          <div className="flex items-center gap-1">
-                            <MapPin size={14} />
-                            <span>{event.location}</span>
+                            {/* Tags */}
+                            <div className="flex flex-wrap gap-2 mt-auto ">
+                              {event.tags.map((tag) => (
+                                <span
+                                  key={tag}
+                                  className="px-3 py-1 bg-brand/40 text-[10px] font-bold uppercase tracking-wider text-black rounded-full"
+                                >
+                                  {tag}
+                                </span>
+                              ))}
+                            </div>
+
+                            <div className="font-inter mt-2 flex items-center justify-between">
+                              <div className="flex items-center gap-4 text-gray-500 text-sm ">
+                                <div className="flex items-center gap-1">
+                                  <MapPin size={14} />
+                                  <span>{event.location}</span>
+                                </div>
+                              </div>
+
+                              <Link
+                                to={`/event/${event._id}`}
+                                className="font-semibold flex items-center gap-2 hover:text-brand transition-colors"
+                              >
+                                <button className="flex gap-2 cursor-pointer items-center">
+                                  Learn More <ChevronRight width={17} />
+                                </button>
+                              </Link>
+                            </div>
                           </div>
                         </div>
-
-                        <Link
-                          to={`/event/${event._id}`}
-                          className="ml-auto mt-auto font-semibold flex items-center gap-2 hover:text-brand transition-colors"
-                        >
-                          <button className="flex gap-2 cursor-pointer">
-                            Learn More <ChevronRight width={17} />
-                          </button>
-                        </Link>
-                      </div>
+                      ))}
                     </div>
                   </div>
                 ))}

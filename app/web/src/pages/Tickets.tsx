@@ -8,10 +8,14 @@ import { Link } from "react-router";
 export default function Tickets() {
   const { user, token } = useAuth();
   const [myEvents, setMyEvents] = useState<UniversityEvent[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchMyEvents = async () => {
-      if (!user) return;
+      if (!user) {
+        setLoading(false);
+        return;
+      }
       try {
         const response = await fetch(`${LOCAL_IP}/api/events/user/${user.id}`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -20,6 +24,8 @@ export default function Tickets() {
         setMyEvents(data);
       } catch (err) {
         console.error("Failed to fetch tickets:", err);
+      } finally {
+        setLoading(false);
       }
     };
     fetchMyEvents();
@@ -30,10 +36,8 @@ export default function Tickets() {
       <Navbar />
       <div className="px-20 pb-20">
         <h1 className="text-5xl font-bebas mt-10 mb-8">My Events</h1>
-        {/* Tab Header */}
         <div className="flex gap-10 items-center mb-0.5 mt-3 ">
           <h2 className="font-bold text-black ml-0.5 ">Upcoming</h2>
-
           <h2 className="font-bold text-gray-400 ml-0.5 ">Past</h2>
         </div>
 
@@ -42,9 +46,10 @@ export default function Tickets() {
           <div className="w-full h-0.5 bg-gray-200 "> </div>
         </div>
 
-        {/* user's events here!! */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
-          {myEvents.length > 0 ? (
+          {loading ? (
+            <p className="text-gray-400 font-league">Loading...</p>
+          ) : myEvents.length > 0 ? (
             myEvents.map((event) => (
               <Link
                 to={`/event/${event._id}`}
@@ -55,7 +60,7 @@ export default function Tickets() {
               </Link>
             ))
           ) : (
-            <p className="text-gray-400 italic">
+            <p className="text-gray-400 italic font-league">
               You haven't joined any events yet.
             </p>
           )}

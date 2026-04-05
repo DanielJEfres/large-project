@@ -83,7 +83,7 @@ export default function Event() {
     <>
       <Navbar />
 
-      <div className="px-20  [&_button]:cursor-pointer">
+      <div className="px-20  [&_button]:cursor-pointer ">
         {/* 2 grids */}
         <div className="grid grid-cols-[350px_1fr] gap-10 mt-10">
           {/* 1st column */}

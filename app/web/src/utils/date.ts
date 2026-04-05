@@ -85,3 +85,17 @@ export const formatStackedDate = (isoString: string | undefined | null) => {
     day: relative,
   };
 };
+
+// Time format
+export const formatTime = (isoString: string | undefined | null): string => {
+  if (!isoString) return "Time TBD";
+
+  const date = new Date(isoString);
+  if (isNaN(date.getTime())) return "Invalid Time";
+
+  return date.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+};
