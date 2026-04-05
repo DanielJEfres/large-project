@@ -81,6 +81,8 @@ const EventSkeleton = () => (
 );
 
 export default function Events() {
+  const [activeTab, setActiveTab] = useState<"RSO" | "Student">("RSO");
+
   const [loading, setLoading] = useState(true);
   const [trendingEvents, setTrendingEvents] = useState<UniversityEvent[]>([]);
   const [upcomingEvents, setUpcomingEvents] = useState<UniversityEvent[]>([]);
@@ -154,20 +156,44 @@ export default function Events() {
     }
   }, [upcomingEvents, fetchOrgDetails]);
 
+  const filteredUpcoming = upcomingEvents.filter((event) =>
+    activeTab === "RSO" ? event.isRSO : !event.isRSO,
+  );
+
+  const filteredTrending = trendingEvents.filter((event) =>
+    activeTab === "RSO" ? event.isRSO : !event.isRSO,
+  );
+
   return (
     <>
       <Navbar />
       <div className="font-inter px-20 pb-20 ">
         <h1 className="text-5xl font-bebas mt-10 mb-8">Events</h1>
-        {/* Tab Header */}
-        <div className="flex gap-10 items-center mb-0.5 mt-3 ">
-          <h2 className="font-bold text-black ml-0.5 ">RSO Events</h2>
 
-          <h2 className="font-bold text-gray-400 ml-0.5  ">Student Events</h2>
+        <div className="flex gap-10 items-center mb-0.5 mt-3 ">
+          {/* 3. Add Click Handlers and Dynamic Styling */}
+          <h2
+            onClick={() => setActiveTab("RSO")}
+            className={`font-bold cursor-pointer ml-0.5 ${activeTab === "RSO" ? "text-black" : "text-gray-400"}`}
+          >
+            RSO Events
+          </h2>
+
+          <h2
+            onClick={() => setActiveTab("Student")}
+            className={`font-bold cursor-pointer ml-0.5 ${activeTab === "Student" ? "text-black" : "text-gray-400"}`}
+          >
+            Student Events
+          </h2>
         </div>
 
         <div className="relative">
-          <div className="w-22 h-0.5 bg-brand absolute z-10"> </div>
+          {/* 4. Animate the underline */}
+          <div
+            className={`w-27 h-0.5 bg-brand absolute z-10 transition-all duration-300 ${activeTab === "Student" ? "translate-x-[110px] scale-x-150 origin-left" : "translate-x-0"}`}
+          >
+            {" "}
+          </div>
           <div className="w-full h-0.5 bg-gray-200 "> </div>
         </div>
         {/* Search Bar */}
@@ -193,7 +219,7 @@ export default function Events() {
           <>
             {/* --- FOR YOU CAROUSEL --- */}
             <div className="flex flex-col gap-4 mt-9 group/carousel relative ">
-              <h2 className="text-2xl font-league">For you</h2>
+              <h2 className="text-2xl font-league ">For you</h2>
 
               {/* Arrows */}
               {scrolledForYou && (
@@ -224,7 +250,7 @@ export default function Events() {
                   </>
                 ) : (
                   <>
-                    {upcomingEvents.map((event) => (
+                    {filteredUpcoming.map((event) => (
                       <Link
                         key={event._id}
                         to={`/event/${event._id}`}
@@ -234,7 +260,7 @@ export default function Events() {
                           <Image size={40} className="text-gray/70" />
                         </div>
                         <div className="w-60 px-5 py-3 relative flex flex-col">
-                          <p className="font-bebas text-sm uppercase tracking-wider text-brand">
+                          <p className="font-bebas text-lg uppercase tracking-wider text-brand">
                             {orgLookup[event.organizationId]?.name ||
                               "Loading..."}
                           </p>
@@ -301,7 +327,7 @@ export default function Events() {
                 onScroll={() => handleScroll(trendingRef, setScrolledTrending)}
                 className="flex gap-10 overflow-x-auto scrollbar-hide scroll-smooth py-2"
               >
-                {trendingEvents.map((event) => (
+                {filteredTrending.map((event) => (
                   <Link to={`/event/${event._id}`}>
                     <div
                       key={event._id}
@@ -311,9 +337,9 @@ export default function Events() {
                         <Image size={40} className="text-gray/70" />
                       </div>
 
-                      <div className="mt-2 max-w-80">
+                      <div className="max-w-80  p-2">
                         <div className="flex justify-between items-center">
-                          <p className="font-bebas text-sm uppercase tracking-wider text-brand">
+                          <p className="font-bebas text-brand text-xl tracking-wide uppercase">
                             {orgLookup[event.organizationId]?.name ||
                               "Loading..."}
                           </p>
@@ -343,7 +369,7 @@ export default function Events() {
               <h2 className="text-2xl font-league">Upcoming Events</h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-                {upcomingEvents.map((event) => (
+                {filteredUpcoming.map((event) => (
                   <Link
                     to={`/event/${event._id}`}
                     key={event._id}
@@ -354,7 +380,7 @@ export default function Events() {
                     </div>
 
                     <div className="p-5 flex flex-col flex-1">
-                      <p className="font-bebas text-brand text-sm uppercase tracking-wider ">
+                      <p className="font-bebas text-brand text-lg uppercase tracking-wider ">
                         {orgLookup[event.organizationId]?.name || "Loading..."}
                       </p>
 
@@ -425,7 +451,7 @@ export default function Events() {
                       </div>
 
                       <div className="p-5 flex flex-col flex-1">
-                        <p className="font-bebas text-brand text-sm uppercase tracking-wider ">
+                        <p className="font-bebas text-brand text-lg uppercase tracking-wider ">
                           {orgLookup[event.organizationId]?.name ||
                             "Loading..."}
                         </p>

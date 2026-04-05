@@ -14,6 +14,7 @@ import CreateEvent from "./pages/CreateEvent.tsx";
 import VerifyEmail from "./pages/VerifyEmail.tsx";
 import Organization from "./pages/Organization.tsx";
 import Tickets from "./pages/Tickets.tsx";
+import Manage from "./pages/Manage.tsx";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -63,6 +64,10 @@ const router = createBrowserRouter([
       {
         path: "tickets",
         element: <Tickets />,
+      },
+      {
+        path: "manage",
+        element: <Manage />,
       },
     ],
   },

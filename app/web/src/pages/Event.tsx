@@ -110,7 +110,7 @@ export default function Event() {
     <>
       <Navbar />
 
-      <div className="px-20  [&_button]:cursor-pointer ">
+      <div className="font-inter px-20  [&_button]:cursor-pointer ">
         {/* 2 grids */}
         <div className="grid grid-cols-[350px_1fr] gap-10 mt-10">
           {/* 1st column */}
@@ -207,7 +207,7 @@ export default function Event() {
               <p className="font-bebas text-2xl font-thin tracking-wider">
                 {hostOrg?.name || "Loading..."}
               </p>
-              <h1 className=" text-4xl font-medium">{event.title}</h1>
+              <h1 className=" text-4xl font-bold">{event.title}</h1>
 
               <div className="mt-5">
                 <p className="font-medium">Hosted by</p>
@@ -215,7 +215,7 @@ export default function Event() {
                 <div className="mt-2">
                   <div className="flex items-center gap-2">
                     <div className="h-7 w-7 bg-gray rounded-full"></div>
-                    <p>{"Random ahh organizer"}</p>
+                    <p>{event.createdBy}</p>
                   </div>
                 </div>
               </div>
@@ -247,7 +247,7 @@ export default function Event() {
             <div className="flex flex-col gap-5 p-2 [&>div>h2]:font-league  [&>div>h2]:mb-1">
               <div className="min-h-50">
                 <h2 className="text-xl mt-2">About This Event</h2>
-                <p>
+                <p className="text-gray-600">
                   {event.description ||
                     "No description provided for this event."}
                 </p>

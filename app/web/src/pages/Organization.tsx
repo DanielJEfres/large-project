@@ -8,13 +8,26 @@ import type { UniversityEvent } from "../types/UniversityEvent";
 import { formatStackedDate, formatTime } from "../utils/date";
 
 export default function Organization() {
+  const [activeTab, setActiveTab] = useState<"Upcoming" | "Past">("Upcoming");
+
   const { orgId } = useParams();
   const [org, setOrg] = useState<Organization | null>(null);
   const [events, setEvents] = useState<UniversityEvent[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const now = new Date();
+
+  const filteredEvents = events.filter((event) => {
+    const eventDate = new Date(event.startDate);
+    if (activeTab === "Upcoming") {
+      return eventDate >= now;
+    } else {
+      return eventDate < now;
+    }
+  });
+
   // creates a dict that groups events together based on their dates (dateKey)
-  const groupedEvents = events.reduce(
+  const groupedEvents = filteredEvents.reduce(
     (groups: { [key: string]: UniversityEvent[] }, event) => {
       const dateKey = formatStackedDate(event.startDate).date;
       if (!groups[dateKey]) {
@@ -127,19 +140,41 @@ export default function Organization() {
               <h2 className="font-bebas text-4xl mb-4">Events</h2>
 
               <div className="flex gap-10 items-center mb-0.5 mt-3 ">
-                <h2 className="font-bold text-black ml-0.5 ">Upcoming</h2>
+                <h2
+                  onClick={() => setActiveTab("Upcoming")}
+                  className={`font-bold cursor-pointer ml-0.5 transition-colors ${activeTab === "Upcoming" ? "text-black" : "text-gray-400"}`}
+                >
+                  Upcoming
+                </h2>
 
-                <h2 className="font-bold text-gray-400 ml-0.5 ">Past</h2>
+                <h2
+                  onClick={() => setActiveTab("Past")}
+                  className={`font-bold cursor-pointer ml-0.5 transition-colors ${activeTab === "Past" ? "text-black" : "text-gray-400"}`}
+                >
+                  Past
+                </h2>
               </div>
 
               <div className="relative">
-                <div className="w-22 h-0.5 bg-brand absolute z-10"> </div>
+                {/* Dynamic Underline */}
+                <div
+                  className={`w-22 h-0.5 bg-brand absolute z-10 transition-all duration-300 ${
+                    activeTab === "Past"
+                      ? "translate-x-[100px] scale-x-90 origin-left"
+                      : "translate-x-0"
+                  }`}
+                ></div>
                 <div className="w-full h-0.5 bg-gray-200 "> </div>
               </div>
 
               {/* events go here */}
 
-              <div className="p-10 flex flex-col gap-10">
+              <div className="p-10 flex flex-col gap-10 justify-center items-center">
+                {Object.keys(groupedEvents).length === 0 && (
+                  <div className="mt-20 h-90 text-gray-400">
+                    <p>There's no {activeTab.toLowerCase()} events. :(</p>
+                  </div>
+                )}
                 {Object.keys(groupedEvents).map((dateKey) => (
                   <div key={dateKey} className="flex flex-col gap-4">
                     {/* Date Header for the Group */}

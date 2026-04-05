@@ -31,7 +31,7 @@ export default function Navbar() {
             Organizations
           </Link>
           <Link to="/tickets" className="font-league hover:opacity-70">
-            Tickets
+            My Events
           </Link>
         </div>
 
@@ -101,7 +101,7 @@ export default function Navbar() {
               onClick={toggleMenu}
               className="text-xl font-league pb-2"
             >
-              Tickets
+              My Events
             </Link>
 
             {/* Mobile-only,if user logged in */}

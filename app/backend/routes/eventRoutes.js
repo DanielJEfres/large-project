@@ -196,4 +196,23 @@ router.get('/user/:userId', async (req, res) => {
     }
 });
 
+//Get all events a specific user CREATED
+router.get('/created-by/:userId', async (req, res) => {
+    try {
+        const { userId } = req.params;
+
+        // Filters events where the 'createdBy' field matches the user's ID
+        const events = await Event.find({ createdBy: userId });
+
+        if (!events || events.length === 0) {
+            return res.status(200).json([]);
+        }
+
+        return res.status(200).json(events);
+    } catch (error) {
+        console.error("Error fetching created events:", error);
+        res.status(500).json({ message: "Could not fetch your created events" });
+    }
+});
+
 export default router
