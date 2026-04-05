@@ -205,7 +205,7 @@ export default function Organization() {
                               {event.tags.map((tag) => (
                                 <span
                                   key={tag}
-                                  className="px-3 py-1 bg-brand/40 text-[10px] font-bold uppercase tracking-wider text-black rounded-full"
+                                  className="px-3 py-1 bg-brand text-[10px] font-bold uppercase tracking-wider text-white rounded-full"
                                 >
                                   {tag}
                                 </span>

@@ -54,7 +54,34 @@ const EVENTS: UniversityEvent[] = [
   },
 ];
 
+const EventSkeleton = () => (
+  <div className="flex min-w-fit bg-white h-80 rounded-2xl  border border-gray-100 animate-pulse">
+    {/* image */}
+    <div className="h-80 w-80 bg-gray-200  rounded-l-2xl"></div>
+
+    {/* info */}
+    <div className="h-80 w-60 px-6 py-4 bg-white rounded-2xl flex flex-col">
+      <div className="flex flex-col">
+        <div className="w-15 h-4 bg-gray-200 rounded mb-1"></div>
+        <div className="w-full h-8 bg-gray-300 rounded"></div>
+      </div>
+
+      <div className="space-y-2 mt-5">
+        <div className="w-3/4 h-3 bg-gray-100 rounded"></div>
+        <div className="w-1/2 h-3 bg-gray-100 rounded"></div>
+      </div>
+
+      <div className="flex gap-1 mt-5">
+        <div className="w-12 h-5 bg-gray-200 rounded-full"></div>
+        <div className="w-12 h-5 bg-gray-200 rounded-full"></div>
+      </div>
+      <div className="mt-auto ml-auto bg-gray-200 h-5  rounded-2xl w-20"></div>
+    </div>
+  </div>
+);
+
 export default function Events() {
+  const [loading, setLoading] = useState(true);
   const [trendingEvents, setTrendingEvents] = useState<UniversityEvent[]>([]);
   const [upcomingEvents, setUpcomingEvents] = useState<UniversityEvent[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -123,13 +150,14 @@ export default function Events() {
     if (upcomingEvents.length > 0) {
       const ids = upcomingEvents.map((e) => e.organizationId);
       fetchOrgDetails(ids);
+      setLoading(false);
     }
   }, [upcomingEvents, fetchOrgDetails]);
 
   return (
     <>
       <Navbar />
-      <div className="px-20 pb-20 ">
+      <div className="font-inter px-20 pb-20 ">
         <h1 className="text-5xl font-bebas mt-10 mb-8">Events</h1>
         {/* Tab Header */}
         <div className="flex gap-10 items-center mb-0.5 mt-3 ">
@@ -188,52 +216,63 @@ export default function Events() {
                 onScroll={() => handleScroll(forYouRef, setScrolledForYou)}
                 className="flex gap-10 overflow-x-auto scrollbar-hide scroll-smooth py-2"
               >
-                {upcomingEvents.map((event) => (
-                  <Link
-                    key={event._id}
-                    to={`/event/${event._id}`}
-                    className="h-max-fit min-w-fit flex border-gray/20 border-1 rounded-2xl overflow-hidden bg-white shrink-0 cursor-pointer"
-                  >
-                    <div className="w-80 min-h-80 bg-gray/30 flex items-center justify-center shrink-0">
-                      <Image size={40} className="text-gray/70" />
-                    </div>
-                    <div className="w-60 px-5 py-3 relative flex flex-col">
-                      <p className="font-bebas text-sm uppercase tracking-wider text-brand">
-                        {orgLookup[event.organizationId]?.name || "Loading..."}
-                      </p>
-                      <p className="font-semibold text-lg leading-tight mt-1 line-clamp-2 ">
-                        {event.title}
-                      </p>
-                      <div className="mt-2 space-y-1 text-gray-700">
-                        <div className="flex items-center gap-2 text-sm">
-                          <Calendar size={14} />
-                          <span>
-                            {formatStackedDate(event.startDate).day +
-                              ", " +
-                              formatStackedDate(event.startDate).date}
-                          </span>
+                {loading ? (
+                  <>
+                    {[...Array(3)].map((_, i) => (
+                      <EventSkeleton key={i} />
+                    ))}
+                  </>
+                ) : (
+                  <>
+                    {upcomingEvents.map((event) => (
+                      <Link
+                        key={event._id}
+                        to={`/event/${event._id}`}
+                        className="bg-[#f5f5f76e]  h-max-fit min-w-fit flex  rounded-2xl overflow-hidden shrink-0 cursor-pointer"
+                      >
+                        <div className="w-80 min-h-80 bg-gray/30 flex items-center justify-center shrink-0">
+                          <Image size={40} className="text-gray/70" />
                         </div>
-                        <div className="flex items-center gap-2 text-sm">
-                          <MapPin size={14} />
-                          <span>{event.location || "Location TBD"}</span>
+                        <div className="w-60 px-5 py-3 relative flex flex-col">
+                          <p className="font-bebas text-sm uppercase tracking-wider text-brand">
+                            {orgLookup[event.organizationId]?.name ||
+                              "Loading..."}
+                          </p>
+                          <p className="font-semibold text-lg leading-tight mt-1 line-clamp-2 ">
+                            {event.title}
+                          </p>
+                          <div className="mt-2 space-y-1 text-gray-700">
+                            <div className="flex items-center gap-2 text-sm">
+                              <Calendar size={14} />
+                              <span>
+                                {formatStackedDate(event.startDate).day +
+                                  ", " +
+                                  formatStackedDate(event.startDate).date}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2 text-sm">
+                              <MapPin size={14} />
+                              <span>{event.location || "Location TBD"}</span>
+                            </div>
+                          </div>
+                          <div className="flex flex-wrap gap-1 mt-3">
+                            {event.tags?.slice(0, 2).map((tag) => (
+                              <span
+                                key={tag}
+                                className="px-3 py-1 bg-brand text-[10px] font-bold uppercase text-white rounded-full"
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                          <div className="pt-6 mt-auto  font-semibold flex items-center justify-end gap-2 text-black hover:text-brand transition-colors">
+                            Learn More <ChevronRight width={17} />
+                          </div>
                         </div>
-                      </div>
-                      <div className="flex flex-wrap gap-1 mt-3">
-                        {event.tags?.slice(0, 2).map((tag) => (
-                          <span
-                            key={tag}
-                            className="px-3 py-1 bg-brand text-[10px] font-bold uppercase text-white rounded-full"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                      <div className="pt-6 mt-auto  font-semibold flex items-center justify-end gap-2 text-black hover:text-brand transition-colors">
-                        Learn More <ChevronRight width={17} />
-                      </div>
-                    </div>
-                  </Link>
-                ))}
+                      </Link>
+                    ))}
+                  </>
+                )}
               </div>
             </div>
 
@@ -308,7 +347,7 @@ export default function Events() {
                   <Link
                     to={`/event/${event._id}`}
                     key={event._id}
-                    className="flex flex-col border-gray/20 border-1 rounded-2xl overflow-hidden bg-white hover:cursor-pointer transition-all"
+                    className="bg-[#f5f5f76e] flex flex-col rounded-2xl overflow-hidden hover:cursor-pointer transition-all"
                   >
                     <div className="w-full h-48 bg-gray/30 flex items-center justify-center shrink-0">
                       <Image size={40} className="text-gray/70" />

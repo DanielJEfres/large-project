@@ -34,7 +34,7 @@ export default function Tickets() {
   return (
     <>
       <Navbar />
-      <div className="px-20 pb-20">
+      <div className="font-inter px-20 pb-20">
         <h1 className="text-5xl font-bebas mt-10 mb-8">My Events</h1>
         <div className="flex gap-10 items-center mb-0.5 mt-3 ">
           <h2 className="font-bold text-black ml-0.5 ">Upcoming</h2>

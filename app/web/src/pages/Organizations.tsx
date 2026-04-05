@@ -46,7 +46,7 @@ export default function Organizations() {
   return (
     <>
       <Navbar />
-      <div className="px-20 pb-20">
+      <div className="font-inter px-20 pb-20">
         <h1 className="text-5xl font-bebas mt-10 mb-8">Organizations</h1>
 
         {/* Searchbar */}
@@ -70,7 +70,7 @@ export default function Organizations() {
             organizations.map((org) => (
               <div
                 key={org._id}
-                className="rounded-2xl bg-white  border-[0.5px] border-gray/10 inset-shadow-[-2px_-2px_0px_1px_rgba(0,0,0,0.05)] transition-all overflow-hidden flex h-50"
+                className="rounded-2xl  bg-[#f5f5f76e] transition-all overflow-hidden flex h-50"
               >
                 {/* Image */}
                 <div className="w-70 bg-gray/30 flex items-center justify-center shrink-0">

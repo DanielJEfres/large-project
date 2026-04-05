@@ -170,7 +170,7 @@ export default function CreateEvent() {
           {/* Title Input */}
           <input
             value={title}
-            placeholder="My Event Title"
+            placeholder="My Event Title*"
             onChange={(e) => setTitle(e.target.value)}
             className="w-full outline-none border-b border-gray-100 pb-2 mb-10 font-bold text-[42px] tracking-tight focus:border-black transition-colors placeholder:text-gray-200"
           />
@@ -281,7 +281,7 @@ export default function CreateEvent() {
               <input
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                placeholder="Location"
+                placeholder="Location*"
                 className="w-full bg-[#F6F6F6] rounded-[14px] px-5 py-4 text-[16px] outline-none placeholder:text-gray-400 focus-within:ring-1 focus-within:text-gray-400"
               />
               <input
