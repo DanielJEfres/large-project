@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext.tsx";
 import { Link, useNavigate } from "react-router";
-import { LogOut, User as UserIcon } from "lucide-react";
+import { LogOut, Ticket, User as UserIcon } from "lucide-react";
 
 export default function UserMenu() {
   const { user, logout } = useAuth();
@@ -56,7 +56,7 @@ export default function UserMenu() {
                 className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                 onClick={() => setIsOpen(false)}
               >
-                <UserIcon size={16} /> Manage Events
+                <Ticket size={16} /> Manage Events
               </Link>
 
               <button
