@@ -178,4 +178,22 @@ router.delete('/:eventId', async (req, res) => {
     }
 })
 
+//Get all events a specific user is attending
+router.get('/user/:userId', async (req, res) => {
+    try {
+        const { userId } = req.params;
+
+        const events = await Event.find({ attendees: userId });
+
+        if (!events) {
+            return res.status(200).json([]);
+        }
+
+        return res.status(200).json(events);
+    } catch (error) {
+        console.error("Error fetching user events:", error);
+        res.status(500).json({ message: "Could not fetch your events" });
+    }
+});
+
 export default router

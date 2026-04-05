@@ -70,7 +70,7 @@ export default function Organizations() {
             organizations.map((org) => (
               <div
                 key={org._id}
-                className="rounded-2xl bg-white border border-lightgray hover:border-gray-300 transition-all overflow-hidden flex h-50"
+                className="rounded-2xl bg-white  border-[0.5px] border-gray/10 inset-shadow-[-2px_-2px_0px_1px_rgba(0,0,0,0.05)] transition-all overflow-hidden flex h-50"
               >
                 {/* Image */}
                 <div className="w-70 bg-gray/30 flex items-center justify-center shrink-0">
@@ -118,7 +118,7 @@ export default function Organizations() {
                         <ChevronRight width={17} />
                       </button>
                     </Link>
-                    <button className="font-bold px-14 rounded-4xl text-white bg-black my-3 py-2 font-league cursor-pointer active:scale-95 transition-transform">
+                    <button className="font-bold px-14 rounded-4xl text-white bg-black my-3 mr-3 font-league cursor-pointer active:scale-95 transition-all hover:bg-brand duration-100 ">
                       Join
                     </button>
                   </div>

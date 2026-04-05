@@ -8,6 +8,7 @@ import {
 import { LOCAL_IP, SERVER_IP } from "../config";
 
 type User = {
+  id: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -52,6 +53,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setToken(data.accessToken);
           if (data.user) {
             setUser(data.user);
+
             localStorage.setItem("user_data", JSON.stringify(data.user));
           }
         } else {

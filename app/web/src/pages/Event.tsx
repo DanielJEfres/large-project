@@ -7,11 +7,16 @@ import type { UniversityEvent } from "../types/UniversityEvent";
 import { formatStackedDate } from "../utils/date";
 import { useOrganizations } from "../hooks/useOrganization";
 
+import { useAuth } from "../context/AuthContext";
+
 export default function Event() {
   const { eventId } = useParams();
   const [event, setEvent] = useState<UniversityEvent | null>(null);
   const [loading, setLoading] = useState(true);
   const { orgLookup, fetchOrgDetails } = useOrganizations();
+
+  const { user, token } = useAuth();
+  const [isAttending, setIsAttending] = useState(false); // Track attendance locally
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -19,6 +24,11 @@ export default function Event() {
         const response = await fetch(`${LOCAL_IP}/api/events/${eventId}`);
         const data = await response.json();
         setEvent(data.event);
+
+        // Check if current user is already in the attendees list
+        if (user && data.event.attendees.includes(user.id)) {
+          setIsAttending(true);
+        }
       } catch (err) {
         console.error("Failed to fetch event:", err);
       } finally {
@@ -26,7 +36,37 @@ export default function Event() {
       }
     };
     if (eventId) fetchEvent();
-  }, [eventId]);
+  }, [eventId, user]);
+
+  const handleRSVP = async () => {
+    if (!user || !user.id) return alert("Please log in to register"); // Check for user.id
+
+    const endpoint = isAttending ? "unattendEvent" : "attendEvent";
+
+    try {
+      const response = await fetch(
+        `${LOCAL_IP}/api/events/${endpoint}/${eventId}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          // Ensure the key matches exactly what the backend looks for: "userId"
+          body: JSON.stringify({ userId: user.id }),
+        },
+      );
+
+      if (response.ok) {
+        setIsAttending(!isAttending);
+      } else {
+        const errorData = await response.json();
+        alert(errorData.message); // This is where you see "userId is required"
+      }
+    } catch (err) {
+      console.error("RSVP Error:", err);
+    }
+  };
 
   useEffect(() => {
     if (event?.organizationId) {
@@ -63,7 +103,7 @@ export default function Event() {
               </div>
 
               <div className="p-5 bg-lightgray rounded-b-xl">
-                <h2 className="text-xl mb-4 font-league text-black">
+                <h2 className="text-xl mb-4 font-bebas text-black">
                   Event details
                 </h2>
 
@@ -161,9 +201,18 @@ export default function Event() {
                 </button>
                 <button
                   disabled={!event.rsvpEnabled}
-                  className="font-bold w-40 px-8 py-3 rounded-4xl text-white bg-black my-3 px-4 py-2 font-league disabled:bg-gray-400"
+                  onClick={handleRSVP}
+                  className={`font-bold w-40 px-8 py-3 rounded-4xl text-white my-3 font-league disabled:bg-gray-400 transition-colors ${
+                    isAttending
+                      ? "bg-brand hover:bg-brand/90"
+                      : "bg-black hover:bg-zinc-800"
+                  }`}
                 >
-                  {event.rsvpEnabled ? "Register" : "No RSVP Required"}
+                  {!event.rsvpEnabled
+                    ? "No RSVP Required"
+                    : isAttending
+                      ? "Unregister"
+                      : "Register"}
                 </button>
               </div>
             </div>
@@ -195,7 +244,7 @@ export default function Event() {
                     {/* buttons */}
                     <div className="mt-auto ml-auto gap-7 flex flex-nowrap">
                       <Link to={`/organization/${event.organizationId}`}>
-                        <button className="font-bold  rounded-4xl my-3 py-2 font-league flex gap-2">
+                        <button className="font-medium  rounded-4xl my-3 py-2 font-league flex gap-2">
                           More Events
                           <ChevronRight width={17} />
                         </button>

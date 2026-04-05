@@ -206,7 +206,7 @@ export default function CreateEvent() {
             <h2 className="text-[28px] font-semibold mb-4 tracking-tight">
               Description
             </h2>
-            <div className="bg-[#F6F6F6] rounded-[14px] p-5">
+            <div className="bg-[#F6F6F6] rounded-[14px] p-5 transition-all focus-within:ring-1 focus-within:text-gray-400">
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
@@ -222,7 +222,7 @@ export default function CreateEvent() {
 
           {/* Event Details Section */}
           <div className="mb-10">
-            <h2 className="text-[28px] font-semibold mb-4 tracking-tight">
+            <h2 className="text-[28px] font-semibold mb-4 tracking-tight ">
               Event Details
             </h2>
             <div className="space-y-3">
@@ -230,13 +230,13 @@ export default function CreateEvent() {
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 placeholder="Location"
-                className="w-full bg-[#F6F6F6] rounded-[14px] px-5 py-4 text-[16px] outline-none placeholder:text-gray-400"
+                className="w-full bg-[#F6F6F6] rounded-[14px] px-5 py-4 text-[16px] outline-none placeholder:text-gray-400 focus-within:ring-1 focus-within:text-gray-400"
               />
               <input
                 value={link}
                 onChange={(e) => setLink(e.target.value)}
                 placeholder="Link (optional)"
-                className="w-full bg-[#F6F6F6] rounded-[14px] px-5 py-4 text-[16px] outline-none placeholder:text-gray-400"
+                className="w-full bg-[#F6F6F6] rounded-[14px] px-5 py-4 text-[16px] outline-none placeholder:text-gray-400 focus-within:ring-1 focus-within:text-gray-400"
               />
             </div>
           </div>
@@ -247,7 +247,7 @@ export default function CreateEvent() {
               <button
                 key={cat}
                 onClick={() => toggleCategory(cat)}
-                className={`px-5 py-2 rounded-full text-[14px] font-medium transition-all ${selectedCategories.includes(cat) ? "bg-black text-white" : "bg-[#F0F0F0] text-black hover:bg-gray-200"}`}
+                className={`px-5 py-2 rounded-full text-[14px] font-medium transition-all ${selectedCategories.includes(cat) ? "bg-brand text-white" : "bg-[#F0F0F0] text-black hover:bg-gray-200"}`}
               >
                 {cat}
               </button>

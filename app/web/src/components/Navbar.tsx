@@ -107,7 +107,7 @@ export default function Navbar() {
             {/* Mobile-only,if user logged in */}
             {isLoggedIn && (
               <Link to="/create" onClick={toggleMenu}>
-                <button className="w-full justify-center rounded-[20px] bg-black text-white px-4 py-3 font-inter font-medium flex items-center gap-2">
+                <button className="w-[98%] justify-center rounded-[20px] bg-black text-white px-4 py-3 font-inter font-medium flex items-center gap-2">
                   <Plus size={18} />
                   Create Event
                 </button>

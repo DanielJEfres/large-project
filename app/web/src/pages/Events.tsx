@@ -189,15 +189,16 @@ export default function Events() {
                 className="flex gap-10 overflow-x-auto scrollbar-hide scroll-smooth py-2"
               >
                 {upcomingEvents.map((event) => (
-                  <div
+                  <Link
                     key={event._id}
-                    className="h-max-fit min-w-fit flex border-gray/20 border-1 rounded-2xl overflow-hidden bg-white shrink-0 hover:shadow-md transition-shadow"
+                    to={`/event/${event._id}`}
+                    className="h-max-fit min-w-fit flex border-gray/20 border-1 rounded-2xl overflow-hidden bg-white shrink-0 cursor-pointer"
                   >
                     <div className="w-60 h-full bg-gray/30 flex items-center justify-center shrink-0">
                       <Image size={40} className="text-gray/70" />
                     </div>
                     <div className="w-60 px-5 py-3 relative flex flex-col">
-                      <p className="font-bebas text-sm uppercase tracking-wider">
+                      <p className="font-bebas text-sm uppercase tracking-wider text-brand">
                         {orgLookup[event.organizationId]?.name || "Loading..."}
                       </p>
                       <p className="font-semibold text-lg leading-tight mt-1 line-clamp-2 ">
@@ -227,14 +228,11 @@ export default function Events() {
                           </span>
                         ))}
                       </div>
-                      <Link
-                        to={`/event/${event._id}`}
-                        className="pt-6 mt-auto  font-semibold flex items-center justify-end gap-2 text-black hover:text-brand transition-colors"
-                      >
+                      <div className="pt-6 mt-auto  font-semibold flex items-center justify-end gap-2 text-black hover:text-brand transition-colors">
                         Learn More <ChevronRight width={17} />
-                      </Link>
+                      </div>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </div>
@@ -307,16 +305,17 @@ export default function Events() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                 {upcomingEvents.map((event) => (
-                  <div
+                  <Link
+                    to={`/event/${event._id}`}
                     key={event._id}
-                    className="flex flex-col border-gray/20 border-1 rounded-2xl overflow-hidden bg-white hover:shadow-lg transition-all"
+                    className="flex flex-col border-gray/20 border-1 rounded-2xl overflow-hidden bg-white hover:cursor-pointer transition-all"
                   >
                     <div className="w-full h-48 bg-gray/30 flex items-center justify-center shrink-0">
                       <Image size={40} className="text-gray/70" />
                     </div>
 
                     <div className="p-5 flex flex-col flex-1">
-                      <p className="font-bebas text-sm uppercase tracking-wider ">
+                      <p className="font-bebas text-brand text-sm uppercase tracking-wider ">
                         {orgLookup[event.organizationId]?.name || "Loading..."}
                       </p>
 
@@ -352,14 +351,11 @@ export default function Events() {
                         ))}
                       </div>
 
-                      <Link
-                        to={`/event/${event._id}`}
-                        className="mt-auto pt-6 font-semibold flex items-center justify-end gap-2 text-black hover:text-brand transition-colors"
-                      >
+                      <div className="mt-auto pt-6 font-semibold flex items-center justify-end gap-2 text-black hover:text-brand transition-colors">
                         Learn More <ChevronRight width={17} />
-                      </Link>
+                      </div>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </div>
@@ -390,7 +386,7 @@ export default function Events() {
                       </div>
 
                       <div className="p-5 flex flex-col flex-1">
-                        <p className="font-bebas text-sm uppercase tracking-wider ">
+                        <p className="font-bebas text-brand text-sm uppercase tracking-wider ">
                           {orgLookup[event.organizationId]?.name ||
                             "Loading..."}
                         </p>
