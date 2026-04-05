@@ -122,7 +122,7 @@ export default function Events() {
   useEffect(() => {
     const fetchTrending = async () => {
       try {
-        const response = await fetch(`${LOCAL_IP}/api/getEvents/getTrending`);
+        const response = await fetch(`${SERVER_IP}/api/getEvents/getTrending`);
         const data = await response.json();
         setTrendingEvents(data.events);
       } catch (err) {
@@ -136,7 +136,7 @@ export default function Events() {
     const fetchEvents = async () => {
       try {
         const upcomingRes = await fetch(
-          `${LOCAL_IP}/api/getEvents/getUpcoming`,
+          `${SERVER_IP}/api/getEvents/getUpcoming`,
         );
         const upcomingData = await upcomingRes.json();
         setUpcomingEvents(upcomingData.events);

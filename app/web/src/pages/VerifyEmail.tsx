@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import Logo from "../components/Logo";
 import styles from "./Login.module.css";
-import { LOCAL_IP } from "../config";
+import { SERVER_IP } from "../config";
 
 export default function VerifyEmail() {
   const { token } = useParams<{ token?: string }>();
@@ -21,7 +21,7 @@ export default function VerifyEmail() {
       setStatusMessage("Verifying your account...");
       try {
         const response = await fetch(
-          `${LOCAL_IP}/api/verifyEmail/verify-email/${token}`,
+          `${SERVER_IP}/api/verifyEmail/verify-email/${token}`,
           { method: "GET" },
         );
         const data = await response.json();

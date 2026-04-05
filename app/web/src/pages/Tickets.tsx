@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import { useAuth } from "../context/AuthContext";
 import type { UniversityEvent } from "../types/UniversityEvent";
-import { LOCAL_IP } from "../config";
+import { SERVER_IP } from "../config";
 import { Link } from "react-router";
 import { useOrganizations } from "../hooks/useOrganization";
 import { formatStackedDate } from "../utils/date";
@@ -34,9 +34,12 @@ export default function Tickets() {
         return;
       }
       try {
-        const response = await fetch(`${LOCAL_IP}/api/events/user/${user.id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const response = await fetch(
+          `${SERVER_IP}/api/events/user/${user.id}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
         const data = await response.json();
         setMyEvents(data);
       } catch (err) {

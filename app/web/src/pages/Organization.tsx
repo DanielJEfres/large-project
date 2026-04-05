@@ -43,7 +43,7 @@ export default function Organization() {
     const fetchOrgAndEvents = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`${LOCAL_IP}/api/organizations/${orgId}`);
+        const response = await fetch(`${SERVER_IP}/api/organizations/${orgId}`);
         const data = await response.json();
 
         if (data.Organization) {

@@ -25,7 +25,7 @@ export default function Event() {
     if (!window.confirm("Are you sure you want to delete this event?")) return;
 
     try {
-      const response = await fetch(`${LOCAL_IP}/api/events/${eventId}`, {
+      const response = await fetch(`${SERVER_IP}/api/events/${eventId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -48,7 +48,7 @@ export default function Event() {
   useEffect(() => {
     const fetchEvent = async () => {
       try {
-        const response = await fetch(`${LOCAL_IP}/api/events/${eventId}`);
+        const response = await fetch(`${SERVER_IP}/api/events/${eventId}`);
         const data = await response.json();
         setEvent(data.event);
 
@@ -72,7 +72,7 @@ export default function Event() {
 
     try {
       const response = await fetch(
-        `${LOCAL_IP}/api/events/${endpoint}/${eventId}`,
+        `${SERVER_IP}/api/events/${endpoint}/${eventId}`,
         {
           method: "PATCH",
           headers: {
