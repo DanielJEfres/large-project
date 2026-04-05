@@ -18,6 +18,33 @@ export default function Event() {
   const { user, token } = useAuth();
   const [isAttending, setIsAttending] = useState(false); // Track attendance locally
 
+  const [showMenu, setShowMenu] = useState(false);
+  const isOwner = user && event && user.id === event.createdBy;
+
+  const handleDelete = async () => {
+    if (!window.confirm("Are you sure you want to delete this event?")) return;
+
+    try {
+      const response = await fetch(`${LOCAL_IP}/api/events/${eventId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        alert("Event deleted successfully");
+        window.location.href = "/"; // Redirect to home or dashboard
+      } else {
+        const data = await response.json();
+        alert(data.message || "Failed to delete event");
+      }
+    } catch (err) {
+      console.error("Delete error:", err);
+      alert("An error occurred while deleting.");
+    }
+  };
+
   useEffect(() => {
     const fetchEvent = async () => {
       try {

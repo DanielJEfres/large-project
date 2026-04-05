@@ -1,6 +1,8 @@
 import { Check } from "lucide-react";
 import Navbar from "../components/Navbar";
 import React, { useState, useRef } from "react";
+import { useAuth } from "../context/AuthContext";
+import { LOCAL_IP } from "../config";
 
 const CATEGORIES = [
   "Music",
@@ -30,8 +32,10 @@ const formatDisplayDate = (dateStr: string) => {
 };
 
 export default function CreateEvent() {
-  const [eventType, setEventType] = useState<"RSO" | "Student">("RSO");
-  const [title, setTitle] = useState("My Event Title");
+  const { user, token } = useAuth();
+
+  const [eventType, setEventType] = useState<"RSO" | "Student">("Student");
+  const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
   const [link, setLink] = useState("");
@@ -63,6 +67,54 @@ export default function CreateEvent() {
     if (file) {
       const url = URL.createObjectURL(file);
       setImage(url);
+    }
+  };
+
+  const handleSubmit = async () => {
+    //validation
+    if (!title || !startDate) {
+      alert("Title and Start Date are required.");
+      return;
+    }
+
+    // 2. Map the frontend state to the Backend Schema
+    const eventData = {
+      title,
+      description,
+      location,
+      startDate,
+      endDate: endDate || null,
+      createdBy: user?.id,
+      isRSO: false, // Explicitly student event
+      status: "upcoming",
+      isPublic: true,
+      rsvpEnabled: true,
+
+      tags: [],
+    };
+
+    try {
+      const response = await fetch(`${LOCAL_IP}/api/events`, {
+        // Removed /addEvent
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(eventData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("Event created successfully!");
+        // Optional: redirect to the new event or home
+      } else {
+        alert(`Error: ${data.error || data.message}`);
+      }
+    } catch (error) {
+      console.error("Error creating event:", error);
+      alert("Failed to connect to server.");
     }
   };
 
@@ -118,7 +170,7 @@ export default function CreateEvent() {
           {/* Title Input */}
           <input
             value={title}
-            placeholder="Event Title"
+            placeholder="My Event Title"
             onChange={(e) => setTitle(e.target.value)}
             className="w-full outline-none border-b border-gray-100 pb-2 mb-10 font-bold text-[42px] tracking-tight focus:border-black transition-colors placeholder:text-gray-200"
           />
@@ -278,7 +330,10 @@ export default function CreateEvent() {
               )}
             </div>
 
-            <button className="w-full bg-[#282828] text-white py-4 rounded-full font-bold text-[16px] hover:bg-black transition-all active:scale-[0.98] shadow-lg">
+            <button
+              onClick={handleSubmit}
+              className="w-full bg-[#282828] text-white py-4 rounded-full font-bold text-[16px] hover:bg-black transition-all active:scale-[0.98] shadow-lg"
+            >
               Create Event
             </button>
           </div>
