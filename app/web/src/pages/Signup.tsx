@@ -73,7 +73,7 @@ export default function Signup() {
     // api call here vvvvvvvv
 
     try {
-      const response = await fetch(`${SERVER_IP}/api/auth/signup`, {
+      const response = await fetch(`${LOCAL_IP}/api/auth/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

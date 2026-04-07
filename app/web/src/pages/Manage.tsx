@@ -30,7 +30,7 @@ export default function Manage() {
       }
       try {
         const response = await fetch(
-          `${SERVER_IP}/api/events/created-by/${user.id}`,
+          `${LOCAL_IP}/api/events/created-by/${user.id}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           },

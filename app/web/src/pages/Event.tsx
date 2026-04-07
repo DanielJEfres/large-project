@@ -15,6 +15,8 @@ export default function Event() {
   const [loading, setLoading] = useState(true);
   const { orgLookup, fetchOrgDetails } = useOrganizations();
 
+  const isPastEvent = event ? new Date(event.startDate) < new Date() : false;
+
   const { user, token } = useAuth();
   const [isAttending, setIsAttending] = useState(false); // Track attendance locally
 
@@ -48,7 +50,7 @@ export default function Event() {
   useEffect(() => {
     const fetchEvent = async () => {
       try {
-        const response = await fetch(`${SERVER_IP}/api/events/${eventId}`);
+        const response = await fetch(`${LOCAL_IP}/api/events/${eventId}`);
         const data = await response.json();
         setEvent(data.event);
 
@@ -72,7 +74,7 @@ export default function Event() {
 
     try {
       const response = await fetch(
-        `${SERVER_IP}/api/events/${endpoint}/${eventId}`,
+        `${LOCAL_IP}/api/events/${endpoint}/${eventId}`,
         {
           method: "PATCH",
           headers: {
@@ -110,7 +112,7 @@ export default function Event() {
     <>
       <Navbar />
 
-      <div className="font-inter px-20  [&_button]:cursor-pointer ">
+      <div className="font-inter px-20   ">
         {/* 2 grids */}
         <div className="grid grid-cols-[350px_1fr] gap-10 mt-10">
           {/* 1st column */}
@@ -222,24 +224,30 @@ export default function Event() {
 
               {/* buttons */}
               <div className="flex mt-auto gap-2 ">
-                <button className=" items-center gap-3 flex font-bold w-fit px-8 py-3 rounded-4xl text-black bg-lightgray my-3 px-4 py-2 font-league">
+                <button className="cursor-pointer items-center gap-3 flex font-bold w-fit px-8 py-3 rounded-4xl text-black bg-lightgray my-3 px-4 py-2 font-league">
                   <Share width={20} />
                   Share Event
                 </button>
                 <button
-                  disabled={!event.rsvpEnabled}
+                  disabled={!event.rsvpEnabled || isPastEvent}
                   onClick={handleRSVP}
-                  className={`font-bold w-40 px-8 py-3 rounded-4xl text-white my-3 font-league disabled:bg-gray-400 transition-colors ${
-                    isAttending
-                      ? "bg-brand hover:bg-brand/90"
-                      : "bg-black hover:bg-zinc-800"
+                  className={` font-bold w-40 px-8 py-3 rounded-4xl text-white my-3 font-league transition-colors ${
+                    isPastEvent
+                      ? "bg-gray-600 cursor-not-allowed"
+                      : !event.rsvpEnabled
+                        ? "bg-gray-400 cursor-pointer"
+                        : isAttending
+                          ? "bg-brand hover:bg-brand/90 cursor-pointer"
+                          : "bg-black hover:bg-zinc-800 cursor-pointer"
                   }`}
                 >
-                  {!event.rsvpEnabled
-                    ? "No RSVP Required"
-                    : isAttending
-                      ? "Unregister"
-                      : "Register"}
+                  {isPastEvent
+                    ? "Event Ended"
+                    : !event.rsvpEnabled
+                      ? "No RSVP Required"
+                      : isAttending
+                        ? "Unregister"
+                        : "Register"}
                 </button>
               </div>
             </div>

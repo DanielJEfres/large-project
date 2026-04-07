@@ -41,7 +41,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const refreshAccess = async () => {
       try {
-        const response = await fetch(`${SERVER_IP}/api/auth/token`, {
+        const response = await fetch(`${LOCAL_IP}/api/auth/token`, {
           method: "POST",
           credentials: "include", // Required to send the HTTPOnly refreshToken cookie
         });
@@ -80,7 +80,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = async () => {
     try {
       // Tell backend to delete the Refresh Token from DB and clear the cookie
-      await fetch(`${SERVER_IP}/api/auth/logout`, {
+      await fetch(`${LOCAL_IP}/api/auth/logout`, {
         method: "DELETE",
         credentials: "include",
       });
