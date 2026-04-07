@@ -1,8 +1,8 @@
-import { useState } from "react";
 import { Link } from "react-router";
 
 export default function Navbar() {
-  const [showSignup, setShowSignup] = useState(false);
+  // const [showSignup, setShowSignup] = useState(false);
+  // commented out for now to fix typescript errors
 
   // add some logic to not show sign up + log in when user is logged in (prolly thru context hook)
   return (
