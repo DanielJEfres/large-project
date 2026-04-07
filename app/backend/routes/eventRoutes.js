@@ -19,6 +19,7 @@ import  express from 'express'
 import mongoose from 'mongoose'
 import Event from '../models/Event.js'
 import User from '../models/User.js'
+import Tag from '../models/Tag.js'
 
 const router = express.Router();
 
@@ -26,11 +27,26 @@ const router = express.Router();
 router.get('/:eventId', async (req, res) => {
 
     try {
-
+        let tags = []
+        
         const event = await Event.findById(req.params.eventId)
        
         if(!event) return res.json(500).json({message: "No Event Found"})
         
+        const eventCreator = await User.findById(event.createdBy).select('firstName lastName')
+        
+        //Get tag names
+        if(event.tags && event.tags.length > 0) {
+            for(let tag of event.tags) {
+                tag = await Tag.findById(tag).select('name')
+                tags.push(tag)
+            }
+        }
+
+        //Update field information
+        event.createdBy = eventCreator
+        event.tags = tags
+
         return res.status(200).json({event:event})
 
     } catch (error) {

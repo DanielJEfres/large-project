@@ -5,6 +5,7 @@ import verifyEmail from './email-verification.js'
 import passwordResetRoutes from './password-reset.js'
 import eventRoutes from './eventRoutes.js'
 import organizationRoutes from './organizationRoutes.js'
+import getEventsRoutes from './getEvents.js'
 
 const router = express.Router()
 
