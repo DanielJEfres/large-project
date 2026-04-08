@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../screens/loginPage.dart';
 
-class eventsScreen extends StatelessWidget {
+
+class EventsScreen extends StatelessWidget {
   String loginName = '';
   @override
 
