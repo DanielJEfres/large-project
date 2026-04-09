@@ -14,6 +14,7 @@ members
 import express from 'express'
 import Organization from '../models/Organization.js'
 import Event from '../models/Event.js'
+import pagination from './helpers/pagination.js'
 
 const router = express.Router()
 
@@ -54,36 +55,47 @@ router.post('/create', async(req, res) => {
     }
 })
 
-//Get all organizations OR partial search organizaitons (name, description, and category)
+//Get all organizations OR partial search organizaitons (name, description, and category) with pagination
 router.get('/', async (req, res) => {
 
     try {
 
         const { name } = req.query
 
-        let organizations = null
-        
+        let page, organizations = null
+
         //Get Organizations by name
-        if(name){
+        if(name) {
 
             const regex = new RegExp(name, "i")
+
+            //Pagination
+            const filter = {name: {$regex:regex}}
+            page = await pagination(req.query.page, req.query.limit, filter, Organization)
+
             organizations = await Organization.find({
-                name: {$regex: regex}
-            }).select('name description category')
-
-
-            return res.status(200).json({Organizations:organizations})
+                name: {$regex:regex}
+            }).select('name description category').skip(page?.skip).limit(page?.limit)
 
         //Get All Organizations
         } else {
 
-            organizations = await Organization.find().select('name description category')
+            //Pagination
+            const filter = {}
+            page = await pagination(req.query.page, req.query.limit, filter, Organization)
 
-            if(!organizations) return res.status(500).json({message:" Error Getting Organization"})
+            organizations = await Organization.find().select('name description category').skip(page?.skip).limit(page?.limit)
 
-            return res.status(200).json({Organizations: organizations})
-
+            if(!organizations) return res.status(500).json({message:" Error Getting Organizations"})
         }
+
+        return res.status(200).json({
+                Organizations: organizations, 
+                pageInfo:{
+                    numberOfPages:page?.numPages, 
+                    hasPrevPage:Boolean(page?.hasPrevPage), 
+                    hasNextPage:Boolean(page?.hasNextPage)
+        }})
 
     } catch(error) {
         console.log(error)
@@ -94,15 +106,35 @@ router.get('/', async (req, res) => {
 //Get specific Organization and their events
 router.get('/:orgId', async (req, res) => {
 
-    const organization = await Organization.findById(req.params.orgId)
+    try {
 
-    if(!organization) return res.status(500).json({messsage:"Could not find organization"})
-    
-    const organizationEvents = await Event.find({
-        organizationId: req.params.orgId
-    })
+        const orgId = req.params.orgId
 
-    return res.status(200).json({Organization:organization,Events:organizationEvents})
+        const organization = await Organization.findById(orgId)
+
+        if(!organization) return res.status(500).json({messsage:"Could Not Find Organization"})
+        
+        //Pagination
+        const filter = {organizationId: orgId}
+        const page = await pagination(req.query.page, req.query.limit, filter, Event)
+
+        const organizationEvents = await Event.find({
+            organizationId: orgId
+        }).skip(page?.skip).limit(page?.limit)
+
+        return res.status(200).json({
+            Organization:organization,
+            Events:organizationEvents, 
+            pageInfo: {
+                numberOfPages:page?.numPages, 
+                hasPrevPage:Boolean(page?.hasPrevPage), 
+                hasNextPage:Boolean(page?.hasNextPage)
+        }})
+        
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({message:"Error Getting Organizations"})
+    }
 })
 
 //Update Organization
@@ -114,9 +146,8 @@ router.put('/:orgId', async (req, res) => {
         req.body,
         {returnDocument: 'after'}
     )
-    //Figure out how to update members
     
-    if(!updatedOrganization) return res.status(500).json({message:"Could not update organization"})
+    if(!updatedOrganization) return res.status(500).json({message:"Could Not Update Organization"})
     
     return res.status(200).json({Organization:updatedOrganization})
 })
@@ -132,6 +163,7 @@ router.delete('/:orgId', async(req, res) =>{
         if(!organization) return res.status(500).json({message:"Could not delete organization"})
         
         return res.status(200).json({message:"Organization Deleted"})
+
     } catch (error) {
         console.log(error)
         res.status(500).json({message:"Could Not Delete Organization"})
