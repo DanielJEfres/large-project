@@ -43,11 +43,12 @@ export default function Organization() {
     const fetchOrgAndEvents = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`${SERVER_IP}/api/organizations/${orgId}`);
+        const response = await fetch(`${LOCAL_IP}/api/organizations/${orgId}`);
         const data = await response.json();
 
         if (data.Organization) {
           setOrg(data.Organization);
+          console.log(data.Events);
           setEvents(data.Events || []);
         }
       } catch (err) {
@@ -244,11 +245,11 @@ export default function Organization() {
                             <div className="flex flex-wrap gap-2 mt-auto ">
                               {event.tags.map((tag) => (
                                 <span
-                                  key={tag}
+                                  key={tag._id}
                                   className="flex gap-1 px-3 py-1 items-center bg-brand text-[10px] font-bold uppercase tracking-wider text-white rounded-full"
                                 >
                                   <Hash size={14} />
-                                  {tag}
+                                  {tag.name}
                                 </span>
                               ))}
                             </div>

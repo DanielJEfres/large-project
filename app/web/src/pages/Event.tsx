@@ -1,4 +1,4 @@
-import { ChevronRight, Share } from "lucide-react";
+import { ChevronRight, Hash, Share } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { Link, useParams } from "react-router";
 import { useEffect, useState } from "react";
@@ -21,7 +21,6 @@ export default function Event() {
   const [isAttending, setIsAttending] = useState(false); // Track attendance locally
 
   const [showMenu, setShowMenu] = useState(false);
-  const isOwner = user && event && user.id === event.createdBy;
 
   const handleDelete = async () => {
     if (!window.confirm("Are you sure you want to delete this event?")) return;
@@ -52,6 +51,8 @@ export default function Event() {
       try {
         const response = await fetch(`${LOCAL_IP}/api/events/${eventId}`);
         const data = await response.json();
+
+        console.log(data);
         setEvent(data.event);
 
         // Check if current user is already in the attendees list
@@ -178,10 +179,11 @@ export default function Event() {
                       {event.tags.length > 0 ? (
                         event.tags.map((tag) => (
                           <span
-                            key={tag}
-                            className="px-3 py-1 bg-brand/10 text-brand text-xs font-bold uppercase rounded-full"
+                            key={tag.name}
+                            className="flex gap-1 px-3 py-1 bg-brand/10 text-brand text-xs font-bold uppercase rounded-full"
                           >
-                            {tag}
+                            <Hash size={14} />
+                            {tag.name}
                           </span>
                         ))
                       ) : (
@@ -217,7 +219,9 @@ export default function Event() {
                 <div className="mt-2">
                   <div className="flex items-center gap-2">
                     <div className="h-7 w-7 bg-gray rounded-full"></div>
-                    <p>{event.createdBy}</p>
+                    <p>
+                      {`${event.createdBy.firstName} ${event.createdBy.lastName}`}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -270,24 +274,26 @@ export default function Event() {
                   {/* second */}
                   <div className="px-8 pt-8 flex flex-col w-full">
                     <p className="text-2xl font-bold font-league text-black leading-tight">
-                      {hostOrg?.name || "Loading..."}
+                      {hostOrg?.name || event.createdBy.fullName}
                     </p>
                     <p className="text-gray-600">
                       {hostOrg?.description || "Loading..."}
                     </p>
 
                     {/* buttons */}
-                    <div className="mt-auto ml-auto gap-7 flex flex-nowrap">
-                      <Link to={`/organization/${event.organizationId}`}>
-                        <button className="font-medium  rounded-4xl my-3 py-2 font-league flex gap-2">
-                          More Events
-                          <ChevronRight width={17} />
+                    {event.isRSO && (
+                      <div className="mt-auto ml-auto gap-7 flex flex-nowrap">
+                        <Link to={`/organization/${event.organizationId}`}>
+                          <button className="font-medium  rounded-4xl my-3 py-2 font-league flex gap-2">
+                            More Events
+                            <ChevronRight width={17} />
+                          </button>
+                        </Link>
+                        <button className="font-bold  px-7  rounded-4xl text-white bg-black my-3  py-2 font-league">
+                          Join
                         </button>
-                      </Link>
-                      <button className="font-bold  px-7  rounded-4xl text-white bg-black my-3  py-2 font-league">
-                        Join
-                      </button>
-                    </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

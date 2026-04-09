@@ -110,10 +110,11 @@ export default function Tickets() {
                   <Image size={40} className="text-gray/70" />
                 </div>
                 <div className=" w-full flex flex-col p-2">
-                  <p className="mt-auto font-bebas text-lg uppercase tracking-wider text-brand line-clamp-1">
-                    {orgLookup[event.organizationId]?.name || "Loading..."}
+                  <p className="font-bebas text-lg uppercase tracking-wider text-brand">
+                    {event.isRSO
+                      ? orgLookup[event.organizationId]?.name || "Loading..."
+                      : `${event.createdBy.firstName} ${event.createdBy.lastName}`}
                   </p>
-
                   <p className="font-semibold text-lg leading-tight mt-1 line-clamp-2">
                     {event.title}
                   </p>

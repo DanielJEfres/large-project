@@ -25,8 +25,16 @@ const EVENTS: UniversityEvent[] = [
     startDate: "2026-04-01T10:00:00Z",
     endDate: "2026-04-02T10:00:00Z",
     organizationId: "org123",
-    createdBy: "user456",
-    tags: ["65d1a...", "65d1b..."], // These would be Tag ObjectIds
+    createdBy: {
+      _id: "1",
+      firstName: "a",
+      lastName: "b",
+    },
+    // Update this to match the Tag interface
+    tags: [
+      { _id: "t1", name: "Coding", isCustom: false, isApproved: true },
+      { _id: "t2", name: "Competition", isCustom: false, isApproved: true },
+    ],
     attendees: [],
     isRSO: true,
     flyer: null,
@@ -43,8 +51,13 @@ const EVENTS: UniversityEvent[] = [
     startDate: "2026-04-03T16:00:00Z",
     endDate: null,
     organizationId: "org789",
-    createdBy: "user456",
-    tags: ["65d1c..."],
+    createdBy: {
+      _id: "1",
+      firstName: "a",
+      lastName: "b",
+    },
+    // Update this to match the Tag interface
+    tags: [{ _id: "t3", name: "Design", isCustom: false, isApproved: true }],
     attendees: [],
     isRSO: false,
     flyer: null,
@@ -271,14 +284,19 @@ export default function Events() {
                         <div className="w-80 h-80 bg-gray/30 flex items-center justify-center shrink-0 overflow-hidden ">
                           <img
                             className="w-full h-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-110"
-                            src="https://www.ucf.edu/wp-content/blogs.dir/4/files/2024/11/PegFa24-OnCampus-1200x800-1.jpg"
+                            src={
+                              event.flyer ||
+                              "https://www.ucf.edu/wp-content/blogs.dir/4/files/2024/11/PegFa24-OnCampus-1200x800-1.jpg"
+                            }
                             alt={event.title}
                           />
                         </div>
                         <div className="w-60 px-5 py-3 relative flex flex-col">
                           <p className="font-bebas text-lg uppercase tracking-wider text-brand">
-                            {orgLookup[event.organizationId]?.name ||
-                              "Loading..."}
+                            {event.isRSO
+                              ? orgLookup[event.organizationId]?.name ||
+                                "Loading..."
+                              : `${event.createdBy.firstName} ${event.createdBy.lastName}`}
                           </p>
                           <p className="font-semibold text-lg leading-tight mt-1 line-clamp-2 ">
                             {event.title}
@@ -300,11 +318,11 @@ export default function Events() {
                           <div className="flex flex-wrap gap-1 mt-3">
                             {event.tags?.slice(0, 2).map((tag) => (
                               <span
-                                key={tag}
-                                className="flex gap-1 items-center px-3 py-1 bg-brand text-[10px] font-bold uppercase text-white rounded-full"
+                                key={tag.name}
+                                className="flex gap-1 items-center px-3 py-1 bg-brand text-[10px] font-bold uppercase text-white rounded-full "
                               >
                                 <Hash size={14} />
-                                {tag}
+                                {tag.name}
                               </span>
                             ))}
                           </div>
@@ -353,16 +371,21 @@ export default function Events() {
                       <div className="w-80 h-80 bg-gray/30 flex items-center justify-center rounded-2xl overflow-hidden group-hover:brightness-95 transition-all">
                         <img
                           className="w-full h-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-110"
-                          src="https://www.ucf.edu/wp-content/blogs.dir/4/files/2024/11/PegFa24-OnCampus-1200x800-1.jpg"
+                          src={
+                            event.flyer ||
+                            "https://www.ucf.edu/wp-content/blogs.dir/4/files/2024/11/PegFa24-OnCampus-1200x800-1.jpg"
+                          }
                           alt={event.title}
                         />
                       </div>
 
                       <div className="max-w-80  p-2">
                         <div className="flex justify-between items-center">
-                          <p className="font-bebas text-brand text-xl tracking-wide uppercase">
-                            {orgLookup[event.organizationId]?.name ||
-                              "Loading..."}
+                          <p className="font-bebas text-lg uppercase tracking-wider text-brand">
+                            {event.isRSO
+                              ? orgLookup[event.organizationId]?.name ||
+                                "Loading..."
+                              : `${event.createdBy.firstName} ${event.createdBy.lastName}`}
                           </p>
                           <span className="text-[10px] font-bold text-gray-400">
                             {event.attendees.length} ATTENDING
@@ -399,14 +422,20 @@ export default function Events() {
                     <div className="w-full overflow-hidden h-48 bg-gray/30 flex items-center justify-center shrink-0">
                       <img
                         className="w-full h-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-110"
-                        src="https://www.ucf.edu/wp-content/blogs.dir/4/files/2024/11/PegFa24-OnCampus-1200x800-1.jpg"
+                        src={
+                          event.flyer ||
+                          "https://www.ucf.edu/wp-content/blogs.dir/4/files/2024/11/PegFa24-OnCampus-1200x800-1.jpg"
+                        }
                         alt={event.title}
                       />
                     </div>
 
                     <div className="p-5 flex flex-col flex-1">
-                      <p className="font-bebas text-brand text-lg uppercase tracking-wider ">
-                        {orgLookup[event.organizationId]?.name || "Loading..."}
+                      <p className="font-bebas text-lg uppercase tracking-wider text-brand">
+                        {event.isRSO
+                          ? orgLookup[event.organizationId]?.name ||
+                            "Loading..."
+                          : `${event.createdBy.firstName} ${event.createdBy.lastName}`}
                       </p>
 
                       <p className="font-semibold text-lg leading-tight mt-1">
@@ -433,11 +462,11 @@ export default function Events() {
                       <div className="flex flex-wrap gap-1 mt-4">
                         {event.tags?.slice(0, 2).map((tag) => (
                           <span
-                            key={tag}
-                            className="flex gap-1 items-center px-3 py-1 bg-brand text-[10px] font-bold uppercase text-white rounded-full"
+                            key={tag.name}
+                            className="flex gap-1 items-center px-3 py-1 bg-brand text-[10px] font-bold uppercase text-white rounded-full "
                           >
                             <Hash size={14} />
-                            {tag}
+                            {tag.name}
                           </span>
                         ))}
                       </div>
@@ -506,11 +535,11 @@ export default function Events() {
                         <div className="flex flex-wrap gap-1 mt-4">
                           {event.tags?.slice(0, 2).map((tag) => (
                             <span
-                              key={tag}
+                              key={tag.name}
                               className="flex gap-1 items-center px-3 py-1 bg-brand text-[10px] font-bold uppercase text-white rounded-full"
                             >
                               <Hash size={14} />
-                              {tag}
+                              {tag.name}
                             </span>
                           ))}
                         </div>

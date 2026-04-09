@@ -118,9 +118,11 @@ router.get('/:orgId', async (req, res) => {
         const filter = {organizationId: orgId}
         const page = await pagination(req.query.page, req.query.limit, filter, Event)
 
-        const organizationEvents = await Event.find({
-            organizationId: orgId
-        }).skip(page?.skip).limit(page?.limit)
+        const organizationEvents = await Event.find({ organizationId: orgId })
+            .skip(page?.skip)
+            .limit(page?.limit)
+            .populate('tags', 'name')
+            .populate('createdBy', 'firstName lastName fullName');
 
         return res.status(200).json({
             Organization:organization,

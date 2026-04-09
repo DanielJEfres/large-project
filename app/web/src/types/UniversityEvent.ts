@@ -8,9 +8,14 @@ export interface UniversityEvent {
   startDate: string;
   endDate: string | null;
   organizationId: string;
-  createdBy: string;
+  createdBy: {
+    _id: string;
+    firstName: string;
+    lastName: string;
+    fullName?: string;
+  };
   // Update this to tag once tag backend call is finished
-  tags: string[];
+  tags: Tag[];
   attendees: string[];
   isRSO: boolean;
   flyer?: string | null;

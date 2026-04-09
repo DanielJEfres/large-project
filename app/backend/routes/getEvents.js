@@ -19,6 +19,8 @@ router.get('/getUpcoming{/:organizationId}', async(req, res)=>{
         }
 
         const events = await eventModel.find(query)
+            .populate('tags', 'name')
+            .populate('createdBy', 'firstName lastName fullName');
 
         return res.status(200).json({events:events})
 
