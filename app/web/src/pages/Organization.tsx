@@ -1,4 +1,4 @@
-import { Calendar, ChevronRight, MapPin, Share } from "lucide-react";
+import { Calendar, ChevronRight, Hash, MapPin, Share } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { Link, useParams } from "react-router";
 import { useEffect, useState } from "react";
@@ -139,39 +139,44 @@ export default function Organization() {
             <div className="mt-10 ">
               <h2 className="font-bebas text-4xl mb-4">Events</h2>
 
-              <div className="flex gap-10 items-center mb-0.5 mt-3 ">
-                <h2
-                  onClick={() => setActiveTab("Upcoming")}
-                  className={`font-bold cursor-pointer ml-0.5 transition-colors ${activeTab === "Upcoming" ? "text-black" : "text-gray-400"}`}
-                >
-                  Upcoming
-                </h2>
-
-                <h2
-                  onClick={() => setActiveTab("Past")}
-                  className={`font-bold cursor-pointer ml-0.5 transition-colors ${activeTab === "Past" ? "text-black" : "text-gray-400"}`}
-                >
-                  Past
-                </h2>
-              </div>
-
-              <div className="relative">
-                {/* Dynamic Underline */}
+              <div className="flex gap-4 items-center mt-3">
                 <div
-                  className={`w-22 h-0.5 bg-brand absolute z-10 transition-all duration-300 ${
-                    activeTab === "Past"
-                      ? "translate-x-[100px] scale-x-90 origin-left"
-                      : "translate-x-0"
-                  }`}
-                ></div>
-                <div className="w-full h-0.5 bg-gray-200 "> </div>
+                  onClick={() => setActiveTab("Upcoming")}
+                  className="relative py-2 cursor-pointer z-10"
+                >
+                  <h2
+                    className={`font-bold transition-colors ${activeTab === "Upcoming" ? "text-black" : "text-gray-400"}`}
+                  >
+                    Upcoming
+                  </h2>
+                  <div
+                    className={`absolute bottom-0 left-0 h-0.5 bg-brand z-20 transition-all duration-200 
+        ${activeTab === "Upcoming" ? "w-full opacity-100" : "w-0 opacity-0"}`}
+                  />
+                </div>
+
+                <div
+                  onClick={() => setActiveTab("Past")}
+                  className="relative py-2 cursor-pointer z-10 px-5"
+                >
+                  <h2
+                    className={`font-bold transition-colors ${activeTab === "Past" ? "text-black" : "text-gray-400"}`}
+                  >
+                    Past
+                  </h2>
+                  <div
+                    className={`absolute bottom-0 left-0 h-0.5 bg-brand z-20 transition-all duration-200 
+        ${activeTab === "Past" ? "w-full opacity-100" : "w-0 opacity-0"}`}
+                  />
+                </div>
               </div>
+              <div className="w-full h-0.5 bg-gray-200 -mt-0.5 relative z-0"></div>
 
               {/* events go here */}
 
               <div className="p-10 flex flex-col gap-10 justify-center items-center">
                 {Object.keys(groupedEvents).length === 0 && (
-                  <div className="mt-20 h-90 text-gray-400">
+                  <div className="mt-20 h-30 text-gray-400">
                     <p>There's no {activeTab.toLowerCase()} events. :(</p>
                   </div>
                 )}
@@ -240,8 +245,9 @@ export default function Organization() {
                               {event.tags.map((tag) => (
                                 <span
                                   key={tag}
-                                  className="px-3 py-1 bg-brand text-[10px] font-bold uppercase tracking-wider text-white rounded-full"
+                                  className="flex gap-1 px-3 py-1 items-center bg-brand text-[10px] font-bold uppercase tracking-wider text-white rounded-full"
                                 >
+                                  <Hash size={14} />
                                   {tag}
                                 </span>
                               ))}

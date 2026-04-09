@@ -6,7 +6,7 @@ import { LOCAL_IP, SERVER_IP } from "../config";
 import { Link } from "react-router";
 import { useOrganizations } from "../hooks/useOrganization";
 import { formatStackedDate } from "../utils/date";
-import { Image } from "lucide-react";
+import { Calendar, Image, MapPin, Users } from "lucide-react";
 
 export default function Manage() {
   const [activeTab, setActiveTab] = useState<"Upcoming" | "Past">("Upcoming");
@@ -61,33 +61,41 @@ export default function Manage() {
       <div className="font-inter px-20 pb-20">
         <h1 className="text-5xl font-bebas mt-10 mb-8">Manage</h1>
 
-        {/* Tab Selection */}
-        <div className="flex gap-10 items-center mb-0.5 mt-3 ">
-          {["Upcoming", "Past"].map((tab) => (
-            <h2
-              key={tab}
-              onClick={() => setActiveTab(tab as "Upcoming" | "Past")}
-              className={`font-bold cursor-pointer ml-0.5 transition-colors ${
-                activeTab === tab ? "text-black" : "text-gray-400"
-              }`}
-            >
-              {tab}
-            </h2>
-          ))}
-        </div>
-
-        {/* Indicator Line */}
-        <div className="relative mb-10">
+        <div className="font-inter flex gap-4 items-center mt-3">
           <div
-            className={`w-22 h-0.5 bg-brand absolute z-10 transition-all duration-300 ${
-              activeTab === "Past" ? "translate-x-[100px]" : "translate-x-0"
-            }`}
-          ></div>
-          <div className="w-full h-0.5 bg-gray-200 "> </div>
+            onClick={() => setActiveTab("Upcoming")}
+            className="relative py-2 cursor-pointer z-10"
+          >
+            <h2
+              className={`font-bold transition-colors ${activeTab === "Upcoming" ? "text-black" : "text-gray-400"}`}
+            >
+              Upcoming
+            </h2>
+            <div
+              className={`absolute bottom-0 left-0 h-0.5 bg-brand z-20 transition-all duration-200 
+        ${activeTab === "Upcoming" ? "w-full opacity-100" : "w-0 opacity-0"}`}
+            />
+          </div>
+
+          <div
+            onClick={() => setActiveTab("Past")}
+            className="relative py-2 cursor-pointer z-10 px-5"
+          >
+            <h2
+              className={`font-bold transition-colors ${activeTab === "Past" ? "text-black" : "text-gray-400"}`}
+            >
+              Past
+            </h2>
+            <div
+              className={`absolute bottom-0 left-0 h-0.5 bg-brand z-20 transition-all duration-200 
+        ${activeTab === "Past" ? "w-full opacity-100" : "w-0 opacity-0"}`}
+            />
+          </div>
         </div>
+        <div className="w-full h-0.5 bg-gray-200 -mt-0.5 relative z-0"></div>
 
         {/* Events Grid */}
-        <div className="grid grid-row-1 gap-6">
+        <div className="grid grid-row-1 gap-6 mt-10">
           {loading ? (
             <p>Loading your events...</p>
           ) : filteredEvents.length > 0 ? (
@@ -97,7 +105,7 @@ export default function Manage() {
                 key={event._id}
                 className="group flex "
               >
-                <div className="relative w-80 h-60 bg-gray-100 rounded-2xl overflow-hidden mb-4">
+                <div className="relative min-w-62 min-h-62 bg-gray-100 rounded-2xl overflow-hidden mb-4">
                   {event.flyer ? (
                     <img
                       src={event.flyer}
@@ -109,7 +117,10 @@ export default function Manage() {
                     </div>
                   )}
                 </div>
-                <div className="flex flex-col p-6">
+                <div className="relative flex flex-col p-6 w-full">
+                  <button className="absolute right-0 bg-gray-100 text-gray-400 px-3 py-1 font-league rounded-2xl">
+                    Edit Event
+                  </button>
                   <p className="font-bebas text-brand text-xl tracking-wide uppercase">
                     {orgLookup[event.organizationId]?.name ||
                       "this should say user's name  :p"}
@@ -117,10 +128,21 @@ export default function Manage() {
                   <h3 className="text-lg font-bold line-clamp-1">
                     {event.title}
                   </h3>
-                  <p className="text-gray-500 font-medium text-sm">
+                  <div className="mt-1 text-gray-500 font-medium text-sm flex items-center gap-1">
+                    <Calendar size={16} className="shrink-0" />
                     {formatStackedDate(event.startDate).day},{" "}
                     {formatStackedDate(event.startDate).date}
-                  </p>
+                  </div>
+
+                  <div className="mt-1 text-gray-500 font-medium text-sm flex items-center gap-1">
+                    <MapPin size={16} className="shrink-0" />
+                    <p>{event.location}</p>
+                  </div>
+
+                  <div className="mt-auto mb-5 text-gray-500 font-medium text-sm flex items-center gap-1">
+                    <Users />
+                    <p>{event.attendees.length} are attending... </p>
+                  </div>
                 </div>
               </Link>
             ))

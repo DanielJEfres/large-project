@@ -6,6 +6,7 @@ import {
   ListFilter,
   Search,
   ChevronLeft,
+  Hash,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { Link } from "react-router";
@@ -167,35 +168,46 @@ export default function Events() {
   return (
     <>
       <Navbar />
-      <div className="font-inter px-20 pb-20 ">
+      <div className="font-league px-20 pb-20 ">
         <h1 className="text-5xl font-bebas mt-10 mb-8">Events</h1>
 
-        <div className="flex gap-10 items-center mb-0.5 mt-3 ">
-          {/* 3. Add Click Handlers and Dynamic Styling */}
-          <h2
-            onClick={() => setActiveTab("RSO")}
-            className={`font-bold cursor-pointer ml-0.5 ${activeTab === "RSO" ? "text-black" : "text-gray-400"}`}
-          >
-            RSO Events
-          </h2>
-
-          <h2
-            onClick={() => setActiveTab("Student")}
-            className={`font-bold cursor-pointer ml-0.5 ${activeTab === "Student" ? "text-black" : "text-gray-400"}`}
-          >
-            Student Events
-          </h2>
-        </div>
-
-        <div className="relative">
-          {/* 4. Animate the underline */}
+        <div className="font-inter flex gap-10 items-center mt-3">
+          {/* RSO Tab */}
           <div
-            className={`w-27 h-0.5 bg-brand absolute z-10 transition-all duration-300 ${activeTab === "Student" ? "translate-x-[110px] scale-x-150 origin-left" : "translate-x-0"}`}
+            onClick={() => setActiveTab("RSO")}
+            className="relative py-2 cursor-pointer z-10"
           >
-            {" "}
+            <h2
+              className={`font-bold transition-colors ${activeTab === "RSO" ? "text-black" : "text-gray-400"}`}
+            >
+              RSO Events
+            </h2>
+            {/* Underline */}
+            <div
+              className={`absolute bottom-0 left-0 h-0.5 bg-brand z-20 transition-all duration-200 
+      ${activeTab === "RSO" ? "w-full opacity-100" : "w-0 opacity-0"}`}
+            />
           </div>
-          <div className="w-full h-0.5 bg-gray-200 "> </div>
+
+          {/* Student Tab */}
+          <div
+            onClick={() => setActiveTab("Student")}
+            className="relative py-2 cursor-pointer z-10"
+          >
+            <h2
+              className={`font-bold transition-colors ${activeTab === "Student" ? "text-black" : "text-gray-400"}`}
+            >
+              Student Events
+            </h2>
+
+            <div
+              className={`absolute bottom-0 left-0 h-0.5 bg-brand z-20 transition-all duration-200 
+      ${activeTab === "Student" ? "w-full opacity-100" : "w-0 opacity-0"}`}
+            />
+          </div>
         </div>
+
+        <div className="w-full h-0.5 bg-gray-200 -mt-0.5 relative z-0"></div>
         {/* Search Bar */}
         <div className="mt-9 flex items-center gap-3">
           <div className="relative flex-1 group">
@@ -254,10 +266,14 @@ export default function Events() {
                       <Link
                         key={event._id}
                         to={`/event/${event._id}`}
-                        className="bg-[#f5f5f76e]  h-max-fit min-w-fit flex  rounded-2xl overflow-hidden shrink-0 cursor-pointer"
+                        className="group shadow-[5px_5px_5px_-3px_rgba(0,0,0,0.1)] h-max-fit min-w-fit flex rounded-2xl overflow-hidden shrink-0 cursor-pointer"
                       >
-                        <div className="w-80 min-h-80 bg-gray/30 flex items-center justify-center shrink-0">
-                          <Image size={40} className="text-gray/70" />
+                        <div className="w-80 h-80 bg-gray/30 flex items-center justify-center shrink-0 overflow-hidden ">
+                          <img
+                            className="w-full h-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-110"
+                            src="https://www.ucf.edu/wp-content/blogs.dir/4/files/2024/11/PegFa24-OnCampus-1200x800-1.jpg"
+                            alt={event.title}
+                          />
                         </div>
                         <div className="w-60 px-5 py-3 relative flex flex-col">
                           <p className="font-bebas text-lg uppercase tracking-wider text-brand">
@@ -285,13 +301,14 @@ export default function Events() {
                             {event.tags?.slice(0, 2).map((tag) => (
                               <span
                                 key={tag}
-                                className="px-3 py-1 bg-brand text-[10px] font-bold uppercase text-white rounded-full"
+                                className="flex gap-1 items-center px-3 py-1 bg-brand text-[10px] font-bold uppercase text-white rounded-full"
                               >
+                                <Hash size={14} />
                                 {tag}
                               </span>
                             ))}
                           </div>
-                          <div className="pt-6 mt-auto  font-semibold flex items-center justify-end gap-2 text-black hover:text-brand transition-colors">
+                          <div className="font-league pt-6 mt-auto  font-semibold flex items-center justify-end gap-2 hover:text-gray-500  text-black transition-colors">
                             Learn More <ChevronRight width={17} />
                           </div>
                         </div>
@@ -331,10 +348,14 @@ export default function Events() {
                   <Link to={`/event/${event._id}`}>
                     <div
                       key={event._id}
-                      className="shrink-0 group cursor-pointer"
+                      className="shrink-0 group cursor-pointer "
                     >
                       <div className="w-80 h-80 bg-gray/30 flex items-center justify-center rounded-2xl overflow-hidden group-hover:brightness-95 transition-all">
-                        <Image size={40} className="text-gray/70" />
+                        <img
+                          className="w-full h-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-110"
+                          src="https://www.ucf.edu/wp-content/blogs.dir/4/files/2024/11/PegFa24-OnCampus-1200x800-1.jpg"
+                          alt={event.title}
+                        />
                       </div>
 
                       <div className="max-w-80  p-2">
@@ -373,10 +394,14 @@ export default function Events() {
                   <Link
                     to={`/event/${event._id}`}
                     key={event._id}
-                    className="bg-[#f5f5f76e] flex flex-col rounded-2xl overflow-hidden hover:cursor-pointer transition-all"
+                    className="group shadow-[5px_5px_5px_-3px_rgba(0,0,0,0.1)] flex flex-col rounded-2xl overflow-hidden hover:cursor-pointer transition-all"
                   >
-                    <div className="w-full h-48 bg-gray/30 flex items-center justify-center shrink-0">
-                      <Image size={40} className="text-gray/70" />
+                    <div className="w-full overflow-hidden h-48 bg-gray/30 flex items-center justify-center shrink-0">
+                      <img
+                        className="w-full h-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-110"
+                        src="https://www.ucf.edu/wp-content/blogs.dir/4/files/2024/11/PegFa24-OnCampus-1200x800-1.jpg"
+                        alt={event.title}
+                      />
                     </div>
 
                     <div className="p-5 flex flex-col flex-1">
@@ -409,14 +434,15 @@ export default function Events() {
                         {event.tags?.slice(0, 2).map((tag) => (
                           <span
                             key={tag}
-                            className="px-3 py-1 bg-brand text-[10px] font-bold uppercase text-white rounded-full"
+                            className="flex gap-1 items-center px-3 py-1 bg-brand text-[10px] font-bold uppercase text-white rounded-full"
                           >
+                            <Hash size={14} />
                             {tag}
                           </span>
                         ))}
                       </div>
 
-                      <div className="mt-auto pt-6 font-semibold flex items-center justify-end gap-2 text-black hover:text-brand transition-colors">
+                      <div className="font-league mt-auto pt-6 font-semibold flex items-center justify-end gap-2 text-black hover:text-gray-500  transition-colors">
                         Learn More <ChevronRight width={17} />
                       </div>
                     </div>
@@ -481,8 +507,9 @@ export default function Events() {
                           {event.tags?.slice(0, 2).map((tag) => (
                             <span
                               key={tag}
-                              className="px-3 py-1 bg-brand text-[10px] font-bold uppercase text-white rounded-full"
+                              className="flex gap-1 items-center px-3 py-1 bg-brand text-[10px] font-bold uppercase text-white rounded-full"
                             >
+                              <Hash size={14} />
                               {tag}
                             </span>
                           ))}
@@ -490,7 +517,7 @@ export default function Events() {
 
                         <Link
                           to={`/event/${event._id}`}
-                          className="mt-6 font-semibold flex items-center justify-end gap-2 text-black hover:text-brand transition-colors"
+                          className="font-league mt-6 font-semibold flex items-center justify-end gap-2 text-black hover:text-gray-500  transition-colors"
                         >
                           Learn More <ChevronRight width={17} />
                         </Link>

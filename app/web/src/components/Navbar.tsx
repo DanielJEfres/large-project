@@ -40,8 +40,8 @@ export default function Navbar() {
           {isLoggedIn ? (
             <>
               <Link to="/create" className="hidden sm:block">
-                <button className="rounded-[20px] bg-[#F6F6F6] text-black px-4 py-2 font-inter font-medium flex items-center gap-2">
-                  <Plus size={18} />
+                <button className="rounded-[20px] bg-[#F6F6F6] text-black px-4 py-2 font-league font-medium flex text-lg items-center gap-2">
+                  <Plus width={18} />
                   Create Event
                 </button>
               </Link>

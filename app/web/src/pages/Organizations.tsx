@@ -99,7 +99,7 @@ export default function Organizations() {
                   {/* Tags / Category */}
                   <div className="flex flex-wrap gap-2 pt-2">
                     {org.category && (
-                      <span className="flex items-center gap-1 px-3 py-1 bg-brand/40 text-xs font-bold uppercase tracking-wider text-black rounded-full">
+                      <span className="flex items-center gap-1 px-3 py-1 bg-brand/40 text-xs font-bold uppercase tracking-wider text-black">
                         {org.category}
                       </span>
                     )}

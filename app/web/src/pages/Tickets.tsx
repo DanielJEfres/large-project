@@ -60,33 +60,41 @@ export default function Tickets() {
       <Navbar />
       <div className="font-inter px-20 pb-20">
         <h1 className="text-5xl font-bebas mt-10 mb-8">My Events</h1>
-        <div className="flex gap-10 items-center mb-0.5 mt-3 ">
-          <h2
-            onClick={() => setActiveTab("Upcoming")}
-            className={`font-bold cursor-pointer ml-0.5 transition-colors ${activeTab === "Upcoming" ? "text-black" : "text-gray-400"}`}
-          >
-            Upcoming
-          </h2>
 
-          <h2
-            onClick={() => setActiveTab("Past")}
-            className={`font-bold cursor-pointer ml-0.5 transition-colors ${activeTab === "Past" ? "text-black" : "text-gray-400"}`}
-          >
-            Past
-          </h2>
-        </div>
+        {/* events header! */}
 
-        <div className="relative">
-          {/* Dynamic Underline */}
+        <div className="flex gap-4 items-center mt-3">
           <div
-            className={`w-22 h-0.5 bg-brand absolute z-10 transition-all duration-300 ${
-              activeTab === "Past"
-                ? "translate-x-[100px] scale-x-90 origin-left"
-                : "translate-x-0"
-            }`}
-          ></div>
-          <div className="w-full h-0.5 bg-gray-200 "> </div>
+            onClick={() => setActiveTab("Upcoming")}
+            className="relative py-2 cursor-pointer z-10"
+          >
+            <h2
+              className={`font-bold transition-colors ${activeTab === "Upcoming" ? "text-black" : "text-gray-400"}`}
+            >
+              Upcoming
+            </h2>
+            <div
+              className={`absolute bottom-0 left-0 h-0.5 bg-brand z-20 transition-all duration-200 
+        ${activeTab === "Upcoming" ? "w-full opacity-100" : "w-0 opacity-0"}`}
+            />
+          </div>
+
+          <div
+            onClick={() => setActiveTab("Past")}
+            className="relative py-2 cursor-pointer z-10 px-5"
+          >
+            <h2
+              className={`font-bold transition-colors ${activeTab === "Past" ? "text-black" : "text-gray-400"}`}
+            >
+              Past
+            </h2>
+            <div
+              className={`absolute bottom-0 left-0 h-0.5 bg-brand z-20 transition-all duration-200 
+        ${activeTab === "Past" ? "w-full opacity-100" : "w-0 opacity-0"}`}
+            />
+          </div>
         </div>
+        <div className="w-full h-0.5 bg-gray-200 -mt-0.5 relative z-0"></div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
           {loading ? (
@@ -96,7 +104,7 @@ export default function Tickets() {
               <Link
                 to={`/event/${event._id}`}
                 key={event._id}
-                className=" relative rounded-xl w-fit "
+                className=" relative rounded-xl max-w-90 "
               >
                 <div className="-z-10 w-full h-80 bg-gray-100  flex items-center justify-center rounded-2xl overflow-hidden group-hover:brightness-95 transition-all">
                   <Image size={40} className="text-gray/70" />
