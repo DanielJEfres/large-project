@@ -3,7 +3,7 @@ import Navbar from "../components/Navbar";
 import { Link, useParams } from "react-router";
 import { useEffect, useState } from "react";
 import type { Organization } from "../types/Organizations";
-import { LOCAL_IP, SERVER_IP } from "../config";
+import { SERVER_IP } from "../config";
 import type { UniversityEvent } from "../types/UniversityEvent";
 import { formatStackedDate, formatTime } from "../utils/date";
 
@@ -43,7 +43,7 @@ export default function Organization() {
     const fetchOrgAndEvents = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`${LOCAL_IP}/api/organizations/${orgId}`);
+        const response = await fetch(`${SERVER_IP}/api/organizations/${orgId}`);
         const data = await response.json();
 
         if (data.Organization) {

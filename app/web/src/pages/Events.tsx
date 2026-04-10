@@ -11,7 +11,7 @@ import {
 import Navbar from "../components/Navbar";
 import { Link } from "react-router";
 import { useRef, useState, useEffect } from "react";
-import { LOCAL_IP, SERVER_IP } from "../config";
+import { SERVER_IP } from "../config";
 import type { UniversityEvent } from "../types/UniversityEvent";
 import { formatStackedDate } from "../utils/date";
 import { useOrganizations } from "../hooks/useOrganization";
@@ -136,7 +136,7 @@ export default function Events() {
   useEffect(() => {
     const fetchTrending = async () => {
       try {
-        const response = await fetch(`${LOCAL_IP}/api/getEvents/getTrending`);
+        const response = await fetch(`${SERVER_IP}/api/getEvents/getTrending`);
         const data = await response.json();
         setTrendingEvents(data.events);
       } catch (err) {
@@ -150,7 +150,7 @@ export default function Events() {
     const fetchEvents = async () => {
       try {
         const upcomingRes = await fetch(
-          `${LOCAL_IP}/api/getEvents/getUpcoming`,
+          `${SERVER_IP}/api/getEvents/getUpcoming`,
         );
         const upcomingData = await upcomingRes.json();
         setUpcomingEvents(upcomingData.events);

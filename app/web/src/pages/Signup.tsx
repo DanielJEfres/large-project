@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router";
 import { X, Eye, EyeOff, Info } from "lucide-react";
 import Logo from "../components/Logo";
 import styles from "./Login.module.css";
-import { LOCAL_IP, SERVER_IP } from "../config";
+import { SERVER_IP } from "../config";
 
 type FormData = {
   firstName: string;
@@ -73,7 +73,7 @@ export default function Signup() {
     // api call here vvvvvvvv
 
     try {
-      const response = await fetch(`${LOCAL_IP}/api/auth/signup`, {
+      const response = await fetch(`${SERVER_IP}/api/auth/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

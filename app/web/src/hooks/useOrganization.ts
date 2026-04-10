@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { LOCAL_IP, SERVER_IP } from "../config";
+import { SERVER_IP } from "../config";
 import type { Organization } from "../types/Organizations";
 
 export function useOrganizations() {

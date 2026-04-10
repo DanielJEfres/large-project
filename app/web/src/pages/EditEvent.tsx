@@ -2,7 +2,7 @@ import { Check, ChevronLeft } from "lucide-react";
 import Navbar from "../components/Navbar";
 import React, { useState, useRef, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
-import { LOCAL_IP, SERVER_IP } from "../config";
+import { SERVER_IP } from "../config";
 import { useParams, useNavigate, Link } from "react-router";
 
 const CATEGORIES = [
@@ -63,7 +63,7 @@ export default function EditEvent() {
   useEffect(() => {
     const fetchEventData = async () => {
       try {
-        const res = await fetch(`${LOCAL_IP}/api/events/${eventId}`);
+        const res = await fetch(`${SERVER_IP}/api/events/${eventId}`);
         const data = await res.json();
         const event = data.event;
 
@@ -143,7 +143,7 @@ export default function EditEvent() {
     }
 
     try {
-      const response = await fetch(`${LOCAL_IP}/api/events/${eventId}`, {
+      const response = await fetch(`${SERVER_IP}/api/events/${eventId}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
