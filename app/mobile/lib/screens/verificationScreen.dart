@@ -117,7 +117,10 @@ class _VerificationScreenState extends State<VerificationScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
                   ),
-                  onPressed: _verifyEmail,
+                  onPressed: () {
+                    _verifyEmail(); // 1. Run your verification logic
+                    Navigator.pushNamed(context, '/recommendations'); // 2. Then move to the next page
+                  },
                   child: const Text('Verify Email', style: TextStyle(fontWeight: FontWeight.bold)),
                 ),
               ),

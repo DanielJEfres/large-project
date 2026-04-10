@@ -10,18 +10,6 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  @override
-  Widget build(BuildContext context) {
-    return MainPage();
-  }
-}
-
-class MainPage extends StatefulWidget {
-  @override
-  _MainPageState createState() => _MainPageState();
-}
-
-class _MainPageState extends State<MainPage> {
   String loginName = '', password = '';
   String emailError = '';
 
@@ -170,7 +158,7 @@ class _MainPageState extends State<MainPage> {
                         } else {
                           // 4. Success! Save token (optional) and go to Events
                           print("Login Successful! Token: ${response['accessToken']}");
-                          Navigator.pushNamed(context, '/events');
+                          Navigator.pushNamed(context, '/event/events');
                         }
                       } else {
                         // 5. Show error from backend (e.g., "Invalid credentials")
@@ -215,3 +203,4 @@ class _MainPageState extends State<MainPage> {
     );
   }
 }
+

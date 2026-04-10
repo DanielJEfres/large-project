@@ -2,34 +2,21 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../utils/getAPI.dart';
 
-
+//Stateful to rebuild the widget tree each , by changing specific parts
 class SignUpScreen extends StatefulWidget {
   @override
   _SignUpScreenState createState() => _SignUpScreenState();
 }
 
+
 const Color myYellow = Color(0xFFFFC527);
 
+
 class _SignUpScreenState extends State<SignUpScreen> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: MainPage(),
-    );
-  }
-}
-
-class MainPage extends StatefulWidget {
-  @override
-  _MainPageState createState() => _MainPageState();
-}
-
-class _MainPageState extends State<MainPage> {
   String loginName = '', password = '';
   String firstName = '', lastName = '';
   String emailError = '';
-  bool _isLoading = false; //for web
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -46,9 +33,12 @@ class _MainPageState extends State<MainPage> {
           ),
         ),
       ),
+      //body safe area to avoid movememnts of the information
       body: SafeArea(
+        //to much info then scroll
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
+          //organized by columns
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -113,14 +103,14 @@ class _MainPageState extends State<MainPage> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
                   ),
                   onPressed: () async {
-                    // 1. Frontend Checks
+                    //Frontend Checks
                     if (firstName.isEmpty || lastName.isEmpty || loginName.isEmpty || password.isEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Please fill in all fields')),
                       );
                       return;
                     }
-
+                    //check that the email is good format
                     if (!loginName.trim().toLowerCase().endsWith('.edu')) {
                       setState(() {
                         emailError = 'Please enter a valid UCF email';
@@ -130,7 +120,7 @@ class _MainPageState extends State<MainPage> {
 
                     setState(() => _isLoading = true);
 
-                    // 2. Backend Call
+                    //Backend Call
                     try {
                       var response = await getAPI.signUp(
                           firstName.trim(),
@@ -187,3 +177,4 @@ class _MainPageState extends State<MainPage> {
     );
   }
 }
+
