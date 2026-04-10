@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { X, Info, CheckCircle } from "lucide-react";
-import { LOCAL_IP } from "../config";
+import { LOCAL_IP, SERVER_IP } from "../config";
 
 export default function ResetPassword() {
   const [email, setEmail] = useState("");
@@ -16,7 +16,7 @@ export default function ResetPassword() {
     setStatus(null);
 
     try {
-      const response = await fetch(`${LOCAL_IP}/api/password-reset/request`, {
+      const response = await fetch(`${SERVER_IP}/api/password-reset/request`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ucfEmail: email }),
