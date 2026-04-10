@@ -29,11 +29,14 @@ const userSchema = new mongoose.Schema({
     enum: ['student', 'admin'], 
     default: 'student' 
   },
-  // interests: [{ // MORE COMPLEX-- Tags not yet implemented.
+  // iginterests: [{ // MORE COMPLEX-- Tags not yet implemented.
   //   type: mongoose.Schema.Types.ObjectId, 
   //   ref: 'Tag' 
   // }],
-  interests: [String],
+  interests: [{
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'Tag',
+  }],
   user_events:[
     {type: mongoose.Schema.Types.ObjectId, ref: 'Event'}
   ],
