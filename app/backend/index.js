@@ -15,6 +15,7 @@ const app = express()
 app.use(cors({
     origin: [
       process.env.CLIENT_URL,
+      process.env.API_URL,
       'http://localhost:5173',
       'http://localhost:3000'
     ],
