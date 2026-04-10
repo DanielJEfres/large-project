@@ -169,6 +169,14 @@ router.post("/login", async (req, res) => {
                     // userId: user_id,
                     is_verified: user.isVerified,
                     accessToken: accessToken,
+                    user: { // Explicitly send user info for the UI
+                        id: user._id,
+                        firstName: user.firstName,
+                        lastName: user.lastName,
+                        email: user.ucfEmail,
+                        pfp: user.profilePicture,
+                        isVerified: user.isVerified
+                    }
                     //refreshToken: refreshToken // send as HTTPOnly Cookie Soon
                 });
 

@@ -1,7 +1,9 @@
 import { useState, type ChangeEvent } from "react";
-import { Link } from "react-router";
+import { useNavigate, Link } from "react-router";
 import { X, Eye, EyeOff, Info } from "lucide-react";
-import { SERVER_IP } from "../config";
+import Logo from "../components/Logo";
+import styles from "./Login.module.css";
+import { LOCAL_IP, SERVER_IP } from "../config";
 
 type FormData = {
   firstName: string;
@@ -12,6 +14,7 @@ type FormData = {
 };
 
 export default function Signup() {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     firstName: "",
@@ -22,8 +25,6 @@ export default function Signup() {
   });
 
   const [error, setError] = useState<string>("");
-
-
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -70,9 +71,9 @@ export default function Signup() {
 
     console.log("Final Data:", formData);
     // api call here vvvvvvvv
-    
+
     try {
-      const response = await fetch(`${SERVER_IP}/api/auth/signup`, {
+      const response = await fetch(`${LOCAL_IP}/api/auth/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -95,9 +96,9 @@ export default function Signup() {
       }
 
       console.log("Success:", data);
-      alert("Signup successful wooo");
+      navigate("/verify");
     } catch (err: any) {
-      setError("Internal Server Error");
+      setError(err?.message || "Internal Server Error");
     }
   };
 
@@ -121,13 +122,12 @@ export default function Signup() {
   `;
 
   return (
-    <div className="[&_button]:cursor-pointer fixed inset-0 bg-white flex flex-col justify-center items-center z-50">
-      <Link
-        to="/"
-        className="absolute top-6 left-6 w-10 h-10 rounded-full bg-black flex items-center justify-center text-white text-xl"
-      ></Link>
-
+    <div className="[&_button]:cursor-pointer min-h-screen  bg-white flex flex-col justify-center items-center z-50">
       <div className="w-95">
+        <div className={styles.logo}>
+          <Logo />
+        </div>
+
         <h2 className="font-bebas text-5xl text-center">
           Sign up to find your next event
         </h2>
