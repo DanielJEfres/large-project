@@ -161,7 +161,7 @@ router.post('/', upload.single('flyer'), async (req, res) => {
 router.put('/:eventId', upload.single('flyer'), async (req, res) => {
 
     try {
-        
+        const updateData = { ...req.body };
         if(req.file) {
             const flyerUrl = await uploadToS3(req.file, 'flyers')
             
@@ -173,10 +173,17 @@ router.put('/:eventId', upload.single('flyer'), async (req, res) => {
 
             if(!updateEventFlyer) return res.status(400).json({message:"Could Not Upload Flyer"})
         }
+
+        if (updateData.tags) {
+            const tagNames = Array.isArray(updateData.tags) ? updateData.tags : [updateData.tags];
+            const foundTags = await Tag.find({ name: { $in: tagNames } });
+            // convert names to ObjectIds
+            updateData.tags = foundTags.map(t => t._id);
+        }
       
         const updatedEvent = await Event.findOneAndUpdate(
             {_id: req.params.eventId},
-            req.body,
+            updateData,
             {returnDocument: 'after'}
         )
 
