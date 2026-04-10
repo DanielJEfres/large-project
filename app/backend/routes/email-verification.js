@@ -24,7 +24,6 @@ router.post('/request', async (req, res) => {
     console.log(`Searching for: ${ucfEmail}`);
     console.log(`Sender email is: ${process.env.FROM_EMAIL}`);
     
-
     try
     {
         const user = await User.findOne({ucfEmail});
