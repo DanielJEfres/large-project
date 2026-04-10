@@ -18,6 +18,7 @@ import Manage from "./pages/Manage.tsx";
 import EventDashboard from "./pages/EventDashboard.tsx";
 import EditEvent from "./pages/EditEvent.tsx";
 import ResetPassword from "./pages/ResetPassword.tsx";
+import NewPassword from "./pages/NewPassword.tsx";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -38,6 +39,10 @@ const router = createBrowserRouter([
       {
         path: "reset",
         element: <ResetPassword />,
+      },
+      {
+        path: "passwordReset/password-reset/:token",
+        element: <NewPassword />,
       },
       {
         path: "events",
