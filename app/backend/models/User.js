@@ -29,10 +29,6 @@ const userSchema = new mongoose.Schema({
     enum: ['student', 'admin'], 
     default: 'student' 
   },
-  // iginterests: [{ // MORE COMPLEX-- Tags not yet implemented.
-  //   type: mongoose.Schema.Types.ObjectId, 
-  //   ref: 'Tag' 
-  // }],
   interests: [{
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'Tag',
