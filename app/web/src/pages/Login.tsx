@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router";
 import { X, Eye, EyeOff, Info } from "lucide-react";
 import styles from "./Login.module.css";
 import Logo from "../components/Logo.tsx";
-import { LOCAL_IP, SERVER_IP } from "../config";
+import { SERVER_IP } from "../config";
 import { useAuth } from "../context/AuthContext.tsx";
 
 interface LoginFormData {
@@ -43,7 +43,7 @@ export default function Login() {
     }
 
     try {
-      const response = await fetch(`${LOCAL_IP}/api/auth/login`, {
+      const response = await fetch(`${SERVER_IP}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include", // Essential for cookies
@@ -176,12 +176,12 @@ export default function Login() {
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                   <div className="w-[1px] h-4 bg-gray-300 mx-1"></div>
-                  <button
-                    type="button"
+                  <Link
+                    to="/reset"
                     className="font-bold text-gray text-sm hover:underline"
                   >
                     Forgot?
-                  </button>
+                  </Link>
                 </div>
               </div>
             </div>

@@ -24,11 +24,12 @@ router.post('/request', async (req, res) => {
     console.log(`Searching for: ${ucfEmail}`);
     console.log(`Sender email is: ${process.env.FROM_EMAIL}`);
     
-
     try
     {
         const user = await User.findOne({ucfEmail});
         if(!user) return res.status(404).json({message: "Email verification: user with this email is not found"});
+
+        
 
         //Generate verification token
         const token = crypto.randomBytes(32).toString('hex');
@@ -40,7 +41,7 @@ router.post('/request', async (req, res) => {
         const recipient = user.ucfEmail;
         console.log(`Attempting to send mail to: ${recipient}`);
 
-        const verificationUrl = `${process.env.CLIENT_URL}/verifyEmail/verify-email/${token}`;
+        const verificationUrl = `${process.env.CLIENT_URL}/email-verification/${token}`;
 
         const emailTemplate = (verificationUrl, firstName) => `
         <!DOCTYPE html>

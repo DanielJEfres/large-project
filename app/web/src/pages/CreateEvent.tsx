@@ -2,7 +2,7 @@ import { Check } from "lucide-react";
 import Navbar from "../components/Navbar";
 import React, { useState, useRef } from "react";
 import { useAuth } from "../context/AuthContext";
-import { LOCAL_IP, SERVER_IP } from "../config";
+import { SERVER_IP } from "../config";
 
 const CATEGORIES = [
   "Sports",
@@ -113,7 +113,7 @@ export default function CreateEvent() {
     }
 
     try {
-      const response = await fetch(`${LOCAL_IP}/api/events`, {
+      const response = await fetch(`${SERVER_IP}/api/events`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
