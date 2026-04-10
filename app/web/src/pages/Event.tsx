@@ -4,7 +4,7 @@ import { Link, useParams } from "react-router";
 import { useEffect, useState } from "react";
 import { LOCAL_IP, SERVER_IP } from "../config";
 import type { UniversityEvent } from "../types/UniversityEvent";
-import { formatStackedDate } from "../utils/date";
+import { formatStackedDate, formatTime } from "../utils/date";
 import { useOrganizations } from "../hooks/useOrganization";
 
 import { useAuth } from "../context/AuthContext";
@@ -134,10 +134,28 @@ export default function Event() {
                     <p className="font-league font-bold text-sm uppercase tracking-wider text-gray-500">
                       Date
                     </p>
-                    <p className=" font-medium text-black">
+                    <p className="font-medium text-black">
                       {formatStackedDate(event.startDate).day +
                         ", " +
-                        formatStackedDate(event.startDate).date}
+                        formatStackedDate(event.startDate).date +
+                        ", " +
+                        formatTime(event.startDate)}
+
+                      {event.endDate && (
+                        <>
+                          {" - "}
+                          {/* if the end date is a different day, show the full date. 
+          if it's the same day, you might just want formatTime(event.endDate) */}
+                          {new Date(event.startDate).toDateString() !==
+                          new Date(event.endDate).toDateString()
+                            ? formatStackedDate(event.endDate).day +
+                              ", " +
+                              formatStackedDate(event.endDate).date +
+                              ", " +
+                              formatTime(event.endDate)
+                            : formatTime(event.endDate)}
+                        </>
+                      )}
                     </p>
                   </div>
 

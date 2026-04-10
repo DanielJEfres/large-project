@@ -106,8 +106,16 @@ export default function Tickets() {
                 key={event._id}
                 className=" relative rounded-xl max-w-90 "
               >
-                <div className="-z-10 w-full h-80 bg-gray-100  flex items-center justify-center rounded-2xl overflow-hidden group-hover:brightness-95 transition-all">
-                  <Image size={40} className="text-gray/70" />
+                <div className="-z-10 w-full h-80 bg-gray-100 flex items-center justify-center rounded-2xl overflow-hidden group-hover:brightness-95 transition-all">
+                  {event.flyer ? (
+                    <img
+                      src={event.flyer}
+                      alt={event.title}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <Image size={40} className="text-gray/70" />
+                  )}
                 </div>
                 <div className=" w-full flex flex-col p-2">
                   <p className="font-bebas text-lg uppercase tracking-wider text-brand">
