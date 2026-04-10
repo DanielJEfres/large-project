@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router";
 import { useState, useEffect } from "react";
-import { LOCAL_IP } from "../config";
+import { LOCAL_IP, SERVER_IP } from "../config";
 
 export default function NewPassword() {
   const { token } = useParams(); // Grabs token from URL
@@ -8,10 +8,10 @@ export default function NewPassword() {
   const [newPassword, setNewPassword] = useState("");
   const [error, setError] = useState("");
 
-  // Optional: Verify token on mount (Backend has a GET /:token route for this)
+  // Verify on mount
   useEffect(() => {
     const verifyToken = async () => {
-      const res = await fetch(`${LOCAL_IP}/api/password-reset/${token}`);
+      const res = await fetch(`${SERVER_IP}/api/password-reset/${token}`);
       if (!res.ok) setError("This link is invalid or has expired.");
     };
     verifyToken();
@@ -20,7 +20,7 @@ export default function NewPassword() {
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch(`${LOCAL_IP}/api/password-reset/update`, {
+      const response = await fetch(`${SERVER_IP}/api/password-reset/update`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token, newPassword }),
