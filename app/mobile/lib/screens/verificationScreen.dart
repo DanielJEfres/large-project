@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-//import 'package:http/http.dart' as http;
 import '../utils/getAPI.dart';
+import '../theme/app_colors.dart';
+import '../components/app_button.dart';
+import '../components/app_text_field.dart';
 
 class VerificationScreen extends StatefulWidget {
   @override
@@ -12,7 +14,6 @@ class _VerificationScreenState extends State<VerificationScreen> {
   final TextEditingController _codeController = TextEditingController();
   bool _isLoading = false;
 
-
   Future<void> _verifyEmail() async {
     if (_emailController.text.isEmpty || _codeController.text.isEmpty) {
       _showSnackBar("Please fill in all fields");
@@ -22,25 +23,22 @@ class _VerificationScreenState extends State<VerificationScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // calling get apis
       var response = await getAPI.verifyEmail(
-          _emailController.text.trim(),
-          _codeController.text.trim()
+        _emailController.text.trim(),
+        _codeController.text.trim(),
       );
-
+      if (!mounted) return;
       if (response['success'] == true) {
         _showSnackBar("Email Verified! You can now log in.");
         Navigator.pushNamed(context, '/login');
-      }
-      else {
+      } else {
         _showSnackBar(response['message'] ?? "Verification failed");
       }
-    }
-    catch (e) {
+    } catch (e) {
+      if (!mounted) return;
       _showSnackBar("Connection error. Check if your Node.js server is running!");
-    }
-    finally {
-      setState(() => _isLoading = false);
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -51,11 +49,12 @@ class _VerificationScreenState extends State<VerificationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppColors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
+          icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.black),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -64,62 +63,40 @@ class _VerificationScreenState extends State<VerificationScreen> {
           padding: const EdgeInsets.all(24.0),
           child: Column(
             children: [
-              const Text('Check your Inbox',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30)),
+              const Text(
+                'Check your Inbox',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
+              ),
               const SizedBox(height: 10),
-              const Text('Enter the code sent to your UCF email',
-                  style: TextStyle(fontSize: 15, color: Colors.grey)),
+              const Text(
+                'Enter the code sent to your UCF email',
+                style: TextStyle(fontSize: 15, color: AppColors.textSecondary),
+              ),
               const SizedBox(height: 40),
-
-              // Image placeholder
               CircleAvatar(
                 radius: 80,
-                backgroundColor: Colors.grey[200],
+                backgroundColor: AppColors.inputFill,
                 backgroundImage: const AssetImage('assets/img.png'),
               ),
-
               const SizedBox(height: 40),
-
-              // Email Field
-              TextField(
+              AppTextField(
+                label: 'UCF Email',
                 controller: _emailController,
-                decoration: InputDecoration(
-                  labelText: 'UCF Email',
-                  filled: true,
-                  fillColor: Colors.grey[100],
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                ),
               ),
               const SizedBox(height: 16),
-
-              // Code Field
-              TextField(
+              AppTextField(
+                label: 'Verification Code',
                 controller: _codeController,
-                decoration: InputDecoration(
-                  labelText: 'Verification Code',
-                  hintText: 'Enter token',
-                  filled: true,
-                  fillColor: Colors.grey[100],
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                ),
               ),
-
               const SizedBox(height: 30),
-
-              _isLoading
-                  ? const CircularProgressIndicator()
-                  : SizedBox(
+              AppButton(
+                label: 'Verify Email',
+                onPressed: () {
+                  _verifyEmail();
+                  Navigator.pushNamed(context, '/recommendations');
+                },
+                isLoading: _isLoading,
                 width: 200,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFFD700),
-                    foregroundColor: Colors.black,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
-                  ),
-                  onPressed: _verifyEmail,
-                  child: const Text('Verify Email', style: TextStyle(fontWeight: FontWeight.bold)),
-                ),
               ),
             ],
           ),
