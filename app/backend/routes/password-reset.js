@@ -17,7 +17,7 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-router.post("/password-reset", async (req, res) =>{
+router.post("/request", async (req, res) =>{
     const {ucfEmail} = req.body;
 
     //DEBUG
@@ -108,7 +108,7 @@ router.post("/password-reset", async (req, res) =>{
 });
 
 
-router.get('/password-reset/:token', async (req, res) => {
+router.get('/:token', async (req, res) => {
   const { token } = req.params;
 
   try 
@@ -134,7 +134,7 @@ router.get('/password-reset/:token', async (req, res) => {
 });
 
 
-router.patch('/password-reset/update', async(req, res) => {
+router.patch('/update', async(req, res) => {
     const {token, newPassword} = req.body;
     try{
         const user = await User.findOne({
