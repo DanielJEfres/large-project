@@ -19,7 +19,7 @@ const transporter = nodemailer.createTransport({
 });
 
 
-router.post('/request-verification', async (req, res) => {
+router.post('/request', async (req, res) => {
     const {ucfEmail} = req.body;
     console.log(`Searching for: ${ucfEmail}`);
     console.log(`Sender email is: ${process.env.FROM_EMAIL}`);
@@ -113,7 +113,7 @@ router.post('/request-verification', async (req, res) => {
 
 
 //This is called when users click the verify email link, that is sent to their email
-router.get('/verify-email/:token', async (req, res) => {
+router.get('/:token', async (req, res) => {
   const { token } = req.params;
 
   try {

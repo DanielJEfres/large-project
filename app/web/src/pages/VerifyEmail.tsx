@@ -21,8 +21,8 @@ export default function VerifyEmail() {
       setStatusMessage("Verifying your account...");
       try {
         const response = await fetch(
-          `${LOCAL_IP}/api/verifyEmail/verify-email/${token}`,
-          { method: "GET" },
+          `${LOCAL_IP}/api/email-verification/request`,
+          { method: "POST" },
         );
         const data = await response.json();
         if (response.ok) {
