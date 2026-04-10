@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router";
-import { LOCAL_IP, SERVER_IP } from "../config";
+import { SERVER_IP } from "../config";
 import Navbar from "../components/Navbar";
 import type { UniversityEvent } from "../types/UniversityEvent";
 import {
@@ -26,7 +26,7 @@ export default function EventDashboard() {
     if (!window.confirm("Are you sure you want to delete this event?")) return;
 
     try {
-      const response = await fetch(`${LOCAL_IP}/api/events/${id}`, {
+      const response = await fetch(`${SERVER_IP}/api/events/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -49,7 +49,7 @@ export default function EventDashboard() {
   useEffect(() => {
     const fetchEventData = async () => {
       try {
-        const res = await fetch(`${LOCAL_IP}/api/events/${id}`);
+        const res = await fetch(`${SERVER_IP}/api/events/${id}`);
         const data = await res.json();
 
         const eventData = data.event;

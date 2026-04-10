@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 
 class getAPI {
   //Domain fo the page connection
-  static const String baseUrl = "https://eventknight.org/api";
+  static const String baseUrl = "https://api.eventknight.org/api";
 
   //Sign up path connection
   static Future<Map<String, dynamic>> signUp(

@@ -2,7 +2,7 @@ import { ChevronRight, Image, Search } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { Link } from "react-router";
 import { useEffect, useState } from "react";
-import { LOCAL_IP, SERVER_IP } from "../config";
+import { SERVER_IP } from "../config";
 import type { Organization } from "../types/Organizations";
 
 export default function Organizations() {
@@ -15,8 +15,8 @@ export default function Organizations() {
       setLoading(true);
       // Using your backend route: GET /api/organizations?name=...
       const url = name
-        ? `${LOCAL_IP}/api/organizations?name=${encodeURIComponent(name)}`
-        : `${LOCAL_IP}/api/organizations`;
+        ? `${SERVER_IP}/api/organizations?name=${encodeURIComponent(name)}`
+        : `${SERVER_IP}/api/organizations`;
 
       const response = await fetch(url);
       const data = await response.json();

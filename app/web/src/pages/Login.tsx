@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router";
 import { X, Eye, EyeOff, Info } from "lucide-react";
 import styles from "./Login.module.css";
 import Logo from "../components/Logo.tsx";
-import { LOCAL_IP, SERVER_IP } from "../config";
+import { SERVER_IP } from "../config";
 import { useAuth } from "../context/AuthContext.tsx";
 
 interface LoginFormData {
@@ -43,7 +43,7 @@ export default function Login() {
     }
 
     try {
-      const response = await fetch(`${LOCAL_IP}/api/auth/login`, {
+      const response = await fetch(`${SERVER_IP}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include", // Essential for cookies
