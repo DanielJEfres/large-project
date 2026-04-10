@@ -67,6 +67,32 @@ class getAPI {
     }
   }
 
+  // Fetch upcoming events
+  static Future<Map<String, dynamic>> getUpcomingEvents() async {
+    try {
+      final response = await http.get(Uri.parse('$baseUrl/getEvents/getUpcoming'));
+      final data = jsonDecode(response.body);
+      return response.statusCode == 200
+          ? {"success": true, "events": data['events'] ?? []}
+          : {"success": false, "events": []};
+    } catch (e) {
+      return {"success": false, "events": []};
+    }
+  }
+
+  // Fetch trending events
+  static Future<Map<String, dynamic>> getTrendingEvents() async {
+    try {
+      final response = await http.get(Uri.parse('$baseUrl/getEvents/getTrending'));
+      final data = jsonDecode(response.body);
+      return response.statusCode == 200
+          ? {"success": true, "events": data['events'] ?? []}
+          : {"success": false, "events": []};
+    } catch (e) {
+      return {"success": false, "events": []};
+    }
+  }
+
   // Email verification
   static Future<Map<String, dynamic>> verifyEmail(
     String email,
