@@ -134,7 +134,13 @@ router.post("/login", async (req, res) => {
 
         } else { // email exists in DB
             // match password
-            if (await user.matchPassword(password) && user.isVerified){
+            if (await user.matchPassword(password))
+            {   
+                //If the user is not verified, they cannot login. This forces them to always be sent to Email Verification on the frontend
+                if(!user.isVerified){
+                    return res.status(400).json({message: "User requires Email Verification", ucfEmail: user.ucfEmail});
+                }
+
                 // user has been validated! JWT below
                 const user_id = user._id;
 
