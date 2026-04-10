@@ -3,6 +3,38 @@
 A new Flutter project.
 
 ## Getting Started
+Scaffold
+
+appBar:
+    body: (child)
+    floatingActionButton:
+    drawer:
+    bottomNavigationBar:
+
+SafeArea
+    child:
+    avoids notch & status bar
+
+Center
+
+    child:
+    centers child on screen
+    Container
+
+    child:
+        width: height:
+        padding: margin:
+        decoration: color:
+        Padding
+    
+    child:
+        padding: EdgeInsets
+        SizedBox
+
+    child: (optional)
+        width: height:
+        used for spacing too
+
 
 This project is a starting point for a Flutter application.
 
