@@ -176,12 +176,12 @@ export default function Login() {
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                   <div className="w-[1px] h-4 bg-gray-300 mx-1"></div>
-                  <button
-                    type="button"
+                  <Link
+                    to="/reset"
                     className="font-bold text-gray text-sm hover:underline"
                   >
                     Forgot?
-                  </button>
+                  </Link>
                 </div>
               </div>
             </div>
