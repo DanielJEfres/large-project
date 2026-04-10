@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
+import '../theme/app_text_styles.dart';
 import '../components/app_button.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -9,15 +10,14 @@ class HomeScreen extends StatelessWidget {
       backgroundColor: AppColors.white,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          padding: const EdgeInsets.symmetric(horizontal: 36.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(height: 40),
-              // Rounded rectangle image placeholder
+              const Spacer(flex: 2),
               Container(
                 width: double.infinity,
-                height: 320,
+                height: 300,
                 decoration: BoxDecoration(
                   color: AppColors.inputFill,
                   borderRadius: BorderRadius.circular(20),
@@ -27,22 +27,15 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 32),
-              const Text(
-                'EVENTKNIGHT',
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
-                ),
-              ),
+              const SizedBox(height: 28),
+              Text('EVENTKNIGHT', style: AppTextStyles.h2),
               const SizedBox(height: 8),
-              const Text(
+              Text(
                 'Discover clubs, events, and everything happening at UCF.',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16, color: AppColors.textSecondary),
+                style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
               ),
-              const Spacer(),
+              const Spacer(flex: 3),
               AppButton(
                 label: 'Log in or Sign up',
                 onPressed: () => Navigator.pushNamed(context, '/login'),
@@ -51,16 +44,12 @@ class HomeScreen extends StatelessWidget {
               const SizedBox(height: 20),
               GestureDetector(
                 onTap: () => Navigator.pushNamed(context, '/events'),
-                child: const Text(
+                child: Text(
                   'Skip to Browse Events',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
-                  ),
+                  style: AppTextStyles.body.copyWith(fontWeight: FontWeight.bold),
                 ),
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 48),
             ],
           ),
         ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
+import '../theme/app_text_styles.dart';
 import '../components/app_button.dart';
 
 class Recommendations extends StatefulWidget {
@@ -30,8 +31,9 @@ class _RecommendationsState extends State<Recommendations> {
         backgroundColor: AppColors.white,
         elevation: 0,
         leadingWidth: 70,
+        toolbarHeight: 72,
         leading: Padding(
-          padding: const EdgeInsets.only(left: 16.0),
+          padding: const EdgeInsets.only(top: 16.0, left: 8.0),
           child: IconButton(
             icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.black, size: 20),
             onPressed: () => Navigator.pop(context),
@@ -58,18 +60,14 @@ class _RecommendationsState extends State<Recommendations> {
           children: [
             SizedBox(height: screenHeight * 0.04),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 40.0),
+              padding: const EdgeInsets.symmetric(horizontal: 32.0),
               child: Column(
                 children: [
-                  const Text(
-                    'Select your interests',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28),
-                    textAlign: TextAlign.center,
-                  ),
+                  Text('SELECT YOUR INTERESTS', style: AppTextStyles.h3, textAlign: TextAlign.center),
                   const SizedBox(height: 15),
-                  const Text(
+                  Text(
                     'Choose your favorite topics to get personalized event and club recommendations.',
-                    style: TextStyle(fontSize: 16, color: AppColors.textMuted),
+                    style: AppTextStyles.body.copyWith(color: AppColors.textMuted),
                     textAlign: TextAlign.center,
                   ),
                 ],

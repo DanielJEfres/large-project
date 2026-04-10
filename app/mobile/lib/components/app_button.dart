@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
+import '../theme/app_text_styles.dart';
 
 class AppButton extends StatelessWidget {
   final String label;
@@ -33,11 +34,12 @@ class AppButton extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(32),
                 ),
+                elevation: 0,
               ),
               onPressed: onPressed,
               child: Text(
                 label,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                style: AppTextStyles.button.copyWith(color: foregroundColor),
               ),
             ),
     );

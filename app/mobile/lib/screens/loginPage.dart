@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../utils/getAPI.dart';
 import '../theme/app_colors.dart';
+import '../theme/app_text_styles.dart';
 import '../components/app_button.dart';
 import '../components/app_text_field.dart';
 
@@ -53,29 +54,29 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Column(
           children: [
             // Back button
-            Align(
-              alignment: Alignment.centerLeft,
-              child: IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.black, size: 20),
-                onPressed: () => Navigator.pop(context),
+            Padding(
+              padding: const EdgeInsets.only(top: 16.0, left: 8.0),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: IconButton(
+                  icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.black, size: 20),
+                  onPressed: () => Navigator.pop(context),
+                ),
               ),
             ),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                padding: const EdgeInsets.symmetric(horizontal: 32.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const SizedBox(height: 8),
-                    const Text(
-                      'Login',
-                      style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
-                    ),
+                    Text('LOGIN', style: AppTextStyles.h3),
                     const SizedBox(height: 8),
-                    const Text(
+                    Text(
                       'Sign in to join clubs, RSVP for events, and more.',
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 15, color: AppColors.textSecondary),
+                      style: AppTextStyles.caption,
                     ),
                     const SizedBox(height: 24),
                     // Rounded rectangle image

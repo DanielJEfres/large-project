@@ -3,6 +3,7 @@ import '../utils/getAPI.dart';
 import '../theme/app_colors.dart';
 import '../components/app_button.dart';
 import '../components/app_text_field.dart';
+import '../theme/app_text_styles.dart';
 
 class VerificationScreen extends StatefulWidget {
   @override
@@ -53,24 +54,25 @@ class _VerificationScreenState extends State<VerificationScreen> {
       appBar: AppBar(
         backgroundColor: AppColors.transparent,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.black),
-          onPressed: () => Navigator.pop(context),
+        toolbarHeight: 72,
+        leading: Padding(
+          padding: const EdgeInsets.only(top: 16.0, left: 8.0),
+          child: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.black),
+            onPressed: () => Navigator.pop(context),
+          ),
         ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 24.0),
           child: Column(
             children: [
-              const Text(
-                'Check your Inbox',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
-              ),
+              Text('CHECK YOUR INBOX', style: AppTextStyles.h3),
               const SizedBox(height: 10),
-              const Text(
+              Text(
                 'Enter the code sent to your UCF email',
-                style: TextStyle(fontSize: 15, color: AppColors.textSecondary),
+                style: AppTextStyles.caption,
               ),
               const SizedBox(height: 40),
               CircleAvatar(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
+import '../theme/app_text_styles.dart';
 import '../components/app_button.dart';
 
 class RsoStudent extends StatefulWidget {
@@ -16,8 +17,9 @@ class _RsoStudentState extends State<RsoStudent> {
         backgroundColor: AppColors.white,
         elevation: 0,
         leadingWidth: 70,
+        toolbarHeight: 72,
         leading: Padding(
-          padding: const EdgeInsets.only(left: 16.0),
+          padding: const EdgeInsets.only(top: 16.0, left: 8.0),
           child: IconButton(
             icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.black, size: 20),
             onPressed: () => Navigator.pop(context),
@@ -28,17 +30,17 @@ class _RsoStudentState extends State<RsoStudent> {
         child: Column(
           children: [
             const SizedBox(height: 40),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 40.0),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 32.0),
               child: Text(
-                'Are you an RSO Organizer?',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+                'ARE YOU AN RSO ORGANIZER?',
+                style: AppTextStyles.h3,
                 textAlign: TextAlign.center,
               ),
             ),
             const Spacer(flex: 2),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 40.0),
+              padding: const EdgeInsets.symmetric(horizontal: 32.0),
               child: Column(
                 children: [
                   AppButton(

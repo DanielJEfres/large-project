@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../utils/getAPI.dart';
 import '../theme/app_colors.dart';
+import '../theme/app_text_styles.dart';
 import '../components/app_button.dart';
 import '../components/app_text_field.dart';
 
@@ -62,29 +63,29 @@ class _SignUpScreenState extends State<SignUpScreen> {
         child: Column(
           children: [
             // Back button
-            Align(
-              alignment: Alignment.centerLeft,
-              child: IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.black, size: 20),
-                onPressed: () => Navigator.pop(context),
+            Padding(
+              padding: const EdgeInsets.only(top: 16.0, left: 8.0),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: IconButton(
+                  icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.black, size: 20),
+                  onPressed: () => Navigator.pop(context),
+                ),
               ),
             ),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                padding: const EdgeInsets.symmetric(horizontal: 32.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const SizedBox(height: 8),
-                    const Text(
-                      'Get Started',
-                      style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
-                    ),
+                    Text('GET STARTED', style: AppTextStyles.h3),
                     const SizedBox(height: 8),
-                    const Text(
+                    Text(
                       'Sign up with your UCF email to get started.',
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 15, color: AppColors.textSecondary),
+                      style: AppTextStyles.caption,
                     ),
                     const SizedBox(height: 32),
                     AppTextField(
@@ -122,7 +123,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             ),
             // Button pinned to bottom
             Padding(
-              padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
+              padding: const EdgeInsets.fromLTRB(32, 0, 32, 32),
               child: AppButton(
                 label: 'Sign up',
                 onPressed: _handleSignUp,
