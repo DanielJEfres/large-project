@@ -59,7 +59,9 @@ export default function CreateEvent() {
   const startFormatted = formatDisplayDate(formData.startDate);
   const endFormatted = formatDisplayDate(formData.endDate);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -136,14 +138,14 @@ export default function CreateEvent() {
     <div className="min-h-screen bg-white font-inter antialiased">
       <Navbar />
 
-      <div className="max-w-7xl mx-auto px-16 pt-10 pb-12 grid grid-cols-12 gap-16">
-        <div className="col-span-8">
+      <div className="max-w-7xl mx-auto px-6 sm:px-16 pt-6 sm:pt-10 pb-12 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16">
+        <div className="order-2 lg:order-1 lg:col-span-8">
           <div className="flex bg-[#F6F6F6] p-1 rounded-2xl w-fit mb-8 border border-[#EBEBEB]">
             <button
-              onClick={() => setFormData(p => ({...p, eventType: "RSO"}))}
-              className={`px-5 py-2 rounded-[12px] text-[14px] font-medium flex items-center gap-2 transition-all duration-200 ${
+              onClick={() => setFormData((p) => ({ ...p, eventType: "RSO" }))}
+              className={`px-4 sm:px-5 py-2 rounded-[12px] text-[13px] sm:text-[14px] font-medium flex items-center gap-2 transition-all duration-200 ${
                 formData.eventType === "RSO"
-                  ? "bg-white text-black  ring-black/5"
+                  ? "bg-white text-black ring-black/5"
                   : "text-gray-500 hover:text-gray-700"
               }`}
             >
@@ -158,10 +160,12 @@ export default function CreateEvent() {
             </button>
 
             <button
-              onClick={() => setFormData(p => ({...p, eventType: "Student"}))}
-              className={`px-5 py-2 rounded-[12px] text-[14px] font-medium flex items-center gap-2 transition-all duration-200 ${
+              onClick={() =>
+                setFormData((p) => ({ ...p, eventType: "Student" }))
+              }
+              className={`px-4 sm:px-5 py-2 rounded-[12px] text-[13px] sm:text-[14px] font-medium flex items-center gap-2 transition-all duration-200 ${
                 formData.eventType === "Student"
-                  ? "bg-white text-black "
+                  ? "bg-white text-black"
                   : "text-gray-500 hover:text-gray-700"
               }`}
             >
@@ -181,33 +185,37 @@ export default function CreateEvent() {
             value={formData.title}
             placeholder="My Event Title*"
             onChange={handleChange}
-            className="w-full outline-none border-b border-gray-100 pb-2 mb-10 font-bold text-[42px] tracking-tight focus:border-black transition-colors placeholder:text-gray-200"
+            className="w-full outline-none border-b border-gray-100 pb-2 mb-10 font-bold text-[32px] sm:text-[42px] tracking-tight focus:border-black transition-colors placeholder:text-gray-200"
           />
 
           <div className="mb-12">
-            <h2 className="text-[28px] font-semibold mb-4 tracking-tight">
+            <h2 className="text-[24px] sm:text-[28px] font-semibold mb-4 tracking-tight">
               Date
             </h2>
-            <div className="inline-flex items-center border border-[#EBEBEB] rounded-[18px] p-2 bg-white">
+            <div className="flex flex-col sm:inline-flex sm:flex-row items-center border border-[#EBEBEB] rounded-[24px] sm:rounded-[18px] p-2 bg-white gap-2 sm:gap-0">
               <input
                 type="datetime-local"
                 ref={startInputRef}
                 className="absolute opacity-0 w-0 h-0"
                 value={formData.startDate}
-                onChange={(e) => setFormData(p => ({...p, startDate: e.target.value}))}
+                onChange={(e) =>
+                  setFormData((p) => ({ ...p, startDate: e.target.value }))
+                }
               />
               <input
                 type="datetime-local"
                 ref={endInputRef}
                 className="absolute opacity-0 w-0 h-0"
                 value={formData.endDate}
-                onChange={(e) => setFormData(p => ({...p, endDate: e.target.value}))}
+                onChange={(e) =>
+                  setFormData((p) => ({ ...p, endDate: e.target.value }))
+                }
               />
 
               <button
                 type="button"
                 onClick={() => startInputRef.current?.showPicker()}
-                className="bg-[#EDEDED] hover:bg-[#E5E5E5] transition-colors rounded-[14px] px-8 py-4 text-center"
+                className="w-full sm:w-auto bg-[#EDEDED] hover:bg-[#E5E5E5] transition-colors rounded-[14px] px-8 py-4 text-center"
               >
                 <p className="text-[14px] text-[#222222] font-medium">
                   {startFormatted.day}
@@ -217,7 +225,7 @@ export default function CreateEvent() {
                 </p>
               </button>
 
-              <div className="px-5">
+              <div className="px-5 rotate-90 sm:rotate-0">
                 <svg
                   width="24"
                   height="24"
@@ -235,7 +243,7 @@ export default function CreateEvent() {
               <button
                 type="button"
                 onClick={() => endInputRef.current?.showPicker()}
-                className={`px-8 py-4 text-center rounded-[14px] transition-colors ${formData.endDate ? "bg-[#EDEDED]" : "hover:bg-gray-50"}`}
+                className={`w-full sm:w-auto px-8 py-4 text-center rounded-[14px] transition-colors ${formData.endDate ? "bg-[#EDEDED]" : "hover:bg-gray-50 border border-dashed border-gray-200 sm:border-none"}`}
               >
                 {formData.endDate ? (
                   <>
@@ -261,10 +269,10 @@ export default function CreateEvent() {
           </div>
 
           <div className="mb-10">
-            <h2 className="text-[28px] font-semibold mb-4 tracking-tight">
+            <h2 className="text-[24px] sm:text-[28px] font-semibold mb-4 tracking-tight">
               Description
             </h2>
-            <div className="bg-[#F6F6F6] rounded-[14px] p-5 transition-all focus-within:ring-1 focus-within:text-gray-400">
+            <div className="bg-[#F6F6F6] rounded-[14px] p-5 transition-all focus-within:ring-1 focus-within:ring-black/5">
               <textarea
                 name="description"
                 value={formData.description}
@@ -280,7 +288,7 @@ export default function CreateEvent() {
           </div>
 
           <div className="mb-10">
-            <h2 className="text-[28px] font-semibold mb-4 tracking-tight ">
+            <h2 className="text-[24px] sm:text-[28px] font-semibold mb-4 tracking-tight">
               Event Details
             </h2>
             <div className="space-y-3">
@@ -289,14 +297,14 @@ export default function CreateEvent() {
                 value={formData.location}
                 onChange={handleChange}
                 placeholder="Location*"
-                className="w-full bg-[#F6F6F6] rounded-[14px] px-5 py-4 text-[16px] outline-none placeholder:text-gray-400 focus-within:ring-1 focus-within:text-gray-400"
+                className="w-full bg-[#F6F6F6] rounded-[14px] px-5 py-4 text-[16px] outline-none placeholder:text-gray-400 focus-within:ring-1 focus-within:ring-black/5"
               />
               <input
                 name="link"
                 value={formData.link}
                 onChange={handleChange}
                 placeholder="Link (optional)"
-                className="w-full bg-[#F6F6F6] rounded-[14px] px-5 py-4 text-[16px] outline-none placeholder:text-gray-400 focus-within:ring-1 focus-within:text-gray-400"
+                className="w-full bg-[#F6F6F6] rounded-[14px] px-5 py-4 text-[16px] outline-none placeholder:text-gray-400 focus-within:ring-1 focus-within:ring-black/5"
               />
             </div>
           </div>
@@ -314,9 +322,9 @@ export default function CreateEvent() {
           </div>
         </div>
 
-        <div className="col-span-4 flex flex-col gap-6 pt-16">
-          <div className="sticky top-10 flex flex-col gap-6">
-            <div className="relative bg-[#DEDEDE] rounded-xl aspect-[3/4] flex items-center justify-center overflow-hidden ">
+        <div className="order-1 lg:order-2 lg:col-span-4 flex flex-col gap-6 lg:pt-16">
+          <div className="lg:sticky lg:top-10 flex flex-col gap-6">
+            <div className="relative bg-[#DEDEDE] rounded-xl aspect-[4/3] lg:aspect-[3/4] sm:aspect-[4/3] flex items-center justify-center overflow-hidden">
               {formData.imagePreview ? (
                 <img
                   src={formData.imagePreview}
@@ -324,7 +332,7 @@ export default function CreateEvent() {
                   alt="Cover"
                 />
               ) : (
-                <label className="cursor-pointer bg-white text-black text-sm font-bold px-8 py-3 rounded-full hover:scale-105 transition-transform active:scale-95 ">
+                <label className="cursor-pointer bg-white text-black text-sm font-bold px-8 py-3 rounded-full hover:scale-105 transition-transform active:scale-95">
                   Upload
                   <input
                     type="file"
@@ -338,7 +346,7 @@ export default function CreateEvent() {
 
             <button
               onClick={handleSubmit}
-              className="w-full bg-[#282828] text-white py-4 rounded-full font-bold text-[16px] hover:bg-black transition-all active:scale-[0.98] shadow-lg"
+              className="cursor-pointer w-full bg-[#282828] text-white py-4 rounded-full font-bold text-[16px] hover:bg-black transition-all mt-4 lg:mt-0"
             >
               Create Event
             </button>

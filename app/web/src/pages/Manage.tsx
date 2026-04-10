@@ -3,12 +3,13 @@ import Navbar from "../components/Navbar";
 import { useAuth } from "../context/AuthContext";
 import type { UniversityEvent } from "../types/UniversityEvent";
 import { LOCAL_IP, SERVER_IP } from "../config";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useOrganizations } from "../hooks/useOrganization";
 import { formatStackedDate } from "../utils/date";
-import { Calendar, Image, MapPin, Users } from "lucide-react";
+import { ArrowRightIcon, Calendar, Image, MapPin, Users } from "lucide-react";
 
 export default function Manage() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"Upcoming" | "Past">("Upcoming");
   const { user, token } = useAuth();
   const [myEvents, setMyEvents] = useState<UniversityEvent[]>([]);
@@ -105,11 +106,11 @@ export default function Manage() {
                 key={event._id}
                 className="group flex "
               >
-                <div className="relative min-w-62 min-h-62 bg-gray-100 rounded-2xl overflow-hidden mb-4">
+                <div className="relative min-w-62 min-h-62 max-w-62 max-h-62 bg-gray-100 rounded-2xl overflow-hidden mb-4">
                   {event.flyer ? (
                     <img
                       src={event.flyer}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                      className="w-full h-full w-2 object-cover group-hover:scale-105 transition-transform"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-gray-300">
@@ -117,32 +118,41 @@ export default function Manage() {
                     </div>
                   )}
                 </div>
-                <div className="relative flex flex-col p-6 w-full">
-                  <button className="absolute right-0 bg-gray-100 text-gray-400 px-3 py-1 font-league rounded-2xl">
-                    Edit Event
+                <div className="flex w-full">
+                  <div className="relative flex flex-col p-6 w-full">
+                    <p className="font-bebas text-brand text-xl tracking-wide uppercase">
+                      {orgLookup[event.organizationId]?.name ||
+                        "this should say user's name  :p"}
+                    </p>
+                    <h3 className="text-lg font-bold line-clamp-1">
+                      {event.title}
+                    </h3>
+                    <div className="mt-1 text-gray-500 font-medium text-sm flex items-center gap-1">
+                      <Calendar size={16} className="shrink-0" />
+                      {formatStackedDate(event.startDate).day},{" "}
+                      {formatStackedDate(event.startDate).date}
+                    </div>
+
+                    <div className="mt-1 text-gray-500 font-medium text-sm flex items-center gap-1">
+                      <MapPin size={16} className="shrink-0" />
+                      <p>{event.location}</p>
+                    </div>
+
+                    <div className="mt-auto mb-5 text-gray-500 font-medium text-sm flex items-center gap-1">
+                      <Users />
+                      <p>{event.attendees.length} are attending... </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      navigate(`/manage/event/${event._id}`);
+                    }}
+                    className="cursor-pointer font-league self-center h-fit flex items-center gap-2 px-6 py-3 bg-gray-100 rounded-2xl hover:bg-gray-200 transition-all font-bold"
+                  >
+                    <span>Manage</span>
+                    <ArrowRightIcon size={16} />
                   </button>
-                  <p className="font-bebas text-brand text-xl tracking-wide uppercase">
-                    {orgLookup[event.organizationId]?.name ||
-                      "this should say user's name  :p"}
-                  </p>
-                  <h3 className="text-lg font-bold line-clamp-1">
-                    {event.title}
-                  </h3>
-                  <div className="mt-1 text-gray-500 font-medium text-sm flex items-center gap-1">
-                    <Calendar size={16} className="shrink-0" />
-                    {formatStackedDate(event.startDate).day},{" "}
-                    {formatStackedDate(event.startDate).date}
-                  </div>
-
-                  <div className="mt-1 text-gray-500 font-medium text-sm flex items-center gap-1">
-                    <MapPin size={16} className="shrink-0" />
-                    <p>{event.location}</p>
-                  </div>
-
-                  <div className="mt-auto mb-5 text-gray-500 font-medium text-sm flex items-center gap-1">
-                    <Users />
-                    <p>{event.attendees.length} are attending... </p>
-                  </div>
                 </div>
               </Link>
             ))

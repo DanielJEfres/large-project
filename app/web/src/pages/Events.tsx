@@ -181,7 +181,7 @@ export default function Events() {
   return (
     <>
       <Navbar />
-      <div className="font-league px-20 pb-20 ">
+      <div className="font-inter px-20 pb-20 ">
         <h1 className="text-5xl font-bebas mt-10 mb-8">Events</h1>
 
         <div className="font-inter flex gap-10 items-center mt-3">
@@ -279,7 +279,7 @@ export default function Events() {
                       <Link
                         key={event._id}
                         to={`/event/${event._id}`}
-                        className="group shadow-[5px_5px_5px_-3px_rgba(0,0,0,0.1)] h-max-fit min-w-fit flex rounded-2xl overflow-hidden shrink-0 cursor-pointer"
+                        className="group border border-gray-100 shadow-sm h-max-fit min-w-fit flex rounded-2xl overflow-hidden shrink-0 cursor-pointer"
                       >
                         <div className="w-80 h-80 bg-gray/30 flex items-center justify-center shrink-0 overflow-hidden ">
                           <img
@@ -417,7 +417,7 @@ export default function Events() {
                   <Link
                     to={`/event/${event._id}`}
                     key={event._id}
-                    className="group shadow-[5px_5px_5px_-3px_rgba(0,0,0,0.1)] flex flex-col rounded-2xl overflow-hidden hover:cursor-pointer transition-all"
+                    className="group border border-gray-100 shadow-sm flex flex-col rounded-2xl overflow-hidden hover:cursor-pointer transition-all"
                   >
                     <div className="w-full overflow-hidden h-48 bg-gray/30 flex items-center justify-center shrink-0">
                       <img

@@ -22,30 +22,6 @@ export default function Event() {
 
   const [showMenu, setShowMenu] = useState(false);
 
-  const handleDelete = async () => {
-    if (!window.confirm("Are you sure you want to delete this event?")) return;
-
-    try {
-      const response = await fetch(`${SERVER_IP}/api/events/${eventId}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        alert("Event deleted successfully");
-        window.location.href = "/"; // Redirect to home or dashboard
-      } else {
-        const data = await response.json();
-        alert(data.message || "Failed to delete event");
-      }
-    } catch (err) {
-      console.error("Delete error:", err);
-      alert("An error occurred while deleting.");
-    }
-  };
-
   useEffect(() => {
     const fetchEvent = async () => {
       try {
@@ -133,6 +109,21 @@ export default function Event() {
               </div>
 
               <div className="p-5 bg-lightgray rounded-b-xl">
+                {/* Manage Access Section */}
+                {user?.id === event.createdBy._id && (
+                  <div className="mb-6 pb-6 border-b border-gray-200">
+                    <p className="text-sm font-medium text-gray-600 mb-2 text-center">
+                      You have manage access for this event.
+                    </p>
+                    <Link
+                      to={`/manage/event/${event._id}`}
+                      className="flex items-center justify-center w-full py-2 bg-black text-white rounded-xl font-league font-bold uppercase tracking-wider hover:bg-zinc-800 transition-colors"
+                    >
+                      Manage
+                    </Link>
+                  </div>
+                )}
+
                 <h2 className="text-xl mb-4 font-bebas text-black">
                   Event details
                 </h2>
@@ -228,7 +219,7 @@ export default function Event() {
 
               {/* buttons */}
               <div className="flex mt-auto gap-2 ">
-                <button className="cursor-pointer items-center gap-3 flex font-bold w-fit px-8 py-3 rounded-4xl text-black bg-lightgray my-3 px-4 py-2 font-league">
+                <button className="cursor-pointer items-center gap-3 flex font-bold w-fit px-8 py-3 rounded-4xl text-black bg-lightgray my-3 font-league hover:bg-gray-200 transition-all">
                   <Share width={20} />
                   Share Event
                 </button>

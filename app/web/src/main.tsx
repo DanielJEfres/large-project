@@ -15,6 +15,8 @@ import VerifyEmail from "./pages/VerifyEmail.tsx";
 import Organization from "./pages/Organization.tsx";
 import Tickets from "./pages/Tickets.tsx";
 import Manage from "./pages/Manage.tsx";
+import EventDashboard from "./pages/EventDashboard.tsx";
+import EditEvent from "./pages/EditEvent.tsx";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -69,6 +71,8 @@ const router = createBrowserRouter([
         path: "manage",
         element: <Manage />,
       },
+      { path: "manage/event/:id", element: <EventDashboard /> },
+      { path: "manage/event/:eventId/edit", element: <EditEvent /> },
     ],
   },
 ]);
