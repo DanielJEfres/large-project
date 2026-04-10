@@ -158,17 +158,29 @@ router.post('/', upload.single('flyer'), async (req, res) => {
 })
 
 //Update Event
-router.put('/:eventId', async (req, res) => {
+router.put('/:eventId', upload.single('flyer'), async (req, res) => {
 
     try {
         
-        const updatedEvent = await Event.findByIdAndUpdate(
+        if(req.file) {
+            const flyerUrl = await uploadToS3(req.file, 'flyers')
+            
+            const updateEventFlyer = await Event.findByIdAndUpdate(
+                {_id: req.params.eventId},
+                {flyer: flyerUrl},
+                {returnDocument: 'after'}
+            )
+
+            if(!updateEventFlyer) return res.status(400).json({message:"Could Not Upload Flyer"})
+        }
+      
+        const updatedEvent = await Event.findOneAndUpdate(
             {_id: req.params.eventId},
             req.body,
             {returnDocument: 'after'}
         )
 
-        if(!updatedEvent) return res.status(500).json({message:"Could Not Update Event"})
+        if (!updatedEvent) return res.status(400).json({message: "Could Not Update Event"})
 
         return res.status(200).json({Event:updatedEvent})
 
