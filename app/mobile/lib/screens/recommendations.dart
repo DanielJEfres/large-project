@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../theme/app_colors.dart';
+import '../components/app_button.dart';
 
 class Recommendations extends StatefulWidget {
   @override
@@ -23,16 +25,15 @@ class _RecommendationsState extends State<Recommendations> {
     final screenWidth = size.width;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.white,
         elevation: 0,
-        // We use leadingWidth to give the back button enough room for your padding
         leadingWidth: 70,
         leading: Padding(
           padding: const EdgeInsets.only(left: 16.0),
           child: IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black, size: 20),
+            icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.black, size: 20),
             onPressed: () => Navigator.pop(context),
           ),
         ),
@@ -41,15 +42,12 @@ class _RecommendationsState extends State<Recommendations> {
             padding: const EdgeInsets.only(right: 16.0),
             child: TextButton(
               style: TextButton.styleFrom(
-                // This is how you do padding INSIDE the button now
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
               ),
-              onPressed: () {
-                Navigator.pushNamed(context, '/event/events');
-              },
+              onPressed: () => Navigator.pushNamed(context, '/event/events'),
               child: const Text(
-                  "Skip",
-                  style: TextStyle(color: Colors.grey, fontSize: 16)
+                'Skip',
+                style: TextStyle(color: AppColors.textSecondary, fontSize: 16),
               ),
             ),
           ),
@@ -58,9 +56,7 @@ class _RecommendationsState extends State<Recommendations> {
       body: SafeArea(
         child: Column(
           children: [
-            // Space at the top
             SizedBox(height: screenHeight * 0.04),
-
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 40.0),
               child: Column(
@@ -73,14 +69,12 @@ class _RecommendationsState extends State<Recommendations> {
                   const SizedBox(height: 15),
                   const Text(
                     'Choose your favorite topics to get personalized event and club recommendations.',
-                    style: TextStyle(fontSize: 16, color: Colors.black54),
+                    style: TextStyle(fontSize: 16, color: AppColors.textMuted),
                     textAlign: TextAlign.center,
                   ),
                 ],
               ),
             ),
-
-            // Middle Section (Flexible)
             Expanded(
               child: Container(
                 padding: EdgeInsets.symmetric(
@@ -103,8 +97,8 @@ class _RecommendationsState extends State<Recommendations> {
                             else _selectedInterests.remove(interest);
                           });
                         },
-                        backgroundColor: const Color(0xFFFEF3C7),
-                        selectedColor: Colors.orangeAccent,
+                        backgroundColor: AppColors.chipBackground,
+                        selectedColor: AppColors.chipSelected,
                         showCheckmark: false,
                         shape: const StadiumBorder(side: BorderSide.none),
                       );
@@ -113,30 +107,18 @@ class _RecommendationsState extends State<Recommendations> {
                 ),
               ),
             ),
-
-            // --- ADJUSTED BUTTON POSITION ---
-            // Adding a small spacer here helps push the button slightly further from the bottom
             const SizedBox(height: 20),
-
             Padding(
               padding: EdgeInsets.only(
-                // INCREASE THIS VALUE to move the button higher up
                 bottom: screenHeight * 0.08,
                 left: 20,
                 right: 20,
               ),
-              child: SizedBox(
+              child: AppButton(
+                label: 'Continue',
+                onPressed: () {},
                 width: screenWidth * 0.85,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFFC107),
-                    padding: const EdgeInsets.symmetric(vertical: 18),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                    elevation: 0,
-                  ),
-                  onPressed: () {},
-                  child: const Text('Log in', style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
-                ),
+                foregroundColor: AppColors.white,
               ),
             ),
           ],
