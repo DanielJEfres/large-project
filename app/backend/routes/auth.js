@@ -134,7 +134,7 @@ router.post("/login", async (req, res) => {
 
         } else { // email exists in DB
             // match password
-            if (await user.matchPassword(password)){
+            if (await user.matchPassword(password) && user.isVerified){
                 // user has been validated! JWT below
                 const user_id = user._id;
 
