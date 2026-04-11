@@ -24,7 +24,11 @@ export default function VerifyEmail() {
       try {
         const response = await fetch(
           `${SERVER_IP}/api/email-verification/request`,
-          { method: "POST",
+          { 
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
             body: JSON.stringify({ ucfEmail: user?.email })
           }
         );
