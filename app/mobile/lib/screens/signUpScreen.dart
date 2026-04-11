@@ -39,7 +39,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       );
       if (!mounted) return;
       if (response['success'] == true) {
-        Navigator.pushNamed(context, '/verification');
+        Navigator.pushNamed(context, '/verification', arguments: loginName.trim());
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(response['message'] ?? 'Sign up failed')),
