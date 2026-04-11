@@ -16,41 +16,38 @@ export default function VerifyEmail() {
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    if (!token) return;
+  // If no token is in the URL, the user just landed here after signing up.
+  // We don't want to call any API automatically yet.
+  if (!token) return;
 
-    const verify = async () => {
-      setLoading(true);
-      setStatusMessage("Verifying your account...");
-      try {
-        const response = await fetch(
-          `${SERVER_IP}/api/email-verification/request`,
-          { 
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ ucfEmail: user?.email })
-          }
-        );
+  const verifyAccount = async () => {
+    setLoading(true);
+    setStatusMessage("Verifying your account...");
+    try {
+      // FIX: Hit the GET endpoint with the token, NOT the /request endpoint
+      const response = await fetch(`${SERVER_IP}/api/email-verification/${token}`, {
+        method: "GET",
+      });
+
+      if (response.ok) {
+        setError("");
+        setStatusMessage("Email verified successfully! Redirecting to events...");
+        // On success, the backend currently redirects, but since this is a fetch call,
+        // we handle the navigation here in React.
+        setTimeout(() => navigate("/events"), 1500);
+      } else {
         const data = await response.json();
-        if (response.ok) {
-          setError("");
-          setStatusMessage(
-            "Email verified successfully! Redirecting to events...",
-          );
-          setTimeout(() => navigate("/events"), 1200);
-        } else {
-          setError(data.message || "Verification failed. Please try again.");
-        }
-      } catch (err) {
-        setError("Server error while verifying email. Please try again later.");
-      } finally {
-        setLoading(false);
+        setError(data.message || "This verification link is invalid or has expired.");
       }
-    };
+    } catch (err) {
+      setError("Server error while verifying. Please check your connection.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    verify();
-  }, [token, navigate]);
+  verifyAccount();
+}, [token, navigate]);
 
   return (
     <div className="[&_button]:cursor-pointer min-h-screen  bg-white flex flex-col justify-center items-center z-50">
