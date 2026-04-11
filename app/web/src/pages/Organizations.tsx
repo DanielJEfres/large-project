@@ -148,16 +148,16 @@ export default function Organizations() {
                       className="font-semibold rounded-4xl my-3 py-2 font-league flex min-w-fit "
                       to={`/organization/${org._id}`}
                     >
-                      <button
-                        className="flex cursor-pointer gap-2 "
-                        //User joins this particular org .
-                        onClick={() => handleJoin(org.name)}
-                      >
+                      <button className="flex cursor-pointer gap-2 ">
                         More Events
                         <ChevronRight width={17} />
                       </button>
                     </Link>
-                    <button className="font-bold px-9 rounded-4xl text-white bg-black my-3 mr-3 font-league cursor-pointer active:scale-95 transition-all hover:bg-brand duration-100 ">
+                    <button
+                      //User joins this particular org.
+                      onClick={() => handleJoin(org.name)}
+                      className="font-bold px-9 rounded-4xl text-white bg-black my-3 mr-3 font-league cursor-pointer active:scale-95 transition-all hover:bg-brand duration-100 "
+                    >
                       Join
                     </button>
                   </div>
