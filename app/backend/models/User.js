@@ -25,7 +25,8 @@ const userSchema = new mongoose.Schema({
     required: true 
   },
   organization: { 
-    type: Dict,  
+    type: Map,
+    of: String,  
     default: {} 
   },
   interests: [{
