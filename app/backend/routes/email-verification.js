@@ -123,11 +123,13 @@ router.get('/:token', async (req, res) => {
 
   try {
     // Find user with this token
+    /*
     const user = await User.findOne({ verificationToken: token });
 
     if (!user) {
       return res.status(400).json({ message: "Invalid or expired token" });
     }
+    */
 
     // Update user status and clear the token
     user.isVerified = true; 
