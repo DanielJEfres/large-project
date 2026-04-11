@@ -45,7 +45,7 @@ router.post('/request', async (req, res) => {
         const recipient = user.ucfEmail;
         console.log(`Attempting to send mail to: ${recipient}`);
 
-        const verificationUrl = `${process.env.CLIENT_URL}/email-verification/${token}`;
+        const verificationUrl = `${process.env.API_URL}/api/email-verification/${token}`;
 
         const emailTemplate = (verificationUrl, firstName) => `
         <!DOCTYPE html>
@@ -123,20 +123,26 @@ router.get('/:token', async (req, res) => {
 
   try {
     // Find user with this token
+    
     const user = await User.findOne({ verificationToken: token });
 
     if (!user) {
       return res.status(400).json({ message: "Invalid or expired token" });
     }
+    
 
     // Update user status and clear the token
     user.isVerified = true; 
     user.verificationToken = undefined; //Clear the token for security purposes
     await user.save();
 
-    res.status(200).json({ message: "Email verified successfully! You can now log in." });
-  } catch (error) {
+    //res.status(200).json({ message: "Email verified successfully! You can now log in." });
+
+    return res.redirect(`${process.env.CLIENT_URL}`)
+  } catch (error) 
+  {
     res.status(500).json({ message: "Error verifying email", error });
+    //res.redirect(`${process.env.API_URL}/error`)
   }
 });
 
