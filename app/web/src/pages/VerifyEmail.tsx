@@ -18,11 +18,6 @@ export default function VerifyEmail() {
 
   useEffect(() => {
     if (token) return;
-
-    if (!unverifiedEmail) {
-      setError("No email found. Please try logging in again.");
-      return;
-    }   
   
     const verify = async () => {
       setLoading(true);
