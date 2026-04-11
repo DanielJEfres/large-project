@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { LOCAL_IP, SERVER_IP } from "../config";
 
 export default function NewPassword() {
-  const { token } = useParams(); // Grabs token from URL
+  const { token } = useParams();
   const navigate = useNavigate();
   const [newPassword, setNewPassword] = useState("");
   const [error, setError] = useState("");
@@ -28,7 +28,7 @@ export default function NewPassword() {
 
       if (!response.ok) throw new Error("Failed to update password.");
 
-      alert("Password updated! Please log in.");
+      alert("Password updated ez ( Style this later if ts works )");
       navigate("/login");
     } catch (err: any) {
       setError(err.message);

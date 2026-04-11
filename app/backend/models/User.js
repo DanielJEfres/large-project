@@ -24,10 +24,10 @@ const userSchema = new mongoose.Schema({
     type: String, 
     required: true 
   },
-  role: { 
-    type: String, 
-    enum: ['student', 'admin'], 
-    default: 'student' 
+  organization: { 
+    type: Map,
+    of: String,  
+    default: {} 
   },
   interests: [{
     type: mongoose.Schema.Types.ObjectId, 
