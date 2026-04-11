@@ -22,7 +22,9 @@ export default function VerifyEmail() {
       try {
         const response = await fetch(
           `${SERVER_IP}/api/email-verification/request`,
-          { method: "POST" },
+          { method: "POST"},
+          
+          
         );
         const data = await response.json();
         if (response.ok) {
