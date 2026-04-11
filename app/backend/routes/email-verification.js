@@ -136,11 +136,11 @@ router.get('/:token', async (req, res) => {
 
     //res.status(200).json({ message: "Email verified successfully! You can now log in." });
 
-    return res.redirect(`${process.env.CLIENT_URL}/?verified=true`)
+    return res.redirect(`${process.env.API_URL}/?verified=true`)
   } catch (error) 
   {
     //res.status(500).json({ message: "Error verifying email", error });
-    res.redirect(`${process.env.CLIENT_URL}/error`)
+    res.redirect(`${process.env.API_URL}/error`)
   }
 });
 
