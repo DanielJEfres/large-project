@@ -3,8 +3,10 @@ import { useNavigate, useParams } from "react-router";
 import Logo from "../components/Logo";
 import styles from "./Login.module.css";
 import { SERVER_IP } from "../config";
+import { useAuth } from "../context/AuthContext";
 
 export default function VerifyEmail() {
+  const {user}  = useAuth();
   const { token } = useParams<{ token?: string }>();
   const navigate = useNavigate();
   const [statusMessage, setStatusMessage] = useState<string>(
@@ -22,9 +24,9 @@ export default function VerifyEmail() {
       try {
         const response = await fetch(
           `${SERVER_IP}/api/email-verification/request`,
-          { method: "POST"},
-          
-          
+          { method: "POST",
+            body: JSON.stringify({ ucfEmail: user?.email })
+          }
         );
         const data = await response.json();
         if (response.ok) {
