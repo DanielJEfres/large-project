@@ -18,11 +18,6 @@ export default function VerifyEmail() {
 
   useEffect(() => {
     if (token) return;
-
-    if (!unverifiedEmail) {
-      setError("No email found. Please try logging in again.");
-      return;
-    }   
   
     const verify = async () => {
       setLoading(true);
@@ -43,7 +38,7 @@ export default function VerifyEmail() {
           setStatusMessage(
             "Email verified successfully! Redirecting to events...",
           );
-          setTimeout(() => navigate("/events"), 1200);
+          //setTimeout(() => navigate("/events"), 1200);
         } else {
           setError(data.message || "Verification failed. Please try again.");
         }
