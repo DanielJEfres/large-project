@@ -6,6 +6,7 @@ import passwordResetRoutes from './password-reset.js'
 import eventRoutes from './eventRoutes.js'
 import organizationRoutes from './organizationRoutes.js'
 import getEventsRoutes from './getEvents.js'
+import authenticateToken from '../middleware/authenticateToken.js'
 
 const router = express.Router()
 
