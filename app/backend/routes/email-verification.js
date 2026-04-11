@@ -98,14 +98,23 @@ router.post('/request', async (req, res) => {
 
         const htmlContent = emailTemplate(verificationUrl, user.firstName || 'Knight');
 
-        await transporter.sendMail({
-            from: `EventKnight <${process.env.FROM_EMAIL}>`,
-            to: user.ucfEmail,
-            replyTo: process.env.FROM_EMAIL,
-            subject: "Explore the UCF Community: Email Verification",
-            text: `Hi ${user.firstName}, please verify your EventKnight account by visiting this link: ${verificationUrl}`,
-            html: htmlContent,
-        });
+        try{
+            await transporter.sendMail(
+            {
+                from: `EventKnight <${process.env.FROM_EMAIL}>`,
+                to: user.ucfEmail,
+                replyTo: process.env.FROM_EMAIL,
+                subject: "Explore the UCF Community: Email Verification",
+                text: `Hi ${user.firstName}, please verify your EventKnight account by visiting this link: ${verificationUrl}`,
+                html: htmlContent,
+            });
+        }
+    
+        catch (mailError) 
+        {
+            console.error("Mail failed:", mailError);
+            return res.status(500).json({ message: "Failed to send email" });
+        }
 
         res.status(200).json({message: "Verification email sent"});
     }
