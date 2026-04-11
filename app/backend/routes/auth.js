@@ -114,7 +114,7 @@ router.post('/signup', async (req, res) => {
 function generateAccessToken(payload) {
     // serialize our payload (user id) using access token in ENV.
     // AccessToken expires in 15 minutes, requires Refresh
-    return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "15s" })
+    return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "15m" })
 }
 
 router.post("/login", async (req, res) => {
