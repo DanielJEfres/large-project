@@ -33,7 +33,6 @@ router.post('/request', async (req, res) => {
         const user = await User.findOne({ucfEmail});
         if(!user) return res.status(404).json({message: "Email verification: user with this email is not found"});
 
-        
 
         //Generate verification token
         const token = crypto.randomBytes(32).toString('hex');

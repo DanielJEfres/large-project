@@ -96,8 +96,11 @@ export default function Signup() {
       }
 
       console.log("Success:", data);
-      navigate("/verify");
-    } catch (err: any) {
+      navigate("/verify", {state: {email: formData.email}});
+    } 
+    
+    catch (err: any) 
+    {
       setError(err?.message || "Internal Server Error");
     }
   };

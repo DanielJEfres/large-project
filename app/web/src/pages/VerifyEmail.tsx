@@ -18,14 +18,10 @@ export default function VerifyEmail() {
 
   useEffect(() => {
     if (token) return;
-
-    if (!unverifiedEmail) {
-      setError("No email found. Please try logging in again.");
-      return;
-    }   
   
     const verify = async () => {
       setLoading(true);
+      await new Promise(resolve => setTimeout(resolve, 500));
       setStatusMessage("Verifying your account...");
       try {
         const response = await fetch(
