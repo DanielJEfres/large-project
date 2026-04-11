@@ -125,7 +125,7 @@ router.get('/:token', async (req, res) => {
     }
 
     //res.status(200).json({ message: "Password reset: Token is Valid" });
-    return res.redirect(`${process.env.CLIENT_URL}/api/password-reset/${token}`)
+    return res.redirect(`${process.env.CLIENT_URL}/password-reset/${en}`)
   } 
 
   catch (error) 
