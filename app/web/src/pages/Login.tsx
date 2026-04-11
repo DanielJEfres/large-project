@@ -57,8 +57,10 @@ export default function Login() {
 
       if (!response.ok) {
         if (response.status === 403) {
+          const unverifiedEmail = data.ucfEmail;
           setError(data.message || "Email not verified.");
-          navigate("/verify");
+
+          navigate("/verify", {state : {email:unverifiedEmail}});
           return;
         }
         throw new Error(data.message || "Something went wrong");
