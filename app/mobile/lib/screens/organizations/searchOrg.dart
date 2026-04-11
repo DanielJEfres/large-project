@@ -1,56 +1,37 @@
+
+// ─── Data Model ───────────────────────────────────────────────────────────────
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-// Import your existing files
-import '../../components/app_bottom_nav.dart';          // your AppNavBar component
-import 'organizations.dart'; // your OrganizationInfoScreen
+import '../../components/app_bottom_nav.dart';
+import 'organizations.dart';
+import '../../utils/getAPI.dart'; // your getAPI file
+import 'dart:async';
 
 // ─── Data Model ───────────────────────────────────────────────────────────────
 
 class Organization {
   final String id;
   final String name;
-  final List<String> tags;
+  final String description;
+  final String category;
 
   const Organization({
     required this.id,
     required this.name,
-    required this.tags,
+    required this.description,
+    required this.category,
   });
+
+  factory Organization.fromJson(Map<String, dynamic> json) {
+    return Organization(
+      id: json['_id'] ?? '',
+      name: json['name'] ?? 'Unknown',
+      description: json['description'] ?? '',
+      category: json['category'] ?? '',
+    );
+  }
 }
-
-// ─── Sample Data ──────────────────────────────────────────────────────────────
-
-const _sampleOrgs = [
-  Organization(id: '1', name: 'Organization Name', tags: ['Tags', 'Tags']),
-  Organization(id: '2', name: 'Organization Name', tags: ['Tags', 'Tags']),
-  Organization(id: '3', name: 'Organization Name', tags: ['Tags', 'Tags']),
-  Organization(id: '4', name: 'Organization Name', tags: ['Tags', 'Tags']),
-  Organization(id: '5', name: 'Organization Name', tags: ['Tags', 'Tags']),
-  Organization(id: '6', name: 'Organization Name', tags: ['Tags', 'Tags']),
-];
-
-const _allCategories = [
-  'All',
-  'Music',
-  'Food & Drink',
-  'Business',
-  'Religion & Spirituality',
-  'Theater & Dance',
-  'Social Justice & Human Rights',
-  'Engineering & Technology',
-  'Science',
-  'Career Development',
-  'Medicine',
-  'Government & Politics',
-  'Education',
-  'Community & Culture',
-  'Humanities',
-  'Arts & Media',
-  'Health & Wellness',
-  'Hobbies & Special Interest',
-  'Other',
-];
 
 // ─── Colors ───────────────────────────────────────────────────────────────────
 
@@ -59,8 +40,15 @@ const kDark       = Color(0xFF1A1A1A);
 const kGray       = Color(0xFF9E9E9E);
 const kLightGray  = Color(0xFFF0F0F0);
 const kBorderGray = Color(0xFFE0E0E0);
-const kHeaderBg   = Color(0xFFD9D9D9);
 const kWhite      = Colors.white;
+
+const _allCategories = [
+  'All', 'Music', 'Food & Drink', 'Business', 'Religion & Spirituality',
+  'Theater & Dance', 'Social Justice & Human Rights', 'Engineering & Technology',
+  'Science', 'Career Development', 'Medicine', 'Government & Politics',
+  'Education', 'Community & Culture', 'Humanities', 'Arts & Media',
+  'Health & Wellness', 'Hobbies & Special Interest', 'Other',
+];
 
 // ─── Main Screen ──────────────────────────────────────────────────────────────
 
@@ -75,18 +63,84 @@ class _SearchOrganizationState extends State<SearchOrganization> {
   String _selectedCategory = 'All';
   final TextEditingController _searchController = TextEditingController();
 
+  List<Organization> _organizations = [];
+  bool _isLoading = true;
+  String? _errorMessage;
+  int _totalResults = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchOrganizations();
+
+    _searchController.addListener(_onSearchChanged);
+  }
+
+// Add this outside initState
+  Timer? _debounce;
+
+  void _onSearchChanged() {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 400), () {
+      if (mounted) _fetchOrganizations(query: _searchController.text.trim());
+    });
+  }
+
   @override
   void dispose() {
+    _debounce?.cancel();
+    _searchController.removeListener(_onSearchChanged);
     _searchController.dispose();
     super.dispose();
   }
 
-  // ── Navigate to Organization Info page ──
+
+
+  Future<void> _fetchOrganizations({String? query}) async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      // Pass name only when there's an actual query
+      final result = await getAPI.getOrganizations(
+        name: (query != null && query.isNotEmpty) ? query : null,
+      );
+
+      if (result['success'] == true) {
+        final List<dynamic> raw = result['organizations'] ?? [];
+        final orgs = raw.map((e) => Organization.fromJson(e)).toList();
+
+        // Client-side category filter (the backend filters by name only)
+        final filtered = _selectedCategory == 'All'
+            ? orgs
+            : orgs.where((o) => o.category == _selectedCategory).toList();
+
+        setState(() {
+          _organizations = filtered;
+          _totalResults = filtered.length;
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _errorMessage = result['message'] ?? 'Failed to load organizations.';
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'An unexpected error occurred.';
+        _isLoading = false;
+      });
+    }
+  }
+
   void _goToOrgInfo(Organization org) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => OrganizationScreen(),
+        builder: (_) => OrganizationScreen(orgId: org.id), // pass the id
       ),
     );
   }
@@ -104,8 +158,12 @@ class _SearchOrganizationState extends State<SearchOrganization> {
         onApply: (selected) {
           if (selected.isNotEmpty) {
             setState(() => _selectedCategory = selected.first);
+          } else {
+            setState(() => _selectedCategory = 'All');
           }
           Navigator.pop(context);
+          // Re-fetch with the new category applied
+          _fetchOrganizations(query: _searchController.text.trim());
         },
       ),
     );
@@ -118,21 +176,18 @@ class _SearchOrganizationState extends State<SearchOrganization> {
       child: Scaffold(
         backgroundColor: kWhite,
         appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(80), // Keep the height for spacing
+          preferredSize: const Size.fromHeight(80),
           child: Container(
-            color: kWhite, // White background for top section
-            child: SafeArea(
+            color: kWhite,
+            child: const SafeArea(
               bottom: false,
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
-                child: Align(
-                  alignment: Alignment.bottomLeft,
-                ),
+                padding: EdgeInsets.fromLTRB(20, 12, 20, 12),
+                child: Align(alignment: Alignment.bottomLeft),
               ),
             ),
           ),
         ),
-
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -144,7 +199,7 @@ class _SearchOrganizationState extends State<SearchOrganization> {
                   const Text(
                     'ORGANIZATIONS',
                     style: TextStyle(
-                      fontSize: 28, // Adjusted size for typography
+                      fontSize: 28,
                       fontFamily: 'League Spartan',
                       fontWeight: FontWeight.w900,
                       letterSpacing: 1.2,
@@ -153,7 +208,7 @@ class _SearchOrganizationState extends State<SearchOrganization> {
                   ),
                   const SizedBox(height: 14),
 
-                  // Search bar
+                  // ── Search bar ──
                   Container(
                     height: 42,
                     decoration: BoxDecoration(
@@ -166,8 +221,7 @@ class _SearchOrganizationState extends State<SearchOrganization> {
                       decoration: const InputDecoration(
                         hintText: 'Search Organizations',
                         hintStyle: TextStyle(fontSize: 14, color: kGray, fontFamily: 'Inter'),
-                        prefixIcon:
-                        Icon(Icons.search, size: 18, color: kGray),
+                        prefixIcon: Icon(Icons.search, size: 18, color: kGray),
                         border: InputBorder.none,
                         contentPadding: EdgeInsets.symmetric(vertical: 12),
                       ),
@@ -175,7 +229,7 @@ class _SearchOrganizationState extends State<SearchOrganization> {
                   ),
                   const SizedBox(height: 12),
 
-                  // Category chips + filter icon
+                  // ── Category chips + filter icon ──
                   Row(
                     children: [
                       Expanded(
@@ -187,21 +241,20 @@ class _SearchOrganizationState extends State<SearchOrganization> {
                               return Padding(
                                 padding: const EdgeInsets.only(right: 8),
                                 child: GestureDetector(
-                                  onTap: () => setState(
-                                          () => _selectedCategory = cat),
+                                  onTap: () {
+                                    setState(() => _selectedCategory = cat);
+                                    _fetchOrganizations(
+                                        query: _searchController.text.trim());
+                                  },
                                   child: AnimatedContainer(
-                                    duration:
-                                    const Duration(milliseconds: 180),
+                                    duration: const Duration(milliseconds: 180),
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 14, vertical: 7),
                                     decoration: BoxDecoration(
                                       color: isSelected ? kYellow : kWhite,
-                                      borderRadius:
-                                      BorderRadius.circular(20),
+                                      borderRadius: BorderRadius.circular(20),
                                       border: Border.all(
-                                        color: isSelected
-                                            ? kYellow
-                                            : kBorderGray,
+                                        color: isSelected ? kYellow : kBorderGray,
                                       ),
                                     ),
                                     child: Text(
@@ -211,8 +264,7 @@ class _SearchOrganizationState extends State<SearchOrganization> {
                                         fontWeight: isSelected
                                             ? FontWeight.w600
                                             : FontWeight.w400,
-                                        color:
-                                        isSelected ? kDark : kGray,
+                                        color: isSelected ? kDark : kGray,
                                       ),
                                     ),
                                   ),
@@ -240,37 +292,68 @@ class _SearchOrganizationState extends State<SearchOrganization> {
                   ),
                   const SizedBox(height: 8),
 
-                  const Text(
-                    'Showing 1,232 results',
-                    style: TextStyle(fontSize: 12, color: kGray),
+                  // ── Results count ──
+                  Text(
+                    _isLoading
+                        ? 'Loading...'
+                        : 'Showing ${_totalResults.toString()} result${_totalResults == 1 ? '' : 's'}',
+                    style: const TextStyle(fontSize: 12, color: kGray),
                   ),
                 ],
               ),
             ),
 
-            // ── List ──
+            // ── List / States ──
             Expanded(
-              child: ListView.separated(
+              child: _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : _errorMessage != null
+                  ? Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.error_outline,
+                        color: kGray, size: 40),
+                    const SizedBox(height: 8),
+                    Text(_errorMessage!,
+                        style: const TextStyle(color: kGray)),
+                    const SizedBox(height: 12),
+                    ElevatedButton(
+                      onPressed: () => _fetchOrganizations(
+                          query: _searchController.text.trim()),
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: kDark,
+                          foregroundColor: kWhite),
+                      child: const Text('Retry'),
+                    ),
+                  ],
+                ),
+              )
+                  : _organizations.isEmpty
+                  ? const Center(
+                child: Text('No organizations found.',
+                    style: TextStyle(color: kGray)),
+              )
+                  : ListView.separated(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                itemCount: _sampleOrgs.length,
+                itemCount: _organizations.length,
                 separatorBuilder: (_, __) =>
                 const Divider(height: 1, color: kBorderGray),
                 itemBuilder: (_, index) => _OrgCard(
-                  org: _sampleOrgs[index],
-                  onViewPage: () => _goToOrgInfo(_sampleOrgs[index]),
+                  org: _organizations[index],
+                  onViewPage: () =>
+                      _goToOrgInfo(_organizations[index]),
                 ),
               ),
             ),
           ],
         ),
-
-
       ),
     );
   }
 }
 
-
+// ─── Org Card ─────────────────────────────────────────────────────────────────
 
 class _OrgCard extends StatelessWidget {
   final Organization org;
@@ -285,7 +368,7 @@ class _OrgCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Thumbnail
+          // Thumbnail placeholder
           Container(
             width: 64,
             height: 64,
@@ -308,37 +391,44 @@ class _OrgCard extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                       color: kDark),
                 ),
+                const SizedBox(height: 4),
+
+                // Show description as a subtitle if available
+                if (org.description.isNotEmpty)
+                  Text(
+                    org.description,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 12, color: kGray),
+                  ),
                 const SizedBox(height: 6),
-                Row(
-                  children: org.tags.map((tag) {
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 6),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: kLightGray,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(tag,
-                            style: const TextStyle(
-                                fontSize: 11, color: kGray)),
-                      ),
-                    );
-                  }).toList(),
-                ),
+
+                // Category tag
+                if (org.category.isNotEmpty)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: kLightGray,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(org.category,
+                        style:
+                        const TextStyle(fontSize: 11, color: kGray)),
+                  ),
                 const SizedBox(height: 10),
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    // ── View Page → navigates to OrganizationInfoScreen ──
                     GestureDetector(
                       onTap: onViewPage,
                       child: const Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text('View Page',
-                              style: TextStyle(fontSize: 12, color: Colors.black)),
+                              style: TextStyle(
+                                  fontSize: 12, color: Colors.black)),
                           SizedBox(width: 2),
                           Icon(Icons.chevron_right,
                               size: 14, color: kGray),
@@ -372,6 +462,9 @@ class _OrgCard extends StatelessWidget {
     );
   }
 }
+
+// ─── Filters Bottom Sheet ─────────────────────────────────────────────────────
+// (unchanged — keeping your existing FiltersBottomSheet exactly as-is)
 
 
 

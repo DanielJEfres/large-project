@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../../utils/getAPI.dart';
 
 // ─── Models ───────────────────────────────────────────────────────────────────
 
@@ -92,51 +93,47 @@ class _OrganizationScreenState extends State<OrganizationScreen>
   }
 
   Future<void> _fetchData() async {
-    await Future.delayed(const Duration(seconds: 2));
+    setState(() => _loading = true);
+
+    final result = await getAPI.getOrganizationById(widget.orgId);
+
     if (!mounted) return;
 
-    setState(() {
-      _org = const Organization(
-        id: '1',
-        name: 'Organization Title',
-        description:
-        'This organization is dedicated to promoting civic engagement and education on various social topics to the UCF student body through educational and service projects.',
-        socialLinks: SocialLinks(
-          website: 'https://example.com',
-          instagram: 'https://instagram.com',
-          linkedin: 'https://linkedin.com',
-          discord: 'https://discord.com',
-        ),
-      );
-      _upcomingEvents = [
-        UniversityEvent(
-          id: 'e1',
-          title: 'Event Title',
-          startDate: DateTime(2025, 3, 23, 16),
-          endDate: DateTime(2025, 3, 23, 22),
-          location: 'BA221, Business Administration 1',
-          isUpcoming: true,
-        ),
-        UniversityEvent(
-          id: 'e2',
-          title: 'Event Title',
-          startDate: DateTime(2025, 3, 23, 16),
-          endDate: DateTime(2025, 3, 23, 22),
-          location: 'BA221, Business Administration 1',
-          isUpcoming: true,
-        ),
-      ];
-      _pastEvents = [
-        UniversityEvent(
-          id: 'e3',
-          title: 'Event Title',
-          startDate: DateTime(2025, 3, 23, 16),
-          endDate: DateTime(2025, 3, 23, 22),
-          location: 'BA221, Business Administration 1',
-        ),
-      ];
-      _loading = false;
-    });
+    if (result['success'] == true) {
+      final org = Organization.fromJson(result['organization']);
+
+      // Split events into upcoming vs past by comparing to now
+      final now = DateTime.now();
+      final allEvents = (result['events'] as List).map((e) {
+        final start = DateTime.tryParse(e['startDate'] ?? '') ?? now;
+        final end = e['endDate'] != null
+            ? DateTime.tryParse(e['endDate'])
+            : null;
+        return UniversityEvent(
+          id: e['_id'] ?? '',
+          title: e['title'] ?? 'Untitled',
+          startDate: start,
+          endDate: end,
+          location: e['location'] ?? 'TBD',
+          isUpcoming: start.isAfter(now),
+        );
+      }).toList();
+
+      setState(() {
+        _org = org;
+        _upcomingEvents = allEvents.where((e) => e.isUpcoming).toList();
+        _pastEvents = allEvents.where((e) => !e.isUpcoming).toList();
+        _loading = false;
+      });
+    } else {
+      setState(() => _loading = false);
+      // Optionally show a snackbar
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not load organization.')),
+        );
+      }
+    }
   }
 
   @override
