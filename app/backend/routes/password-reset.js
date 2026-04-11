@@ -48,7 +48,7 @@ router.post("/request", async (req, res) =>{
         const recipient = user.ucfEmail;
         console.log(`Attempting to send mail to: ${recipient}`);
 
-        const passwordResetURL = `${process.env.CLIENT_URL}/password-reset/${resetToken}`;
+        const passwordResetURL = `${process.env.API_URL}/password-reset/${resetToken}`;
         
         const resetEmailTemplate = (url, name) => `
         <!DOCTYPE html>
