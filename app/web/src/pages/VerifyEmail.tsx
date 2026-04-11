@@ -17,8 +17,13 @@ export default function VerifyEmail() {
   const unverifiedEmail = location.state?.email;
 
   useEffect(() => {
-    if (!token) return;
-    
+    if (token) return;
+
+    if (!unverifiedEmail) {
+      setError("No email found. Please try logging in again.");
+      return;
+    }   
+  
     const verify = async () => {
       setLoading(true);
       setStatusMessage("Verifying your account...");
@@ -35,7 +40,6 @@ export default function VerifyEmail() {
         );
         const data = await response.json();
         if (response.ok) {
-          setError("");
           setStatusMessage(
             "Email verified successfully! Redirecting to events...",
           );
