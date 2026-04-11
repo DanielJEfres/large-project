@@ -41,7 +41,7 @@ router.post('/request', async (req, res) => {
         const recipient = user.ucfEmail;
         console.log(`Attempting to send mail to: ${recipient}`);
 
-        const verificationUrl = `${process.env.CLIENT_URL}/email-verification/${token}`;
+        const verificationUrl = `${process.env.API_URL}/api/email-verification/${token}`;
 
         const emailTemplate = (verificationUrl, firstName) => `
         <!DOCTYPE html>
