@@ -138,7 +138,11 @@ router.post("/login", async (req, res) => {
             {   
                 //If the user is not verified, they cannot login. This forces them to always be sent to Email Verification on the frontend
                 if(!user.isVerified){
-                    return res.status(400).json({message: "User requires Email Verification", ucfEmail: user.ucfEmail});
+                    return res.status(403).json(
+                        {
+                            message: "User requires Email Verification", 
+                            ucfEmail: user.ucfEmail
+                        });
                 }
 
                 // user has been validated! JWT below
@@ -191,7 +195,7 @@ router.post("/login", async (req, res) => {
             }
         }
     } catch (err){
-        res.status(500).json({message:"Server error."});
+        res.status(500).json({message:"Server error.", error: err});
     }
 })
 
