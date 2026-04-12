@@ -192,22 +192,14 @@ class getAPI {
   static Future<Map<String, dynamic>> getOrganizations({String? name}) async {
     try {
       final uri = name != null && name.isNotEmpty
-          ? Uri.parse('$baseUrl/organizations?name=$name')
+          ? Uri.parse('$baseUrl/organizations?name=${Uri.encodeComponent(name)}')
           : Uri.parse('$baseUrl/organizations');
-
-      print('=== CALLING: $uri');
-
       final response = await http.get(uri);
-
-      print('=== STATUS: ${response.statusCode}'); // ADD THIS
-      print('=== BODY: ${response.body}'); // ADD THIS
-
       final data = jsonDecode(response.body);
       return response.statusCode == 200
           ? {"success": true, "organizations": data['Organizations'] ?? []}
           : {"success": false, "organizations": []};
     } catch (e) {
-      print('=== ERROR: $e');
       return {"success": false, "organizations": [], "message": "Error: $e"};
     }
   }
@@ -218,13 +210,33 @@ class getAPI {
       final data = jsonDecode(response.body);
       return response.statusCode == 200
           ? {
-        "success": true,
-        "organization": data['Organization'],
-        "events": data['Events'] ?? [],
-      }
+              "success": true,
+              "organization": data['Organization'],
+              "events": data['Events'] ?? [],
+            }
           : {"success": false, "organization": null, "events": []};
     } catch (e) {
       return {"success": false, "organization": null, "events": []};
+    }
+  }
+
+  // Join an organization by name
+  static Future<Map<String, dynamic>> joinOrganization(String orgName) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/organizations/join'),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer ${AuthService.token}",
+        },
+        body: jsonEncode({"orgName": orgName}),
+      );
+      final data = jsonDecode(response.body);
+      return response.statusCode == 200
+          ? {"success": true}
+          : {"success": false, "message": data['message'] ?? "Failed to join organization"};
+    } catch (e) {
+      return {"success": false, "message": "Could not connect to server."};
     }
   }
 }

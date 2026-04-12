@@ -16,6 +16,7 @@ import Organization from '../models/Organization.js'
 import User from '../models/User.js'
 import Event from '../models/Event.js'
 import pagination from './helpers/pagination.js'
+import authenticateToken from '../middleware/authenticateToken.js'
 
 const router = express.Router()
 
@@ -56,7 +57,7 @@ router.post('/create', async(req, res) => { // Middleware -- can you create? Onl
     }
 })
 
-router.post('/join', async (req, res) => {
+router.post('/join', authenticateToken, async (req, res) => {
     try {
         const { orgName } = req.body
         if (!orgName) {
@@ -102,7 +103,7 @@ router.post('/join', async (req, res) => {
     }
 });
 
-router.post('/selfpromote', async (req, res) => {
+router.post('/selfpromote', authenticateToken, async (req, res) => {
     try {
         const { orgName } = req.body
 

@@ -5,7 +5,8 @@ import 'package:flutter/services.dart';
 
 import '../../components/app_bottom_nav.dart';
 import 'organizations.dart';
-import '../../utils/getAPI.dart'; // your getAPI file
+import '../../utils/getAPI.dart';
+import '../../utils/auth_service.dart';
 import 'dart:async';
 
 // ─── Data Model ───────────────────────────────────────────────────────────────
@@ -67,6 +68,8 @@ class _SearchOrganizationState extends State<SearchOrganization> {
   bool _isLoading = true;
   String? _errorMessage;
   int _totalResults = 0;
+  final Set<String> _joinedOrgIds = {};
+  final Set<String> _joiningOrgIds = {};
 
   @override
   void initState() {
@@ -136,6 +139,27 @@ class _SearchOrganizationState extends State<SearchOrganization> {
     }
   }
 
+  Future<void> _joinOrg(Organization org) async {
+    setState(() => _joiningOrgIds.add(org.id));
+    final result = await getAPI.joinOrganization(org.name);
+    if (!mounted) return;
+    setState(() => _joiningOrgIds.remove(org.id));
+    if (result['success'] == true) {
+      setState(() => _joinedOrgIds.add(org.id));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Joined ${org.name}!')),
+      );
+    } else {
+      final msg = result['message'] ?? '';
+      final display = (msg.toLowerCase().contains('server') || msg.isEmpty)
+          ? 'Could not join — please try again later.'
+          : msg;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(display)),
+      );
+    }
+  }
+
   void _goToOrgInfo(Organization org) {
     Navigator.push(
       context,
@@ -175,19 +199,6 @@ class _SearchOrganizationState extends State<SearchOrganization> {
       value: SystemUiOverlayStyle.dark,
       child: Scaffold(
         backgroundColor: kWhite,
-        appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(80),
-          child: Container(
-            color: kWhite,
-            child: const SafeArea(
-              bottom: false,
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(20, 12, 20, 12),
-                child: Align(alignment: Alignment.bottomLeft),
-              ),
-            ),
-          ),
-        ),
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -339,11 +350,16 @@ class _SearchOrganizationState extends State<SearchOrganization> {
                 itemCount: _organizations.length,
                 separatorBuilder: (_, __) =>
                 const Divider(height: 1, color: kBorderGray),
-                itemBuilder: (_, index) => _OrgCard(
-                  org: _organizations[index],
-                  onViewPage: () =>
-                      _goToOrgInfo(_organizations[index]),
-                ),
+                itemBuilder: (_, index) {
+                  final org = _organizations[index];
+                  return _OrgCard(
+                    org: org,
+                    onViewPage: () => _goToOrgInfo(org),
+                    isMember: _joinedOrgIds.contains(org.id),
+                    isJoining: _joiningOrgIds.contains(org.id),
+                    onJoin: () => _joinOrg(org),
+                  );
+                },
               ),
             ),
           ],
@@ -358,8 +374,17 @@ class _SearchOrganizationState extends State<SearchOrganization> {
 class _OrgCard extends StatelessWidget {
   final Organization org;
   final VoidCallback onViewPage;
+  final bool isMember;
+  final bool isJoining;
+  final VoidCallback? onJoin;
 
-  const _OrgCard({required this.org, required this.onViewPage});
+  const _OrgCard({
+    required this.org,
+    required this.onViewPage,
+    this.isMember = false,
+    this.isJoining = false,
+    this.onJoin,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -437,10 +462,20 @@ class _OrgCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 10),
                     ElevatedButton(
-                      onPressed: () {},
+                      onPressed: (isMember || isJoining)
+                          ? null
+                          : () {
+                              if (!AuthService.isLoggedIn) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('You need to be logged in to join an organization.')),
+                                );
+                                return;
+                              }
+                              onJoin?.call();
+                            },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: kDark,
-                        foregroundColor: kWhite,
+                        backgroundColor: isMember ? Colors.grey[300] : kDark,
+                        foregroundColor: isMember ? Colors.black54 : kWhite,
                         padding: const EdgeInsets.symmetric(
                             horizontal: 22, vertical: 9),
                         minimumSize: Size.zero,
@@ -450,7 +485,13 @@ class _OrgCard extends StatelessWidget {
                         textStyle: const TextStyle(
                             fontSize: 13, fontWeight: FontWeight.w600),
                       ),
-                      child: const Text('Join'),
+                      child: isJoining
+                          ? const SizedBox(
+                              height: 14,
+                              width: 14,
+                              child: CircularProgressIndicator(strokeWidth: 2, color: kWhite),
+                            )
+                          : Text(isMember ? 'Joined' : 'Join'),
                     ),
                   ],
                 ),

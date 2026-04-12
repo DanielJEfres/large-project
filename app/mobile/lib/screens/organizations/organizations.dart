@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../utils/getAPI.dart';
+import '../../utils/auth_service.dart';
+import '../../theme/app_text_styles.dart';
+import '../../theme/app_colors.dart';
 
 // ─── Models ───────────────────────────────────────────────────────────────────
 
@@ -24,22 +27,39 @@ class SocialLinks {
   );
 }
 
-class Organization {
+class OrgDetail {
   final String id;
   final String name;
   final String description;
+  final String? logo;
   final SocialLinks socialLinks;
+  final List<String> memberIds;
 
-  const Organization({
-    required this.id, required this.name, required this.description, required this.socialLinks,
+  const OrgDetail({
+    required this.id,
+    required this.name,
+    required this.description,
+    this.logo,
+    required this.socialLinks,
+    required this.memberIds,
   });
 
-  factory Organization.fromJson(Map<String, dynamic> json) => Organization(
-    id: json['_id'] ?? '',
-    name: json['name'] ?? '',
-    description: json['description'] ?? '',
-    socialLinks: SocialLinks.fromJson(json['socialLinks'] ?? {}),
-  );
+  factory OrgDetail.fromJson(Map<String, dynamic> json) {
+    final rawMembers = json['members'] as List<dynamic>? ?? [];
+    final memberIds = rawMembers
+        .map((m) => (m is Map ? m['userId']?.toString() : m?.toString()) ?? '')
+        .where((id) => id.isNotEmpty)
+        .toList();
+    return OrgDetail(
+      id: json['_id'] ?? '',
+      name: json['name'] ?? '',
+      description: json['description'] ?? '',
+      logo: json['logo']?.toString(),
+      socialLinks: SocialLinks.fromJson(
+          json['socialLinks'] is Map<String, dynamic> ? json['socialLinks'] : {}),
+      memberIds: memberIds,
+    );
+  }
 }
 
 class UniversityEvent {
@@ -73,10 +93,12 @@ class OrganizationScreen extends StatefulWidget {
 class _OrganizationScreenState extends State<OrganizationScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
-  Organization? _org;
+  OrgDetail? _org;
   List<UniversityEvent> _upcomingEvents = [];
   List<UniversityEvent> _pastEvents = [];
   bool _loading = true;
+  bool _isMember = false;
+  bool _isJoining = false;
 
   @override
   void initState() {
@@ -92,6 +114,27 @@ class _OrganizationScreenState extends State<OrganizationScreen>
     super.dispose();
   }
 
+  Future<void> _joinOrg() async {
+    if (_org == null || !AuthService.isLoggedIn) return;
+    setState(() => _isJoining = true);
+    final result = await getAPI.joinOrganization(_org!.name);
+    if (!mounted) return;
+    if (result['success'] == true) {
+      setState(() {
+        _isMember = true;
+        _isJoining = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Joined ${_org!.name}!')),
+      );
+    } else {
+      setState(() => _isJoining = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result['message'] ?? 'Failed to join organization')),
+      );
+    }
+  }
+
   Future<void> _fetchData() async {
     setState(() => _loading = true);
 
@@ -100,7 +143,7 @@ class _OrganizationScreenState extends State<OrganizationScreen>
     if (!mounted) return;
 
     if (result['success'] == true) {
-      final org = Organization.fromJson(result['organization']);
+      final org = OrgDetail.fromJson(result['organization']);
 
       // Split events into upcoming vs past by comparing to now
       final now = DateTime.now();
@@ -119,10 +162,15 @@ class _OrganizationScreenState extends State<OrganizationScreen>
         );
       }).toList();
 
+      final currentUserId = AuthService.userId;
+      final alreadyMember = currentUserId != null &&
+          org.memberIds.contains(currentUserId);
+
       setState(() {
         _org = org;
         _upcomingEvents = allEvents.where((e) => e.isUpcoming).toList();
         _pastEvents = allEvents.where((e) => !e.isUpcoming).toList();
+        _isMember = alreadyMember;
         _loading = false;
       });
     } else {
@@ -202,35 +250,45 @@ class _OrganizationScreenState extends State<OrganizationScreen>
         Container(
           margin: const EdgeInsets.only(top: 80),
           width: double.infinity,
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            //borderRadius: BorderRadius.only(
-             // topLeft: Radius.circular(32),
-              //topRight: Radius.circular(32),
-            //),
-          ),
-          padding: const EdgeInsets.fromLTRB(24, 60, 24, 0),
+          decoration: const BoxDecoration(color: Colors.white),
+          padding: const EdgeInsets.fromLTRB(24, 48, 24, 0),
           child: Column(
             children: [
               _loading
                   ? const _PlaceholderBox(width: 150, height: 20)
                   : Text(
-                _org!.name,
-                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-              ),
+                      _org!.name,
+                      style: AppTextStyles.h3.copyWith(color: AppColors.black),
+                    ),
               const SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _loading ? null : () {},
+                  onPressed: (_loading || _isMember || _isJoining)
+                      ? null
+                      : () {
+                          if (!AuthService.isLoggedIn) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('You need to be logged in to join an organization.')),
+                            );
+                            return;
+                          }
+                          _joinOrg();
+                        },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
-                    foregroundColor: Colors.white,
+                    backgroundColor: _isMember ? Colors.grey[300] : Colors.black,
+                    foregroundColor: _isMember ? Colors.black54 : Colors.white,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12)),
                     padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
-                  child: const Text('Join'),
+                  child: _isJoining
+                      ? const SizedBox(
+                          height: 18,
+                          width: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                        )
+                      : Text(_isMember ? 'Joined' : 'Join'),
                 ),
               ),
               const SizedBox(height: 12),
@@ -296,11 +354,11 @@ class _OrganizationScreenState extends State<OrganizationScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Description', style: TextStyle(fontWeight: FontWeight.bold)),
+          Text('Description', style: AppTextStyles.h4),
           const SizedBox(height: 8),
           _ExpandableDescription(text: _org!.description),
           const SizedBox(height: 24),
-          const Text('Websites', style: TextStyle(fontWeight: FontWeight.bold)),
+          Text('Websites', style: AppTextStyles.h4),
           const SizedBox(height: 12),
           _SocialLinksRow(links: _org!.socialLinks),
         ],
