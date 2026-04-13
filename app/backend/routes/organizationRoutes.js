@@ -17,6 +17,7 @@ import User from '../models/User.js'
 import Event from '../models/Event.js'
 import pagination from './helpers/pagination.js'
 import authenticateToken from '../middleware/authenticateToken.js'
+import mongoose from 'mongoose'
 
 const router = express.Router()
 
@@ -59,13 +60,14 @@ router.post('/create', async(req, res) => { // Middleware -- can you create? Onl
 
 router.post('/join', authenticateToken, async (req, res) => {
     try {
-        const { orgName } = req.body
-        if (!orgName) {
-            return res.status(400).json({ message:"No organization name was passed" })
+        const { orgId } = req.body
+        
+        if (!orgId) {
+            return res.status(400).json({ message:"No organization ID was passed" })
         }
         
         const user_id = req.user.sub; // from JWT middleware
-        const org = await Organization.findOne({ name: orgName })
+        const org = await Organization.findById(orgId)
         
         if (!org) {
             return res.status(400).json({message:"Organization does not exist in database"})
@@ -90,7 +92,7 @@ router.post('/join', authenticateToken, async (req, res) => {
             orgRole: "member"
         });
         
-        user.organization[orgName] = "member"
+        user.organization.set(org.name, "member") 
 
         await org.save();
         await user.save();
@@ -103,16 +105,16 @@ router.post('/join', authenticateToken, async (req, res) => {
     }
 });
 
-router.post('/selfpromote', authenticateToken, async (req, res) => {
+router.post('/leave', authenticateToken, async (req, res) => {
     try {
-        const { orgName } = req.body
-
-        if (!orgName) {
-            return res.status(400).json({ message:"No organization name was passed" })
-        }
+        const { orgId } = req.body
         
+        if (!orgId) {
+            return res.status(400).json({ message:"No organization ID was passed" })
+        }
+
         const user_id = req.user.sub; // from JWT middleware
-        const org = await Organization.findOne({ name: orgName })
+        const org = await Organization.findById(orgId)
         
         if (!org) {
             return res.status(400).json({message:"Organization does not exist in database"})
@@ -124,8 +126,54 @@ router.post('/selfpromote', authenticateToken, async (req, res) => {
             return res.status(400).json({ message: "User not found" });
         }
 
-        const role = user.organization?.[orgName];
+        const member = org.members.some(
+            m => m.userId.toString() === user_id.toString()
+        );
 
+        if (!member) {
+            return res.status(400).json({ message: "User is not in organization" });
+        }
+            
+        org.members = org.members.filter(
+            m => m.userId.toString() !== user_id.toString()
+        );
+        
+        user.organization.delete(org.name) 
+
+        await org.save();
+        await user.save();
+
+        res.status(200).json({ message: "Left organization successfully" });
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({message:"Server error"})
+    }
+});
+
+router.post('/selfpromote', authenticateToken, async (req, res) => {
+    try {
+        const { orgId } = req.body
+
+        if (!orgId) {
+            return res.status(400).json({ message:"No organization ID was passed" })
+        }
+        
+        const user_id = req.user.sub; // from JWT middleware
+        const org = await Organization.findById(orgId)
+        
+        if (!org) {
+            return res.status(400).json({message:"Organization does not exist in database"})
+        }
+        
+        const user = await User.findById(user_id);
+        console.log(user)
+        if (!user) {
+            return res.status(400).json({ message: "User not found" });
+        }
+
+        const role = user.organization?.get(org.name);
+        console.log(role)
         if ( role == "officer" || role == "director") {
             return res.status(400).json({ message: "User already an officer" });
         }
@@ -143,7 +191,7 @@ router.post('/selfpromote', authenticateToken, async (req, res) => {
         }
 
         member.orgRole = "officer"
-        user.organization[orgName] = "officer"
+        user.organization.set(org.name, "officer") 
 
         await org.save();
         await user.save();
