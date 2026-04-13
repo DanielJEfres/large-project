@@ -10,4 +10,10 @@ class GlobalData {
 
   static String password = '';
 
+  // Session fields — set on login, cleared on logout
+  static String token = '';
+  static String mongoUserId = '';
+
+  static bool get isLoggedIn => token.isNotEmpty && mongoUserId.isNotEmpty;
+
 }

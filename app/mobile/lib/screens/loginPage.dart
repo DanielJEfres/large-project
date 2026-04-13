@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../utils/getAPI.dart';
+import '../utils/GlobalData.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
 import '../components/app_button.dart';
@@ -31,6 +32,11 @@ class _LoginScreenState extends State<LoginScreen> {
           );
           Navigator.pushNamed(context, '/verification');
         } else {
+          final user = response['user'] as Map<String, dynamic>? ?? {};
+          GlobalData.token = response['accessToken'] ?? '';
+          GlobalData.mongoUserId = user['id']?.toString() ?? '';
+          GlobalData.firstName = user['firstName']?.toString() ?? '';
+          GlobalData.lastName = user['lastName']?.toString() ?? '';
           Navigator.pushNamed(context, '/event/events');
         }
       } else {
