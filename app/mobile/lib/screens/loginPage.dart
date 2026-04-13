@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../utils/getAPI.dart';
+import '../utils/auth_service.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
 import '../components/app_button.dart';
@@ -24,12 +25,23 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       var response = await getAPI.login(loginName.trim(), password);
       if (!mounted) return;
-      if (response['success'] == true) {
+      if (response['requiresVerification'] == true) {
+        // Account exists but email not verified
+        if (!mounted) return;
+        Navigator.pushNamed(context, '/verification', arguments: loginName.trim());
+      } else if (response['success'] == true) {
+        final user = response['user'] as Map<String, dynamic>? ?? {};
+        await AuthService.saveSession(
+          token: response['accessToken'] ?? '',
+          userId: user['id']?.toString() ?? '',
+          firstName: user['firstName']?.toString() ?? '',
+          lastName: user['lastName']?.toString() ?? '',
+          email: user['email']?.toString() ?? '',
+        );
+        if (!mounted) return;
         if (response['isVerified'] == false) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Please verify your email first.')),
-          );
-          Navigator.pushNamed(context, '/verification');
+          // Fallback: backend returned 200 but flagged as unverified
+          Navigator.pushNamed(context, '/verification', arguments: loginName.trim());
         } else {
           Navigator.pushNamed(context, '/event/events');
         }

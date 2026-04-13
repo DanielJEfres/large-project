@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router";
+import { useParams, Link, useNavigate } from "react-router";
 import { SERVER_IP } from "../config";
 import Navbar from "../components/Navbar";
 import type { UniversityEvent } from "../types/UniversityEvent";
@@ -17,6 +17,7 @@ import {
 import { useAuth } from "../context/AuthContext";
 
 export default function EventDashboard() {
+  const navigate = useNavigate();
   const { id } = useParams();
   const [event, setEvent] = useState<UniversityEvent | null>(null);
   const [loading, setLoading] = useState(true);
@@ -35,7 +36,7 @@ export default function EventDashboard() {
 
       if (response.ok) {
         alert("Event deleted successfully");
-        window.location.href = "/";
+        navigate("/manage");
       } else {
         const data = await response.json();
         alert(data.message || "Failed to delete event");
