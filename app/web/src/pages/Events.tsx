@@ -15,6 +15,7 @@ import { SERVER_IP } from "../config";
 import type { UniversityEvent } from "../types/UniversityEvent";
 import { formatStackedDate } from "../utils/date";
 import { useOrganizations } from "../hooks/useOrganization";
+import EventSkeleton from "../components/EventSkeleton";
 
 const EVENTS: UniversityEvent[] = [
   {
@@ -67,32 +68,6 @@ const EVENTS: UniversityEvent[] = [
     rsvpLimit: null,
   },
 ];
-
-const EventSkeleton = () => (
-  <div className="flex min-w-fit bg-white h-80 rounded-2xl  border border-gray-100 animate-pulse">
-    {/* image */}
-    <div className="h-80 w-80 bg-gray-200  rounded-l-2xl"></div>
-
-    {/* info */}
-    <div className="h-80 w-60 px-6 py-4 bg-white rounded-2xl flex flex-col">
-      <div className="flex flex-col">
-        <div className="w-15 h-4 bg-gray-200 rounded mb-1"></div>
-        <div className="w-full h-8 bg-gray-300 rounded"></div>
-      </div>
-
-      <div className="space-y-2 mt-5">
-        <div className="w-3/4 h-3 bg-gray-100 rounded"></div>
-        <div className="w-1/2 h-3 bg-gray-100 rounded"></div>
-      </div>
-
-      <div className="flex gap-1 mt-5">
-        <div className="w-12 h-5 bg-gray-200 rounded-full"></div>
-        <div className="w-12 h-5 bg-gray-200 rounded-full"></div>
-      </div>
-      <div className="mt-auto ml-auto bg-gray-200 h-5  rounded-2xl w-20"></div>
-    </div>
-  </div>
-);
 
 export default function Events() {
   const [activeTab, setActiveTab] = useState<"RSO" | "Student">("RSO");
@@ -270,7 +245,7 @@ export default function Events() {
                 {loading ? (
                   <>
                     {[...Array(3)].map((_, i) => (
-                      <EventSkeleton key={i} />
+                      <EventSkeleton key={i} variant="horizontal" />
                     ))}
                   </>
                 ) : (
@@ -362,50 +337,60 @@ export default function Events() {
                 onScroll={() => handleScroll(trendingRef, setScrolledTrending)}
                 className="flex gap-10 overflow-x-auto scrollbar-hide scroll-smooth py-2"
               >
-                {filteredTrending.map((event) => (
-                  <Link to={`/event/${event._id}`}>
-                    <div
-                      key={event._id}
-                      className="shrink-0 group cursor-pointer "
-                    >
-                      <div className="w-80 h-80 bg-gray/30 flex items-center justify-center rounded-2xl overflow-hidden group-hover:brightness-95 transition-all">
-                        <img
-                          className="w-full h-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-110"
-                          src={
-                            event.flyer ||
-                            "https://www.ucf.edu/wp-content/blogs.dir/4/files/2024/11/PegFa24-OnCampus-1200x800-1.jpg"
-                          }
-                          alt={event.title}
-                        />
-                      </div>
+                {loading ? (
+                  <>
+                    {[...Array(10)].map((_, i) => (
+                      <EventSkeleton key={i} variant="square" />
+                    ))}
+                  </>
+                ) : (
+                  <>
+                    {filteredTrending.map((event) => (
+                      <Link to={`/event/${event._id}`}>
+                        <div
+                          key={event._id}
+                          className="shrink-0 group cursor-pointer "
+                        >
+                          <div className="w-80 h-80 bg-gray/30 flex items-center justify-center rounded-2xl overflow-hidden group-hover:brightness-95 transition-all">
+                            <img
+                              className="w-full h-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-110"
+                              src={
+                                event.flyer ||
+                                "https://www.ucf.edu/wp-content/blogs.dir/4/files/2024/11/PegFa24-OnCampus-1200x800-1.jpg"
+                              }
+                              alt={event.title}
+                            />
+                          </div>
 
-                      <div className="max-w-80  p-2">
-                        <div className="flex justify-between items-center">
-                          <p className="font-bebas text-lg uppercase tracking-wider text-brand">
-                            {event.isRSO
-                              ? orgLookup[event.organizationId]?.name ||
-                                "Loading..."
-                              : `${event.createdBy.firstName} ${event.createdBy.lastName}`}
-                          </p>
-                          <span className="text-[10px] font-bold text-gray-400">
-                            {event.attendees.length} ATTENDING
-                          </span>
+                          <div className="max-w-80  p-2">
+                            <div className="flex justify-between items-center">
+                              <p className="font-bebas text-lg uppercase tracking-wider text-brand">
+                                {event.isRSO
+                                  ? orgLookup[event.organizationId]?.name ||
+                                    "Loading..."
+                                  : `${event.createdBy.firstName} ${event.createdBy.lastName}`}
+                              </p>
+                              <span className="text-[10px] font-bold text-gray-400">
+                                {event.attendees.length} ATTENDING
+                              </span>
+                            </div>
+
+                            <p className="font-semibold text-lg leading-tight mt-1 line-clamp-2">
+                              {event.title}
+                            </p>
+                            <span className="text-sm text-gray">
+                              <span>
+                                {formatStackedDate(event.startDate).day +
+                                  ", " +
+                                  formatStackedDate(event.startDate).date}
+                              </span>
+                            </span>
+                          </div>
                         </div>
-
-                        <p className="font-semibold text-lg leading-tight mt-1 line-clamp-2">
-                          {event.title}
-                        </p>
-                        <span className="text-sm text-gray">
-                          <span>
-                            {formatStackedDate(event.startDate).day +
-                              ", " +
-                              formatStackedDate(event.startDate).date}
-                          </span>
-                        </span>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
+                      </Link>
+                    ))}
+                  </>
+                )}
               </div>
             </div>
 
@@ -413,70 +398,80 @@ export default function Events() {
               <h2 className="text-2xl font-league">Upcoming Events</h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-                {filteredUpcoming.map((event) => (
-                  <Link
-                    to={`/event/${event._id}`}
-                    key={event._id}
-                    className="group border border-gray-100 shadow-sm flex flex-col rounded-2xl overflow-hidden hover:cursor-pointer transition-all"
-                  >
-                    <div className="w-full overflow-hidden h-48 bg-gray/30 flex items-center justify-center shrink-0">
-                      <img
-                        className="w-full h-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-110"
-                        src={
-                          event.flyer ||
-                          "https://www.ucf.edu/wp-content/blogs.dir/4/files/2024/11/PegFa24-OnCampus-1200x800-1.jpg"
-                        }
-                        alt={event.title}
-                      />
-                    </div>
-
-                    <div className="p-5 flex flex-col flex-1">
-                      <p className="font-bebas text-lg uppercase tracking-wider text-brand">
-                        {event.isRSO
-                          ? orgLookup[event.organizationId]?.name ||
-                            "Loading..."
-                          : `${event.createdBy.firstName} ${event.createdBy.lastName}`}
-                      </p>
-
-                      <p className="font-semibold text-lg leading-tight mt-1">
-                        {event.title}
-                      </p>
-
-                      <div className="mt-3 space-y-1 text-gray-700">
-                        <div className="flex items-center gap-2 text-sm">
-                          <Calendar size={14} className="shrink-0" />
-                          <span>
-                            {formatStackedDate(event.startDate).day +
-                              ", " +
-                              formatStackedDate(event.startDate).date}
-                          </span>
+                {loading ? (
+                  <>
+                    {[...Array(6)].map((_, i) => (
+                      <EventSkeleton key={i} variant="vertical" />
+                    ))}
+                  </>
+                ) : (
+                  <>
+                    {filteredUpcoming.map((event) => (
+                      <Link
+                        to={`/event/${event._id}`}
+                        key={event._id}
+                        className="group border border-gray-100 shadow-sm flex flex-col rounded-2xl overflow-hidden hover:cursor-pointer transition-all"
+                      >
+                        <div className="w-full overflow-hidden h-48 bg-gray/30 flex items-center justify-center shrink-0">
+                          <img
+                            className="w-full h-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-110"
+                            src={
+                              event.flyer ||
+                              "https://www.ucf.edu/wp-content/blogs.dir/4/files/2024/11/PegFa24-OnCampus-1200x800-1.jpg"
+                            }
+                            alt={event.title}
+                          />
                         </div>
-                        <div className="flex items-center gap-2 text-sm">
-                          <MapPin size={14} className="shrink-0" />
-                          <span className="line-clamp-1">
-                            {event.location || "Location TBD"}
-                          </span>
+
+                        <div className="p-5 flex flex-col flex-1">
+                          <p className="font-bebas text-lg uppercase tracking-wider text-brand">
+                            {event.isRSO
+                              ? orgLookup[event.organizationId]?.name ||
+                                "Loading..."
+                              : `${event.createdBy.firstName} ${event.createdBy.lastName}`}
+                          </p>
+
+                          <p className="font-semibold text-lg leading-tight mt-1">
+                            {event.title}
+                          </p>
+
+                          <div className="mt-3 space-y-1 text-gray-700">
+                            <div className="flex items-center gap-2 text-sm">
+                              <Calendar size={14} className="shrink-0" />
+                              <span>
+                                {formatStackedDate(event.startDate).day +
+                                  ", " +
+                                  formatStackedDate(event.startDate).date}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2 text-sm">
+                              <MapPin size={14} className="shrink-0" />
+                              <span className="line-clamp-1">
+                                {event.location || "Location TBD"}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="flex flex-wrap gap-1 mt-4">
+                            {event.tags?.slice(0, 2).map((tag) => (
+                              <span
+                                key={tag.name}
+                                className="flex gap-1 items-center px-3 py-1 bg-brand text-[10px] font-bold uppercase text-white rounded-full "
+                              >
+                                <Hash size={14} />
+                                {tag.name}
+                              </span>
+                            ))}
+                          </div>
+
+                          <div className="font-league mt-auto pt-6 font-semibold flex items-center justify-end gap-2 text-black hover:text-gray-500  transition-colors">
+                            Learn More <ChevronRight width={17} />
+                          </div>
                         </div>
-                      </div>
-
-                      <div className="flex flex-wrap gap-1 mt-4">
-                        {event.tags?.slice(0, 2).map((tag) => (
-                          <span
-                            key={tag.name}
-                            className="flex gap-1 items-center px-3 py-1 bg-brand text-[10px] font-bold uppercase text-white rounded-full "
-                          >
-                            <Hash size={14} />
-                            {tag.name}
-                          </span>
-                        ))}
-                      </div>
-
-                      <div className="font-league mt-auto pt-6 font-semibold flex items-center justify-end gap-2 text-black hover:text-gray-500  transition-colors">
-                        Learn More <ChevronRight width={17} />
-                      </div>
-                    </div>
-                  </Link>
-                ))}
+                      </Link>
+                    ))}
+                  </>
+                )}
               </div>
             </div>
           </>
