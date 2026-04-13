@@ -7,6 +7,8 @@ import '../../components/app_bottom_nav.dart';
 import 'organizations.dart';
 import '../../utils/getAPI.dart';
 import '../../utils/auth_service.dart';
+import '../../theme/app_text_styles.dart';
+import '../../theme/app_colors.dart';
 import 'dart:async';
 
 // ─── Data Model ───────────────────────────────────────────────────────────────
@@ -141,7 +143,7 @@ class _SearchOrganizationState extends State<SearchOrganization> {
 
   Future<void> _joinOrg(Organization org) async {
     setState(() => _joiningOrgIds.add(org.id));
-    final result = await getAPI.joinOrganization(org.name);
+    final result = await getAPI.joinOrganization(org.id);
     if (!mounted) return;
     setState(() => _joiningOrgIds.remove(org.id));
     if (result['success'] == true) {
@@ -207,99 +209,94 @@ class _SearchOrganizationState extends State<SearchOrganization> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'ORGANIZATIONS',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontFamily: 'League Spartan',
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 1.2,
-                      color: kDark,
-                    ),
-                  ),
+                  Text('ORGANIZATIONS', style: AppTextStyles.h2),
                   const SizedBox(height: 14),
 
                   // ── Search bar ──
-                  Container(
-                    height: 42,
-                    decoration: BoxDecoration(
-                      color: kLightGray,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: TextField(
-                      controller: _searchController,
-                      style: const TextStyle(fontSize: 14, color: kDark),
-                      decoration: const InputDecoration(
-                        hintText: 'Search Organizations',
-                        hintStyle: TextStyle(fontSize: 14, color: kGray, fontFamily: 'Inter'),
-                        prefixIcon: Icon(Icons.search, size: 18, color: kGray),
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(vertical: 12),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-
-                  // ── Category chips + filter icon ──
                   Row(
                     children: [
                       Expanded(
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: _allCategories.map((cat) {
-                              final isSelected = cat == _selectedCategory;
-                              return Padding(
-                                padding: const EdgeInsets.only(right: 8),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    setState(() => _selectedCategory = cat);
-                                    _fetchOrganizations(
-                                        query: _searchController.text.trim());
-                                  },
-                                  child: AnimatedContainer(
-                                    duration: const Duration(milliseconds: 180),
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 14, vertical: 7),
-                                    decoration: BoxDecoration(
-                                      color: isSelected ? kYellow : kWhite,
-                                      borderRadius: BorderRadius.circular(20),
-                                      border: Border.all(
-                                        color: isSelected ? kYellow : kBorderGray,
-                                      ),
-                                    ),
-                                    child: Text(
-                                      cat,
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        fontWeight: isSelected
-                                            ? FontWeight.w600
-                                            : FontWeight.w400,
-                                        color: isSelected ? kDark : kGray,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              );
-                            }).toList(),
+                        child: Container(
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: AppColors.inputFill,
+                            borderRadius: BorderRadius.circular(24),
+                          ),
+                          child: TextField(
+                            controller: _searchController,
+                            decoration: const InputDecoration(
+                              hintText: 'Search Organizations',
+                              hintStyle: TextStyle(
+                                color: AppColors.textMuted,
+                                fontSize: 14,
+                              ),
+                              prefixIcon: Icon(
+                                Icons.search,
+                                color: AppColors.textMuted,
+                                size: 20,
+                              ),
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.symmetric(vertical: 14),
+                            ),
                           ),
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 10),
                       GestureDetector(
                         onTap: _openFilters,
                         child: Container(
-                          width: 34,
-                          height: 34,
+                          width: 48,
+                          height: 48,
                           decoration: BoxDecoration(
-                            color: kLightGray,
-                            borderRadius: BorderRadius.circular(8),
+                            color: AppColors.inputFill,
+                            borderRadius: BorderRadius.circular(24),
                           ),
-                          child: const Icon(Icons.tune_rounded,
-                              size: 18, color: kDark),
+                          child: const Icon(Icons.tune, color: AppColors.textMuted),
                         ),
                       ),
                     ],
+                  ),
+                  const SizedBox(height: 12),
+
+                  // ── Category chips ──
+                  SizedBox(
+                    height: 36,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: _allCategories.length,
+                      separatorBuilder: (_, _) => const SizedBox(width: 8),
+                      itemBuilder: (_, i) {
+                        final cat = _allCategories[i];
+                        final isSelected = cat == _selectedCategory;
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() => _selectedCategory = cat);
+                            _fetchOrganizations(query: _searchController.text.trim());
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            decoration: BoxDecoration(
+                              color: isSelected ? AppColors.primary : Colors.transparent,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: isSelected
+                                    ? AppColors.primary
+                                    : AppColors.textMuted.withValues(alpha: 0.35),
+                              ),
+                            ),
+                            alignment: Alignment.center,
+                            child: Text(
+                              cat,
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                color: isSelected ? AppColors.white : AppColors.textSecondary,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
                   ),
                   const SizedBox(height: 8),
 
@@ -411,10 +408,10 @@ class _OrgCard extends StatelessWidget {
               children: [
                 Text(
                   org.name,
-                  style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: kDark),
+                  style: AppTextStyles.body.copyWith(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.black),
                 ),
                 const SizedBox(height: 4),
 
@@ -424,7 +421,7 @@ class _OrgCard extends StatelessWidget {
                     org.description,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 12, color: kGray),
+                    style: AppTextStyles.caption.copyWith(fontSize: 13, color: AppColors.textMuted),
                   ),
                 const SizedBox(height: 6),
 
@@ -434,12 +431,14 @@ class _OrgCard extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 10, vertical: 3),
                     decoration: BoxDecoration(
-                      color: kLightGray,
+                      color: AppColors.inputFill,
                       borderRadius: BorderRadius.circular(6),
                     ),
-                    child: Text(org.category,
-                        style:
-                        const TextStyle(fontSize: 11, color: kGray)),
+                    child: Text(
+                      org.category,
+                      style: AppTextStyles.caption.copyWith(
+                          fontSize: 11, color: AppColors.textMuted),
+                    ),
                   ),
                 const SizedBox(height: 10),
 
@@ -448,14 +447,14 @@ class _OrgCard extends StatelessWidget {
                   children: [
                     GestureDetector(
                       onTap: onViewPage,
-                      child: const Row(
+                      child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text('View Page',
-                              style: TextStyle(
-                                  fontSize: 12, color: Colors.black)),
-                          SizedBox(width: 2),
-                          Icon(Icons.chevron_right,
+                              style: AppTextStyles.caption.copyWith(
+                                  fontSize: 13, color: AppColors.black)),
+                          const SizedBox(width: 2),
+                          const Icon(Icons.chevron_right,
                               size: 14, color: kGray),
                         ],
                       ),

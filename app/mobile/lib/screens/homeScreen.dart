@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../theme/app_colors.dart';
 import '../components/app_button.dart';
 
@@ -14,16 +15,13 @@ class HomeScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 40),
-              // Rounded rectangle image placeholder
-              Container(
-                width: double.infinity,
-                height: 320,
-                decoration: BoxDecoration(
-                  color: AppColors.inputFill,
-                  borderRadius: BorderRadius.circular(20),
-                  image: const DecorationImage(
-                    image: AssetImage('assets/img.png'),
-                    fit: BoxFit.contain,
+              ClipRect(
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  heightFactor: 0.82,
+                  child: SvgPicture.asset(
+                    'assets/knight.svg',
+                    height: 320,
                   ),
                 ),
               ),
