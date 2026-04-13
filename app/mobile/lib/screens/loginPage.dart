@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../utils/getAPI.dart';
-import '../utils/GlobalData.dart';
+import '../utils/auth_service.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
 import '../components/app_button.dart';
 import '../components/app_text_field.dart';
+import 'forgot_password_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -25,18 +27,24 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       var response = await getAPI.login(loginName.trim(), password);
       if (!mounted) return;
-      if (response['success'] == true) {
+      if (response['requiresVerification'] == true) {
+        // Account exists but email not verified
+        if (!mounted) return;
+        Navigator.pushNamed(context, '/verification', arguments: loginName.trim());
+      } else if (response['success'] == true) {
+        final user = response['user'] as Map<String, dynamic>? ?? {};
+        await AuthService.saveSession(
+          token: response['accessToken'] ?? '',
+          userId: user['id']?.toString() ?? '',
+          firstName: user['firstName']?.toString() ?? '',
+          lastName: user['lastName']?.toString() ?? '',
+          email: user['email']?.toString() ?? '',
+        );
+        if (!mounted) return;
         if (response['isVerified'] == false) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Please verify your email first.')),
-          );
-          Navigator.pushNamed(context, '/verification');
+          // Fallback: backend returned 200 but flagged as unverified
+          Navigator.pushNamed(context, '/verification', arguments: loginName.trim());
         } else {
-          final user = response['user'] as Map<String, dynamic>? ?? {};
-          GlobalData.token = response['accessToken'] ?? '';
-          GlobalData.mongoUserId = user['id']?.toString() ?? '';
-          GlobalData.firstName = user['firstName']?.toString() ?? '';
-          GlobalData.lastName = user['lastName']?.toString() ?? '';
           Navigator.pushNamed(context, '/event/events');
         }
       } else {
@@ -86,15 +94,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 24),
                     // Rounded rectangle image
-                    Container(
-                      width: double.infinity,
-                      height: 220,
-                      decoration: BoxDecoration(
-                        color: AppColors.inputFill,
-                        borderRadius: BorderRadius.circular(16),
-                        image: const DecorationImage(
-                          image: AssetImage('assets/img.png'),
-                          fit: BoxFit.contain,
+                    ClipRect(
+                      child: Align(
+                        alignment: Alignment.topCenter,
+                        heightFactor: 0.82,
+                        child: SvgPicture.asset(
+                          'assets/knight.svg',
+                          height: 220,
                         ),
                       ),
                     ),
@@ -116,15 +122,23 @@ class _LoginScreenState extends State<LoginScreen> {
                       label: 'Password',
                       onChanged: (text) => password = text,
                       isPassword: true,
-                      suffix: GestureDetector(
-                        onTap: () {
-                          // TODO: handle password reset
-                        },
+                    ),
+                    const SizedBox(height: 8),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: GestureDetector(
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const ForgotPasswordScreen(),
+                          ),
+                        ),
                         child: const Text(
-                          'Reset',
+                          'Forgot password?',
                           style: TextStyle(
                             color: AppColors.textSecondary,
                             fontWeight: FontWeight.w500,
+                            fontSize: 13,
                           ),
                         ),
                       ),

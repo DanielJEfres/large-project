@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useLocation, useNavigate, useParams } from "react-router";
 import Logo from "../components/Logo";
 import styles from "./Login.module.css";
 import { SERVER_IP } from "../config";
@@ -7,26 +7,35 @@ import { SERVER_IP } from "../config";
 export default function VerifyEmail() {
   const { token } = useParams<{ token?: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+
   const [statusMessage, setStatusMessage] = useState<string>(
-    "We sent a verification link to your email. Check your inbox.",
-  );
+    "We sent a verification link to your email. Check your inbox.");
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
-  useEffect(() => {
-    if (!token) return;
+  const unverifiedEmail = location.state?.email;
 
+  useEffect(() => {
+    if (token) return;
+  
     const verify = async () => {
       setLoading(true);
+      await new Promise(resolve => setTimeout(resolve, 500));
       setStatusMessage("Verifying your account...");
       try {
         const response = await fetch(
           `${SERVER_IP}/api/email-verification/request`,
-          { method: "POST" },
+          { 
+            method: "POST",
+            headers: {
+            "Content-Type": "application/json",
+          },
+            body: JSON.stringify({ ucfEmail: unverifiedEmail})
+          }
         );
         const data = await response.json();
         if (response.ok) {
-          setError("");
           setStatusMessage(
             "Email verified successfully! Redirecting to events...",
           );

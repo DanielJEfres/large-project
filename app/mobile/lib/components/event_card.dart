@@ -43,16 +43,22 @@ class EventCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final orgName =
-        (event['organizationName'] ?? event['organizationId'] ?? 'Organization')
-            .toString();
+    final isRSO = event['isRSO'] == true;
+    final orgName = isRSO
+        ? (event['organizationName'] ?? event['organizationId'] ?? 'Organization').toString()
+        : null;
     final title = (event['title'] ?? 'Event Title').toString();
     final location = (event['location'] ?? 'Location TBD').toString();
     final date = _formatDate(event['startDate']?.toString());
     final flyer = event['flyer']?.toString();
 
+    final eventId = event['_id']?.toString();
+
     return GestureDetector(
-      onTap: onTap,
+      onTap: onTap ??
+          (eventId != null
+              ? () => Navigator.pushNamed(context, '/event/$eventId')
+              : null),
       child: Container(
         width: width,
         decoration: BoxDecoration(
@@ -90,21 +96,23 @@ class EventCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      orgName.toUpperCase(),
-                      style: GoogleFonts.bebasNeue(
-                        fontSize: 11,
-                        color: AppColors.primary,
-                        letterSpacing: 0.8,
+                    if (orgName != null) ...[
+                      Text(
+                        orgName.toUpperCase(),
+                        style: GoogleFonts.bebasNeue(
+                          fontSize: 12,
+                          color: AppColors.primary,
+                          letterSpacing: 0.8,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 3),
+                      const SizedBox(height: 3),
+                    ],
                     Text(
                       title,
                       style: const TextStyle(
-                        fontSize: 12,
+                        fontSize: 13,
                         fontWeight: FontWeight.bold,
                         color: AppColors.black,
                         height: 1.3,
@@ -116,7 +124,7 @@ class EventCard extends StatelessWidget {
                     Text(
                       date,
                       style: const TextStyle(
-                        fontSize: 10,
+                        fontSize: 11,
                         color: AppColors.textMuted,
                       ),
                       maxLines: 1,
@@ -127,7 +135,7 @@ class EventCard extends StatelessWidget {
                       children: [
                         const Icon(
                           Icons.location_on_outlined,
-                          size: 10,
+                          size: 11,
                           color: AppColors.textMuted,
                         ),
                         const SizedBox(width: 2),
@@ -135,7 +143,7 @@ class EventCard extends StatelessWidget {
                           child: Text(
                             location,
                             style: const TextStyle(
-                              fontSize: 10,
+                              fontSize: 11,
                               color: AppColors.textMuted,
                             ),
                             maxLines: 1,

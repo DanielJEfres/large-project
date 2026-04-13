@@ -114,7 +114,7 @@ router.post('/signup', async (req, res) => {
 function generateAccessToken(payload) {
     // serialize our payload (user id) using access token in ENV.
     // AccessToken expires in 15 minutes, requires Refresh
-    return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "15s" })
+    return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "15m" })
 }
 
 router.post("/login", async (req, res) => {
@@ -134,7 +134,17 @@ router.post("/login", async (req, res) => {
 
         } else { // email exists in DB
             // match password
-            if (await user.matchPassword(password)){
+            if (await user.matchPassword(password))
+            {   
+                //If the user is not verified, they cannot login. This forces them to always be sent to Email Verification on the frontend
+                if(!user.isVerified){
+                    return res.status(403).json(
+                        {
+                            message: "User requires Email Verification", 
+                            ucfEmail: user.ucfEmail
+                        });
+                }
+
                 // user has been validated! JWT below
                 const user_id = user._id;
 
@@ -185,7 +195,7 @@ router.post("/login", async (req, res) => {
             }
         }
     } catch (err){
-        res.status(500).json({message:"Server error."});
+        res.status(500).json({message:"Server error.", error: err});
     }
 })
 

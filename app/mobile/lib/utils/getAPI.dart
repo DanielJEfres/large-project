@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'GlobalData.dart';
+import 'auth_service.dart';
 
 class getAPI {
   //Domain fo the page connection
@@ -55,6 +55,15 @@ class getAPI {
           "user": data['user'],
         };
       }
+      // Some deployments return 403 when email is not verified
+      final message = (data['message'] ?? '').toString().toLowerCase();
+      if (response.statusCode == 403 || message.contains('verif')) {
+        return {
+          "success": false,
+          "requiresVerification": true,
+          "message": data['message'] ?? "Email verification required",
+        };
+      }
       return {
         "success": false,
         "message": data['message'] ?? "Invalid credentials",
@@ -67,41 +76,29 @@ class getAPI {
     }
   }
 
-  // GET /api/users/me — fetch logged-in user's profile
-  static Future<Map<String, dynamic>> getUserProfile() async {
+  // Fetch a single event by ID
+  static Future<Map<String, dynamic>> getEvent(String eventId) async {
     try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/users/me'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ${GlobalData.token}',
-        },
-      );
+      final response = await http.get(Uri.parse('$baseUrl/events/$eventId'));
       final data = jsonDecode(response.body);
       return response.statusCode == 200
-          ? {'success': true, 'user': data['user']}
-          : {'success': false, 'message': data['message'] ?? 'Failed to load profile'};
+          ? {"success": true, "event": data['event']}
+          : {"success": false, "event": null};
     } catch (e) {
-      return {'success': false, 'message': 'Could not connect to server.'};
+      return {"success": false, "event": null};
     }
   }
 
-  // GET /api/users/me/organizations — fetch organizations user belongs to
-  static Future<Map<String, dynamic>> getUserOrganizations() async {
+  // Fetch organization by ID
+  static Future<Map<String, dynamic>> getOrganization(String orgId) async {
     try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/users/me/organizations'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ${GlobalData.token}',
-        },
-      );
+      final response = await http.get(Uri.parse('$baseUrl/organizations/$orgId'));
       final data = jsonDecode(response.body);
       return response.statusCode == 200
-          ? {'success': true, 'organizations': data['organizations'] ?? []}
-          : {'success': false, 'organizations': []};
+          ? {"success": true, "organization": data['Organization'] ?? data['organization'] ?? data}
+          : {"success": false, "organization": null};
     } catch (e) {
-      return {'success': false, 'organizations': []};
+      return {"success": false, "organization": null};
     }
   }
 
@@ -131,24 +128,245 @@ class getAPI {
     }
   }
 
-  // Email verification
-  static Future<Map<String, dynamic>> verifyEmail(
-    String email,
-    String token,
-  ) async {
+  // RSVP to an event
+  static Future<Map<String, dynamic>> attendEvent(String eventId) async {
+    final userId = AuthService.userId;
+    if (userId == null) return {"success": false, "message": "Not logged in"};
     try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/verifyEmail/verify-email'),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"ucfEmail": email, "token": token}),
+      final response = await http.patch(
+        Uri.parse('$baseUrl/events/attendEvent/$eventId'),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer ${AuthService.token}",
+        },
+        body: jsonEncode({"userId": userId}),
       );
-
       final data = jsonDecode(response.body);
       return response.statusCode == 200
-          ? {"success": true, "message": "Verified!"}
-          : {"success": false, "message": data['message'] ?? "Invalid Code"};
+          ? {"success": true}
+          : {"success": false, "message": data['message'] ?? "RSVP failed"};
+    } catch (e) {
+      return {"success": false, "message": "Could not connect to server."};
+    }
+  }
+
+  // Cancel RSVP
+  static Future<Map<String, dynamic>> unattendEvent(String eventId) async {
+    final userId = AuthService.userId;
+    if (userId == null) return {"success": false, "message": "Not logged in"};
+    try {
+      final response = await http.patch(
+        Uri.parse('$baseUrl/events/unattendEvent/$eventId'),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer ${AuthService.token}",
+        },
+        body: jsonEncode({"userId": userId}),
+      );
+      final data = jsonDecode(response.body);
+      return response.statusCode == 200
+          ? {"success": true}
+          : {"success": false, "message": data['message'] ?? "Unattend failed"};
+    } catch (e) {
+      return {"success": false, "message": "Could not connect to server."};
+    }
+  }
+
+  // Request a verification email to be sent
+  static Future<Map<String, dynamic>> requestVerificationEmail(String email) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/email-verification/request'),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"ucfEmail": email}),
+      );
+      final data = jsonDecode(response.body);
+      return response.statusCode == 200
+          ? {"success": true}
+          : {"success": false, "message": data['message'] ?? "Failed to send email"};
     } catch (e) {
       return {"success": false, "message": "Connection failed."};
+    }
+  }
+
+  static Future<Map<String, dynamic>> getOrganizations({String? name}) async {
+    try {
+      final uri = name != null && name.isNotEmpty
+          ? Uri.parse('$baseUrl/organizations?name=${Uri.encodeComponent(name)}')
+          : Uri.parse('$baseUrl/organizations');
+      final response = await http.get(uri);
+      final data = jsonDecode(response.body);
+      return response.statusCode == 200
+          ? {"success": true, "organizations": data['Organizations'] ?? []}
+          : {"success": false, "organizations": []};
+    } catch (e) {
+      return {"success": false, "organizations": [], "message": "Error: $e"};
+    }
+  }
+
+  static Future<Map<String, dynamic>> getOrganizationById(String orgId) async {
+    try {
+      final response = await http.get(Uri.parse('$baseUrl/organizations/$orgId'));
+      final data = jsonDecode(response.body);
+      return response.statusCode == 200
+          ? {
+              "success": true,
+              "organization": data['Organization'],
+              "events": data['Events'] ?? [],
+            }
+          : {"success": false, "organization": null, "events": []};
+    } catch (e) {
+      return {"success": false, "organization": null, "events": []};
+    }
+  }
+
+  // Get all events a user is attending
+  static Future<Map<String, dynamic>> getUserEvents(String userId) async {
+    try {
+      final response = await http.get(Uri.parse('$baseUrl/events/user/$userId'));
+      final data = jsonDecode(response.body);
+      return response.statusCode == 200
+          ? {"success": true, "events": data is List ? data : []}
+          : {"success": false, "events": []};
+    } catch (e) {
+      return {"success": false, "events": []};
+    }
+  }
+
+  // Request a password reset email
+  static Future<Map<String, dynamic>> requestPasswordReset(String email) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/password-reset/request'),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"ucfEmail": email}),
+      );
+      final data = jsonDecode(response.body);
+      return response.statusCode == 200
+          ? {"success": true}
+          : {"success": false, "message": data['message'] ?? "Failed to send reset email"};
+    } catch (e) {
+      return {"success": false, "message": "Could not connect to server."};
+    }
+  }
+
+  // Create a new event
+  static Future<Map<String, dynamic>> createEvent({
+    required String title,
+    required String location,
+    required String description,
+    required String startDate,
+    String? endDate,
+    required bool isRSO,
+    required bool rsvpEnabled,
+    required String createdBy,
+    required List<String> tags,
+  }) async {
+    try {
+      final body = <String, dynamic>{
+        'title': title,
+        'location': location,
+        'description': description,
+        'startDate': startDate,
+        'isRSO': isRSO,
+        'rsvpEnabled': rsvpEnabled,
+        'createdBy': createdBy,
+        'tags': tags,
+      };
+      if (endDate != null) body['endDate'] = endDate;
+
+      final response = await http.post(
+        Uri.parse('$baseUrl/events'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${AuthService.token}',
+        },
+        body: jsonEncode(body),
+      );
+      final data = jsonDecode(response.body);
+      return response.statusCode == 201 || response.statusCode == 200
+          ? {'success': true, 'event': data['event'] ?? data}
+          : {'success': false, 'message': data['message'] ?? 'Failed to create event'};
+    } catch (e) {
+      return {'success': false, 'message': 'Could not connect to server.'};
+    }
+  }
+
+  // Leave an organization by ID
+  static Future<Map<String, dynamic>> leaveOrganization(String orgId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/organizations/leave'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${AuthService.token}',
+        },
+        body: jsonEncode({'orgId': orgId}),
+      );
+      final data = jsonDecode(response.body);
+      return response.statusCode == 200
+          ? {'success': true}
+          : {'success': false, 'message': data['message'] ?? 'Failed to leave organization'};
+    } catch (e) {
+      return {'success': false, 'message': 'Could not connect to server.'};
+    }
+  }
+
+  // Join an organization by ID
+  static Future<Map<String, dynamic>> joinOrganization(String orgId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/organizations/join'),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer ${AuthService.token}",
+        },
+        body: jsonEncode({"orgId": orgId}),
+      );
+      final data = jsonDecode(response.body);
+      return response.statusCode == 200
+          ? {"success": true}
+          : {"success": false, "message": data['message'] ?? "Failed to join organization"};
+    } catch (e) {
+      return {"success": false, "message": "Could not connect to server."};
+    }
+  }
+
+  // GET /api/users/me — fetch logged-in user's profile
+  static Future<Map<String, dynamic>> getUserProfile() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/users/me'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${AuthService.token}',
+        },
+      );
+      final data = jsonDecode(response.body);
+      return response.statusCode == 200
+          ? {'success': true, 'user': data['user']}
+          : {'success': false, 'message': data['message'] ?? 'Failed to load profile'};
+    } catch (e) {
+      return {'success': false, 'message': 'Could not connect to server.'};
+    }
+  }
+
+  // GET /api/users/me/organizations — fetch organizations user belongs to
+  static Future<Map<String, dynamic>> getUserOrganizations() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/users/me/organizations'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${AuthService.token}',
+        },
+      );
+      final data = jsonDecode(response.body);
+      return response.statusCode == 200
+          ? {'success': true, 'organizations': data['organizations'] ?? []}
+          : {'success': false, 'organizations': []};
+    } catch (e) {
+      return {'success': false, 'organizations': []};
     }
   }
 }

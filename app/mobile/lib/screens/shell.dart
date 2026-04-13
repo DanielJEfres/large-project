@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../components/app_bottom_nav.dart';
 import 'events/events.dart';
-import 'organizations.dart';
+import 'organizations/searchOrg.dart';
 import 'create_event.dart';
 import 'tickets.dart';
 import 'profile.dart';
@@ -19,7 +19,7 @@ class _MainShellState extends State<MainShell> {
   // IndexedStack keeps all screens alive so scroll position is preserved
   final List<Widget> _screens = [
     EventsScreen(),
-    OrganizationsScreen(),
+    SearchOrganization(),
     CreateEventScreen(),
     TicketsScreen(),
     ProfileScreen(),

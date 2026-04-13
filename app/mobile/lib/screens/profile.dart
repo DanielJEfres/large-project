@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
 import '../utils/getAPI.dart';
-import '../utils/GlobalData.dart';
+import '../utils/auth_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -23,7 +23,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _fetchData() async {
-    if (!GlobalData.isLoggedIn) {
+    if (!AuthService.isLoggedIn) {
       setState(() => _loading = false);
       return;
     }
@@ -44,7 +44,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (!GlobalData.isLoggedIn) {
+    if (!AuthService.isLoggedIn) {
       return Scaffold(
         backgroundColor: AppColors.white,
         body: SafeArea(
@@ -72,8 +72,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
     }
 
-    final firstName = _user?['firstName']?.toString() ?? GlobalData.firstName;
-    final lastName = _user?['lastName']?.toString() ?? GlobalData.lastName;
+    final firstName = _user?['firstName']?.toString() ?? AuthService.firstName ?? '';
+    final lastName = _user?['lastName']?.toString() ?? AuthService.lastName ?? '';
     final fullName = '$firstName $lastName'.trim();
     final pfp = _user?['profilePicture']?.toString();
 
