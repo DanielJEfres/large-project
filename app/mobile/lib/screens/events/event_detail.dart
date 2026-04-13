@@ -5,6 +5,7 @@ import '../../theme/app_text_styles.dart';
 import '../../components/app_button.dart';
 import '../../utils/getAPI.dart';
 import '../../utils/auth_service.dart';
+import '../organizations/organizations.dart';
 
 class EventDetailScreen extends StatefulWidget {
   final String eventId;
@@ -21,6 +22,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   bool _loading = true;
   bool _descExpanded = false;
   bool _isAttending = false;
+  bool _isOrgMember = false;
+  bool _isJoiningOrg = false;
 
   @override
   void initState() {
@@ -51,7 +54,44 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   Future<void> _fetchOrg(String orgId) async {
     final result = await getAPI.getOrganization(orgId);
     if (!mounted) return;
-    setState(() => _org = result['organization'] as Map<String, dynamic>?);
+    final org = result['organization'] as Map<String, dynamic>?;
+    bool alreadyMember = false;
+    if (org != null && AuthService.userId != null) {
+      final members = (org['members'] as List<dynamic>?) ?? [];
+      alreadyMember = members.any((m) =>
+          (m is Map ? m['userId']?.toString() : m?.toString()) == AuthService.userId);
+    }
+    setState(() {
+      _org = org;
+      _isOrgMember = alreadyMember;
+    });
+  }
+
+  Future<void> _joinOrg() async {
+    if (_org == null) return;
+    if (!AuthService.isLoggedIn) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('You need to be logged in to join an organization.')),
+      );
+      return;
+    }
+    setState(() => _isJoiningOrg = true);
+    final result = await getAPI.joinOrganization(_org!['_id'].toString());
+    if (!mounted) return;
+    if (result['success'] == true) {
+      setState(() {
+        _isOrgMember = true;
+        _isJoiningOrg = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Joined ${_org!['name']}!')),
+      );
+    } else {
+      setState(() => _isJoiningOrg = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result['message'] ?? 'Failed to join organization')),
+      );
+    }
   }
 
   String _formatDate(String? dateStr) {
@@ -409,28 +449,45 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                       children: [
                                         Expanded(
                                           child: OutlinedButton(
-                                            onPressed: () {},
+                                            onPressed: _isOrgMember || _isJoiningOrg ? null : _joinOrg,
                                             style: OutlinedButton.styleFrom(
-                                              side: const BorderSide(color: AppColors.black),
+                                              side: BorderSide(
+                                                color: _isOrgMember ? AppColors.textMuted : AppColors.black,
+                                              ),
                                               shape: RoundedRectangleBorder(
                                                 borderRadius: BorderRadius.circular(20),
                                               ),
                                               padding: const EdgeInsets.symmetric(vertical: 8),
                                             ),
-                                            child: const Text(
-                                              'Join',
-                                              style: TextStyle(
-                                                color: AppColors.black,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 13,
-                                              ),
-                                            ),
+                                            child: _isJoiningOrg
+                                                ? const SizedBox(
+                                                    height: 14,
+                                                    width: 14,
+                                                    child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.black),
+                                                  )
+                                                : Text(
+                                                    _isOrgMember ? 'Joined' : 'Join',
+                                                    style: TextStyle(
+                                                      color: _isOrgMember ? AppColors.textMuted : AppColors.black,
+                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: 13,
+                                                    ),
+                                                  ),
                                           ),
                                         ),
                                         const SizedBox(width: 8),
                                         Expanded(
                                           child: OutlinedButton(
-                                            onPressed: () {},
+                                            onPressed: _org != null
+                                                ? () => Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (_) => OrganizationScreen(
+                                                        orgId: _org!['_id'].toString(),
+                                                      ),
+                                                    ),
+                                                  )
+                                                : null,
                                             style: OutlinedButton.styleFrom(
                                               side: const BorderSide(color: AppColors.black),
                                               shape: RoundedRectangleBorder(

@@ -117,7 +117,7 @@ class _OrganizationScreenState extends State<OrganizationScreen>
   Future<void> _joinOrg() async {
     if (_org == null || !AuthService.isLoggedIn) return;
     setState(() => _isJoining = true);
-    final result = await getAPI.joinOrganization(_org!.name);
+    final result = await getAPI.joinOrganization(_org!.id);
     if (!mounted) return;
     if (result['success'] == true) {
       setState(() {
@@ -258,7 +258,7 @@ class _OrganizationScreenState extends State<OrganizationScreen>
                   ? const _PlaceholderBox(width: 150, height: 20)
                   : Text(
                       _org!.name,
-                      style: AppTextStyles.h3.copyWith(color: AppColors.black),
+                      style: AppTextStyles.h4.copyWith(color: AppColors.black),
                     ),
               const SizedBox(height: 16),
               SizedBox(
@@ -398,7 +398,9 @@ class _EventRow extends StatelessWidget {
         '${DateFormat('h:mm a').format(event.endDate!)}'
         : DateFormat('EEE, MMM d').format(event.startDate);
 
-    return Padding(
+    return GestureDetector(
+      onTap: () => Navigator.pushNamed(context, '/event/${event.id}'),
+      child: Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -433,6 +435,7 @@ class _EventRow extends StatelessWidget {
           ),
         ],
       ),
+    ),
     );
   }
 }

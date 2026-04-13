@@ -220,8 +220,25 @@ class getAPI {
     }
   }
 
-  // Join an organization by name
-  static Future<Map<String, dynamic>> joinOrganization(String orgName) async {
+  // Request a password reset email
+  static Future<Map<String, dynamic>> requestPasswordReset(String email) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/password-reset/request'),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"ucfEmail": email}),
+      );
+      final data = jsonDecode(response.body);
+      return response.statusCode == 200
+          ? {"success": true}
+          : {"success": false, "message": data['message'] ?? "Failed to send reset email"};
+    } catch (e) {
+      return {"success": false, "message": "Could not connect to server."};
+    }
+  }
+
+  // Join an organization by ID
+  static Future<Map<String, dynamic>> joinOrganization(String orgId) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/organizations/join'),
@@ -229,7 +246,7 @@ class getAPI {
           "Content-Type": "application/json",
           "Authorization": "Bearer ${AuthService.token}",
         },
-        body: jsonEncode({"orgName": orgName}),
+        body: jsonEncode({"orgId": orgId}),
       );
       final data = jsonDecode(response.body);
       return response.statusCode == 200
