@@ -29,7 +29,7 @@ class _RecommendationsState extends State<Recommendations> {
       backgroundColor: AppColors.white,
       appBar: AppBar(
         backgroundColor: AppColors.white,
-        elevation: 0,
+        elevation: 100,
         leadingWidth: 70,
         toolbarHeight: 72,
         leading: Padding(
