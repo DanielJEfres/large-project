@@ -13,35 +13,35 @@ export default function Organizations() {
 
   const { token, isLoggedIn } = useAuth();
 
-  const handleJoin = async (orgName: string) => {
+  const handleJoin = async (id: string) => {
     if (!isLoggedIn) {
       alert("Please log in to join organizations!");
       return;
     }
 
     try {
-      const response = await fetch(`${LOCAL_IP}/api/organizations/join`, {
+      const response = await fetch(`${SERVER_IP}/api/organizations/join`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          // Pass token for middleware check
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ orgName }), // backend wants a { orgName } = req.body
+        // Route expects an org id
+        body: JSON.stringify({ orgId: id }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        alert(`Successfully joined ${orgName}!`);
-
-        //this refreshes the list.
-        fetchOrganizations(searchQuery);
+        alert("Successfully joined!");
+        //Re-fetch organizations to update the UI
+        fetchOrganizations();
       } else {
         alert(data.message || "Failed to join");
       }
     } catch (err) {
       console.error("Join error:", err);
-      alert("A server error occurred.");
     }
   };
 
@@ -155,7 +155,7 @@ export default function Organizations() {
                     </Link>
                     <button
                       //User joins this particular org.
-                      onClick={() => handleJoin(org.name)}
+                      onClick={() => handleJoin(org._id)}
                       className="font-bold px-9 rounded-4xl text-white bg-black my-3 mr-3 font-league cursor-pointer active:scale-95 transition-all hover:bg-brand duration-100 "
                     >
                       Join
