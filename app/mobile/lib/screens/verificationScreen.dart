@@ -14,6 +14,19 @@ class VerificationScreen extends StatefulWidget {
 class _VerificationScreenState extends State<VerificationScreen> {
   bool _isLoading = false;
   bool _emailSent = false;
+  bool _initialSendDone = false;
+  String _email = '';
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_initialSendDone) {
+      _initialSendDone = true;
+      final email = ModalRoute.of(context)?.settings.arguments as String? ?? '';
+      _email = email;
+      if (email.isNotEmpty) _resendEmail(email);
+    }
+  }
 
   Future<void> _resendEmail(String email) async {
     if (email.isEmpty) return;
@@ -36,12 +49,14 @@ class _VerificationScreenState extends State<VerificationScreen> {
   }
 
   void _showSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
   Widget build(BuildContext context) {
-    final email = ModalRoute.of(context)?.settings.arguments as String? ?? '';
+    final email = _email;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -80,7 +95,9 @@ class _VerificationScreenState extends State<VerificationScreen> {
               const SizedBox(height: 32),
               Text(
                 'Open your email and tap the link to verify your account. Then come back and log in.',
-                style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
+                style: AppTextStyles.body.copyWith(
+                  color: AppColors.textSecondary,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 40),
@@ -93,10 +110,12 @@ class _VerificationScreenState extends State<VerificationScreen> {
               const SizedBox(height: 16),
               TextButton(
                 onPressed: () => Navigator.pushNamedAndRemoveUntil(
-                  context, '/login', (route) => false,
+                  context,
+                  '/login',
+                  (route) => false,
                 ),
                 child: const Text(
-                  "I've verified my email — Log in",
+                  "I've verified my email. Log in",
                   style: TextStyle(
                     color: AppColors.black,
                     fontWeight: FontWeight.w600,

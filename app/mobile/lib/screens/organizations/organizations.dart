@@ -135,6 +135,42 @@ class _OrganizationScreenState extends State<OrganizationScreen>
     }
   }
 
+  Future<void> _leaveOrg() async {
+    if (_org == null) return;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Leave organization?'),
+        content: Text('Are you sure you want to leave ${_org!.name}?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Leave', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    setState(() => _isJoining = true);
+    final result = await getAPI.leaveOrganization(_org!.id);
+    if (!mounted) return;
+    setState(() => _isJoining = false);
+    if (result['success'] == true) {
+      setState(() => _isMember = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Left ${_org!.name}')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result['message'] ?? 'Failed to leave organization')),
+      );
+    }
+  }
+
   Future<void> _fetchData() async {
     setState(() => _loading = true);
 
@@ -264,7 +300,7 @@ class _OrganizationScreenState extends State<OrganizationScreen>
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: (_loading || _isMember || _isJoining)
+                  onPressed: (_loading || _isJoining)
                       ? null
                       : () {
                           if (!AuthService.isLoggedIn) {
@@ -273,7 +309,7 @@ class _OrganizationScreenState extends State<OrganizationScreen>
                             );
                             return;
                           }
-                          _joinOrg();
+                          _isMember ? _leaveOrg() : _joinOrg();
                         },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: _isMember ? Colors.grey[300] : Colors.black,
