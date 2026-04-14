@@ -4,6 +4,8 @@ import React, { useState, useRef } from "react";
 import { useAuth } from "../context/AuthContext";
 import { SERVER_IP } from "../config";
 
+import { useNavigate } from "react-router-dom";
+
 const CATEGORIES = [
   "Sports",
   "Computer Science",
@@ -39,7 +41,7 @@ const formatDisplayDate = (dateStr: string) => {
 
 export default function CreateEvent() {
   const { user, token } = useAuth();
-
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     eventType: "Student" as "RSO" | "Student",
     title: "",
@@ -87,6 +89,7 @@ export default function CreateEvent() {
   };
 
   const handleSubmit = async () => {
+    
     if (!formData.title || !formData.startDate) {
       alert("Title and Start Date are required.");
       return;
@@ -124,7 +127,9 @@ export default function CreateEvent() {
       const data = await response.json();
 
       if (response.ok) {
-        alert("Event created successfully!");
+        //alert("Event created successfully!");
+        navigate("/events");
+        
       } else {
         alert(`Error: ${data.error || data.message}`);
       }
