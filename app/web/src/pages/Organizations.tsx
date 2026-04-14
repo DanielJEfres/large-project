@@ -98,7 +98,7 @@ export default function Organizations() {
           ) : (
             organizations.map((org) => {
               const isMember = joinedOrgIds.has(org._id);
-              console.log(isMember);
+              console.log(joinedOrgIds);
 
               return (
                 <div

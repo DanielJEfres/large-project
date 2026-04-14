@@ -19,6 +19,7 @@ import EventDashboard from "./pages/EventDashboard.tsx";
 import EditEvent from "./pages/EditEvent.tsx";
 import ResetPassword from "./pages/ResetPassword.tsx";
 import NewPassword from "./pages/NewPassword.tsx";
+import Profile from "./pages/Profile.tsx";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -83,6 +84,10 @@ const router = createBrowserRouter([
       },
       { path: "manage/event/:id", element: <EventDashboard /> },
       { path: "manage/event/:eventId/edit", element: <EditEvent /> },
+      {
+        path: "me",
+        element: <Profile />,
+      },
     ],
   },
 ]);
