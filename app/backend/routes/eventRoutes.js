@@ -169,6 +169,12 @@ router.put('/:eventId', upload.single('flyer'), async (req, res) => {
 
     try {
         const updateData = { ...req.body };
+
+        // If organizationId is an empty string, set it to null
+        if (updateData.organizationId === "") {
+            updateData.organizationId = null;
+        }
+        
         if(req.file) {
             const flyerUrl = await uploadToS3(req.file, 'flyers')
             

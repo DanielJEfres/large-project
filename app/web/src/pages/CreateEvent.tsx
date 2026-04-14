@@ -1,6 +1,6 @@
 import { Check } from "lucide-react";
 import Navbar from "../components/Navbar";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { SERVER_IP } from "../config";
 
@@ -49,6 +49,7 @@ const formatDisplayDate = (dateStr: string) => {
 
 export default function CreateEvent() {
   const { user, token } = useAuth();
+  const [userOrgs, setUserOrgs] = useState<{ id: string; name: string }[]>([]);
 
   const [formData, setFormData] = useState({
     eventType: "Student" as "RSO" | "Student",
@@ -56,10 +57,10 @@ export default function CreateEvent() {
     description: "",
     location: "",
     link: "",
+    selectedOrgId: "", // New field to track which org is selected
     selectedCategories: [] as string[],
     imagePreview: null as string | null,
     file: null as File | null,
-
     startDate: new Date(
       new Date().getTime() - new Date().getTimezoneOffset() * 60000,
     )
@@ -67,6 +68,32 @@ export default function CreateEvent() {
       .slice(0, 16),
     endDate: "",
   });
+
+  // Fetch organizations the user belongs to
+  useEffect(() => {
+    const fetchMyOrgs = async () => {
+      if (!token) return;
+      try {
+        const res = await fetch(`${SERVER_IP}/api/users/me/organizations`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        if (data.organizations) {
+          setUserOrgs(data.organizations);
+          // Automatically select the first org if available
+          if (data.organizations.length > 0) {
+            setFormData((prev) => ({
+              ...prev,
+              selectedOrgId: data.organizations[0].id,
+            }));
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching user organizations:", err);
+      }
+    };
+    fetchMyOrgs();
+  }, [token]);
 
   const startInputRef = useRef<HTMLInputElement>(null);
   const endInputRef = useRef<HTMLInputElement>(null);
@@ -102,8 +129,13 @@ export default function CreateEvent() {
   };
 
   const handleSubmit = async () => {
-    if (!formData.title || !formData.startDate) {
-      alert("Title and Start Date are required.");
+    if (!formData.title || !formData.startDate || !formData.location) {
+      alert("Title, start date, and location are required.");
+      return;
+    }
+
+    if (formData.eventType === "RSO" && !formData.selectedOrgId) {
+      alert("Please select an organization.");
       return;
     }
 
@@ -123,6 +155,11 @@ export default function CreateEvent() {
 
     submissionData.append("createdBy", user?.id || "");
     submissionData.append("isRSO", String(formData.eventType === "RSO"));
+
+    if (formData.eventType === "RSO") {
+      submissionData.append("organizationId", formData.selectedOrgId);
+    }
+
     submissionData.append("status", "upcoming");
     submissionData.append("isPublic", "true");
     submissionData.append("rsvpEnabled", "true");
@@ -343,6 +380,50 @@ export default function CreateEvent() {
               </button>
             ))}
           </div>
+
+          {/* dropdown */}
+          {formData.eventType === "RSO" && (
+            <div className="mt-10 pt-10 border-t border-gray-100 animate-in fade-in slide-in-from-bottom-2 duration-300">
+              <h2 className="text-[24px] sm:text-[28px] font-semibold mb-4 tracking-tight">
+                Post as Organization
+              </h2>
+              <div className="relative max-w-md">
+                <select
+                  name="selectedOrgId"
+                  value={formData.selectedOrgId}
+                  onChange={(e) =>
+                    setFormData((p) => ({
+                      ...p,
+                      selectedOrgId: e.target.value,
+                    }))
+                  }
+                  className="w-full bg-[#F6F6F6] rounded-[14px] px-5 py-4 text-[16px] outline-none border border-transparent focus:border-black transition-all appearance-none cursor-pointer"
+                  style={{
+                    backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
+                    backgroundRepeat: "no-repeat",
+                    backgroundPosition: "right 1.25rem center",
+                    backgroundSize: "1em",
+                  }}
+                >
+                  {userOrgs.length > 0 ? (
+                    userOrgs.map((org) => (
+                      <option key={org.id} value={org.id}>
+                        {org.name}
+                      </option>
+                    ))
+                  ) : (
+                    <option value="">No organizations joined</option>
+                  )}
+                </select>
+
+                {userOrgs.length === 0 && (
+                  <p className="text-red-500 text-[13px] mt-2 ml-1">
+                    You must be a member of an RSO to post an RSO event.
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="order-1 lg:order-2 lg:col-span-4 flex flex-col gap-6 lg:pt-16">
