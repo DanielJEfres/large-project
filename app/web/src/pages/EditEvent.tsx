@@ -20,14 +20,23 @@ const CATEGORIES = [
 
 const formatDisplayDate = (dateStr: string) => {
   if (!dateStr) return { day: "", time: "" };
-  const d = new Date(dateStr);
-  const day = d
+
+  // Split the string and create the date manually to force LOCAL time
+  const [datePart, timePart] = dateStr.split("T");
+  const [year, month, day] = datePart.split("-").map(Number);
+  const [hours, minutes] = timePart.split(":").map(Number);
+
+  // This constructor uses the system's local timezone
+  const d = new Date(year, month - 1, day, hours, minutes);
+
+  const dayName = d
     .toLocaleDateString("en-US", {
       weekday: "short",
       month: "short",
       day: "numeric",
     })
     .replace(",", "");
+
   const time = d
     .toLocaleTimeString("en-US", {
       hour: "numeric",
@@ -35,7 +44,14 @@ const formatDisplayDate = (dateStr: string) => {
       hour12: true,
     })
     .toLowerCase();
-  return { day, time };
+
+  return { day: dayName, time };
+};
+
+const toLocalISO = (dateStr: string) => {
+  const d = new Date(dateStr);
+  const offset = d.getTimezoneOffset() * 60000; // offset in milliseconds
+  return new Date(d.getTime() - offset).toISOString().slice(0, 16);
 };
 
 export default function EditEvent() {
@@ -84,10 +100,8 @@ export default function EditEvent() {
           selectedCategories: matchedTags,
           imagePreview: event.flyer || null,
           file: null,
-          startDate: new Date(event.startDate).toISOString().slice(0, 16),
-          endDate: event.endDate
-            ? new Date(event.endDate).toISOString().slice(0, 16)
-            : "",
+          startDate: toLocalISO(event.startDate),
+          endDate: event.endDate ? toLocalISO(event.endDate) : "",
         });
       } catch (err) {
         console.error("Error fetching event:", err);
@@ -127,11 +141,21 @@ export default function EditEvent() {
 
   const handleSubmit = async () => {
     const submissionData = new FormData();
+
+    // Create a proper UTC string from the local input value
+    // This correctly shifts it +4/5 hours for the DB
+    const utcStartDate = new Date(formData.startDate).toISOString();
+    submissionData.append("startDate", utcStartDate);
+
+    if (formData.endDate) {
+      const utcEndDate = new Date(formData.endDate).toISOString();
+      submissionData.append("endDate", utcEndDate);
+    }
+
     submissionData.append("title", formData.title);
     submissionData.append("description", formData.description);
     submissionData.append("location", formData.location);
-    submissionData.append("startDate", formData.startDate);
-    if (formData.endDate) submissionData.append("endDate", formData.endDate);
+
     submissionData.append("isRSO", String(formData.eventType === "RSO"));
 
     formData.selectedCategories.forEach((tag) => {

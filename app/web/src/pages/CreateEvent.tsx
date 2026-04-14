@@ -19,14 +19,23 @@ const CATEGORIES = [
 
 const formatDisplayDate = (dateStr: string) => {
   if (!dateStr) return { day: "", time: "" };
-  const d = new Date(dateStr);
-  const day = d
+
+  // Split the string and create the date manually to force LOCAL time
+  const [datePart, timePart] = dateStr.split("T");
+  const [year, month, day] = datePart.split("-").map(Number);
+  const [hours, minutes] = timePart.split(":").map(Number);
+
+  // This constructor uses the system's local timezone
+  const d = new Date(year, month - 1, day, hours, minutes);
+
+  const dayName = d
     .toLocaleDateString("en-US", {
       weekday: "short",
       month: "short",
       day: "numeric",
     })
     .replace(",", "");
+
   const time = d
     .toLocaleTimeString("en-US", {
       hour: "numeric",
@@ -34,7 +43,8 @@ const formatDisplayDate = (dateStr: string) => {
       hour12: true,
     })
     .toLowerCase();
-  return { day, time };
+
+  return { day: dayName, time };
 };
 
 export default function CreateEvent() {
@@ -49,7 +59,12 @@ export default function CreateEvent() {
     selectedCategories: [] as string[],
     imagePreview: null as string | null,
     file: null as File | null,
-    startDate: new Date().toISOString().slice(0, 16),
+
+    startDate: new Date(
+      new Date().getTime() - new Date().getTimezoneOffset() * 60000,
+    )
+      .toISOString()
+      .slice(0, 16),
     endDate: "",
   });
 
@@ -93,11 +108,19 @@ export default function CreateEvent() {
     }
 
     const submissionData = new FormData();
+
+    const utcStartDate = new Date(formData.startDate).toISOString();
+    submissionData.append("startDate", utcStartDate);
+
+    if (formData.endDate) {
+      const utcEndDate = new Date(formData.endDate).toISOString();
+      submissionData.append("endDate", utcEndDate);
+    }
+
     submissionData.append("title", formData.title);
     submissionData.append("description", formData.description);
     submissionData.append("location", formData.location);
-    submissionData.append("startDate", formData.startDate);
-    if (formData.endDate) submissionData.append("endDate", formData.endDate);
+
     submissionData.append("createdBy", user?.id || "");
     submissionData.append("isRSO", String(formData.eventType === "RSO"));
     submissionData.append("status", "upcoming");
