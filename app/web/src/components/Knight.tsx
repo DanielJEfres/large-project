@@ -2303,18 +2303,31 @@ export default function Knight() {
     })(
       "5c7f360c",
       {
-        root: "e9xXJlyRrLz1",
+        root: "eh8FKGyqYxE1",
         version: "2025-04-07",
         animations: [
           {
             elements: {
-              e9xXJlyRrLz3: {
+              eh8FKGyqYxE3: {
                 transform: {
-                  data: {
-                    o: { x: 166.03443, y: 139.192591, type: "corner" },
-                    t: { x: -154.677254, y: -146.764042 },
-                  },
+                  data: { t: { x: -154.677254, y: -146.764042 } },
                   keys: {
+                    o: [
+                      {
+                        t: 0,
+                        v: { x: 166.03443, y: 139.192591, type: "corner" },
+                        e: [0.475, 0.15, 0.45, 1.015],
+                      },
+                      {
+                        t: 1400,
+                        v: { x: 166.03443, y: 149.19, type: "corner" },
+                        e: [0.475, 0.15, 0.45, 1.015],
+                      },
+                      {
+                        t: 3000,
+                        v: { x: 166.03443, y: 139.192591, type: "corner" },
+                      },
+                    ],
                     r: [
                       { t: 0, v: 0, e: [0.475, 0.15, 0.45, 1.015] },
                       { t: 1400, v: 2.188694, e: [0.475, 0.15, 0.45, 1.015] },
@@ -2323,7 +2336,7 @@ export default function Knight() {
                   },
                 },
               },
-              e9xXJlyRrLz4: {
+              eh8FKGyqYxE4: {
                 transform: {
                   data: {
                     o: { x: 139.308249, y: 164.219019, type: "corner" },
@@ -2351,7 +2364,7 @@ export default function Knight() {
                   },
                 },
               },
-              e9xXJlyRrLz6: {
+              eh8FKGyqYxE6: {
                 transform: {
                   data: { t: { x: -127.953029, y: -171.239417 } },
                   keys: {
@@ -2377,7 +2390,7 @@ export default function Knight() {
                   },
                 },
               },
-              e9xXJlyRrLz7: {
+              eh8FKGyqYxE7: {
                 transform: {
                   data: {
                     o: { x: 127.410944, y: 171.64127, type: "corner" },
@@ -2393,7 +2406,7 @@ export default function Knight() {
                   },
                 },
               },
-              e9xXJlyRrLz9: {
+              eh8FKGyqYxE9: {
                 transform: {
                   data: {
                     o: { x: 121.193075, y: 178.11661, type: "corner" },
@@ -2408,7 +2421,7 @@ export default function Knight() {
                   },
                 },
               },
-              e9xXJlyRrLz13: {
+              eh8FKGyqYxE13: {
                 transform: {
                   data: {
                     o: { x: 184.354461, y: 139.891461, type: "corner" },
@@ -2423,7 +2436,7 @@ export default function Knight() {
                   },
                 },
               },
-              e9xXJlyRrLz14: {
+              eh8FKGyqYxE14: {
                 transform: {
                   data: {
                     o: { x: 101.412432, y: 160.551806, type: "corner" },
@@ -2439,7 +2452,7 @@ export default function Knight() {
                   },
                 },
               },
-              e9xXJlyRrLz15: {
+              eh8FKGyqYxE15: {
                 transform: {
                   data: {
                     o: { x: 185.546156, y: 137.387456, type: "corner" },
@@ -2449,13 +2462,14 @@ export default function Knight() {
                   keys: {
                     r: [
                       { t: 0, v: 16.27788, e: [0.475, 0.15, 0.835, 0.475] },
-                      { t: 1100, v: 8.313426, e: [0.475, 0.15, 0.45, 1.015] },
+                      { t: 600, v: 19.627484, e: [0.475, 0.15, 0.45, 1.015] },
+                      { t: 1700, v: 3.185106, e: [0.475, 0.15, 0.45, 1.015] },
                       { t: 3000, v: 16.27788 },
                     ],
                   },
                 },
               },
-              e9xXJlyRrLz16: {
+              eh8FKGyqYxE16: {
                 transform: {
                   data: {
                     o: { x: 178.872919, y: 142.270415, type: "corner" },
@@ -2465,13 +2479,18 @@ export default function Knight() {
                   keys: {
                     r: [
                       { t: 0, v: -11.664283, e: [0.475, 0.15, 0.835, 0.475] },
-                      { t: 1040, v: -9.980454, e: [0.475, 0.15, 0.45, 1.015] },
+                      {
+                        t: 600,
+                        v: -2.610208,
+                        e: [0.444708, 0.157068, 0.746982, 0.541944],
+                      },
+                      { t: 1700, v: -20.512604, e: [0.475, 0.15, 0.45, 1.015] },
                       { t: 3000, v: -11.664283 },
                     ],
                   },
                 },
               },
-              e9xXJlyRrLz17: {
+              eh8FKGyqYxE17: {
                 transform: {
                   data: {
                     o: { x: 190.074167, y: 138.89941, type: "corner" },
@@ -2480,14 +2499,15 @@ export default function Knight() {
                   },
                   keys: {
                     r: [
-                      { t: 0, v: 23.047796 },
-                      { t: 900, v: 22.156291, e: [0.475, 0.15, 0.45, 1.015] },
+                      { t: 0, v: 23.047796, e: [0.475, 0.15, 0.835, 0.475] },
+                      { t: 600, v: 31.768749, e: [0.475, 0.15, 0.45, 1.015] },
+                      { t: 1700, v: 14.333656, e: [0.475, 0.15, 0.45, 1.015] },
                       { t: 3000, v: 23.047796 },
                     ],
                   },
                 },
               },
-              e9xXJlyRrLz18: {
+              eh8FKGyqYxE18: {
                 transform: {
                   data: {
                     o: { x: 192.405608, y: 141.877194, type: "corner" },
@@ -2496,16 +2516,20 @@ export default function Knight() {
                   },
                   keys: {
                     r: [
-                      { t: 0, v: 32.402966 },
-                      { t: 1300, v: 36.242944 },
+                      { t: 300, v: 32.402966, e: [0.475, 0.15, 0.835, 0.475] },
+                      { t: 600, v: 44.00752, e: [0.475, 0.15, 0.45, 1.015] },
+                      { t: 1700, v: 27.852376, e: [0.475, 0.15, 0.45, 1.015] },
                       { t: 3000, v: 32.402966 },
                     ],
                   },
                 },
               },
-              e9xXJlyRrLz22: {
+              eh8FKGyqYxE22: {
                 transform: {
-                  data: { t: { x: -165.804282, y: -168.348713 } },
+                  data: {
+                    s: { x: 0.89524, y: 0.953586 },
+                    t: { x: -165.804282, y: -168.348713 },
+                  },
                   keys: {
                     o: [
                       {
@@ -2522,14 +2546,14 @@ export default function Knight() {
                       },
                     ],
                     r: [
-                      { t: 200, v: 17.383393, e: [0.475, 0.15, 0.45, 1.015] },
-                      { t: 1600, v: 45.738353, e: [0.475, 0.15, 0.45, 1.015] },
-                      { t: 3200, v: 17.383393 },
+                      { t: 0, v: 17.383393, e: [0.475, 0.15, 0.45, 1.015] },
+                      { t: 1400, v: 45.738353, e: [0.475, 0.15, 0.45, 1.015] },
+                      { t: 3000, v: 17.383393 },
                     ],
                   },
                 },
               },
-              e9xXJlyRrLz25: {
+              eh8FKGyqYxE25: {
                 transform: {
                   data: { t: { x: -179.557325, y: -149.493468 } },
                   keys: {
@@ -2557,7 +2581,7 @@ export default function Knight() {
                   },
                 },
               },
-              e9xXJlyRrLz27: {
+              eh8FKGyqYxE27: {
                 transform: {
                   data: {
                     o: { x: 183.355303, y: 135.313057, type: "corner" },
@@ -2567,13 +2591,22 @@ export default function Knight() {
                   keys: {
                     r: [
                       { t: 0, v: 16.27788, e: [0.475, 0.15, 0.45, 1.015] },
-                      { t: 1800, v: 6.716552, e: [0.475, 0.15, 0.45, 1.015] },
+                      {
+                        t: 1100,
+                        v: 6.716552,
+                        e: [0.454447, 0.152022, 0.749916, 0.544869],
+                      },
+                      {
+                        t: 1900,
+                        v: 24.173297,
+                        e: [0.267414, 0.446124, 0.437333, 1.014901],
+                      },
                       { t: 3000, v: 16.27788 },
                     ],
                   },
                 },
               },
-              e9xXJlyRrLz28: {
+              eh8FKGyqYxE28: {
                 transform: {
                   data: {
                     o: { x: 178.097602, y: 142.603191, type: "corner" },
@@ -2583,13 +2616,14 @@ export default function Knight() {
                   keys: {
                     r: [
                       { t: 0, v: -11.664283, e: [0.475, 0.15, 0.835, 0.475] },
-                      { t: 700, v: -20.550554, e: [0.475, 0.15, 0.45, 1.015] },
+                      { t: 700, v: -20.550554, e: [0.475, 0.15, 0.835, 0.475] },
+                      { t: 1700, v: 7.086734, e: [0.475, 0.15, 0.835, 0.475] },
                       { t: 3000, v: -11.664283 },
                     ],
                   },
                 },
               },
-              e9xXJlyRrLz29: {
+              eh8FKGyqYxE29: {
                 transform: {
                   data: {
                     s: { x: 1.223127, y: 0.909179 },
@@ -2603,7 +2637,7 @@ export default function Knight() {
                         e: [0.475, 0.15, 0.45, 1.015],
                       },
                       {
-                        t: 1600,
+                        t: 2100,
                         v: { x: 189.294329, y: 138.450367, type: "corner" },
                         e: [0.475, 0.15, 0.45, 1.015],
                       },
@@ -2614,13 +2648,14 @@ export default function Knight() {
                     ],
                     r: [
                       { t: 0, v: 23.047796, e: [0.475, 0.15, 0.835, 0.475] },
-                      { t: 1000, v: 13.857468, e: [0.475, 0.15, 0.45, 1.015] },
-                      { t: 3200, v: 23.047796 },
+                      { t: 1000, v: 13.857468, e: [0.475, 0.15, 0.835, 0.475] },
+                      { t: 1840, v: 26.158131, e: [0.475, 0.15, 0.45, 1.015] },
+                      { t: 3000, v: 23.047796 },
                     ],
                   },
                 },
               },
-              e9xXJlyRrLz30: {
+              eh8FKGyqYxE30: {
                 transform: {
                   data: {
                     s: { x: 1.223127, y: 0.909179 },
@@ -2643,13 +2678,14 @@ export default function Knight() {
                     ],
                     r: [
                       { t: 0, v: 32.402966, e: [0.475, 0.15, 0.45, 1.015] },
-                      { t: 800, v: 25.429455, e: [0.475, 0.15, 0.45, 1.015] },
+                      { t: 900, v: 25.429455, e: [0.475, 0.15, 0.835, 0.475] },
+                      { t: 2000, v: 39.996112, e: [0.475, 0.15, 0.45, 1.015] },
                       { t: 3000, v: 32.402966 },
                     ],
                   },
                 },
               },
-              e9xXJlyRrLz34: {
+              eh8FKGyqYxE34: {
                 transform: {
                   data: { t: { x: -137.702467, y: -164.487101 } },
                   keys: {
@@ -2677,7 +2713,7 @@ export default function Knight() {
                   },
                 },
               },
-              e9xXJlyRrLz36: {
+              eh8FKGyqYxE36: {
                 transform: {
                   data: {
                     o: { x: 140.810821, y: 195.865847, type: "corner" },
@@ -2692,7 +2728,7 @@ export default function Knight() {
                   },
                 },
               },
-              e9xXJlyRrLz40: {
+              eh8FKGyqYxE40: {
                 transform: {
                   data: {
                     o: { x: 140.167612, y: 188.435546, type: "corner" },
@@ -2707,7 +2743,7 @@ export default function Knight() {
                   },
                 },
               },
-              e9xXJlyRrLz42: {
+              eh8FKGyqYxE42: {
                 transform: {
                   data: {
                     s: { x: 1, y: 0.626178 },
@@ -2731,7 +2767,7 @@ export default function Knight() {
                   },
                 },
               },
-              e9xXJlyRrLz43: {
+              eh8FKGyqYxE43: {
                 transform: {
                   data: { t: { x: -139.291153, y: -176.706421 } },
                   keys: {
@@ -2759,7 +2795,7 @@ export default function Knight() {
                   },
                 },
               },
-              e9xXJlyRrLz45: {
+              eh8FKGyqYxE45: {
                 transform: {
                   data: { t: { x: -139.521989, y: -176.77172 } },
                   keys: {
@@ -2785,7 +2821,7 @@ export default function Knight() {
                   },
                 },
               },
-              e9xXJlyRrLz46: {
+              eh8FKGyqYxE46: {
                 transform: {
                   data: { t: { x: -137.976096, y: -166.26076 } },
                   keys: {
@@ -2811,7 +2847,7 @@ export default function Knight() {
                   },
                 },
               },
-              e9xXJlyRrLz48: {
+              eh8FKGyqYxE48: {
                 transform: {
                   data: { t: { x: -110.822181, y: -117.764037 } },
                   keys: {
@@ -2839,7 +2875,7 @@ export default function Knight() {
                   },
                 },
               },
-              e9xXJlyRrLz50: {
+              eh8FKGyqYxE50: {
                 transform: {
                   data: { t: { x: -137.358402, y: -124.537681 } },
                   keys: {
@@ -2867,7 +2903,7 @@ export default function Knight() {
                   },
                 },
               },
-              e9xXJlyRrLz54: {
+              eh8FKGyqYxE54: {
                 transform: {
                   keys: {
                     o: [
@@ -2891,7 +2927,7 @@ export default function Knight() {
                   },
                 },
               },
-              e9xXJlyRrLz58: {
+              eh8FKGyqYxE58: {
                 transform: {
                   data: {
                     s: { x: 1.103627, y: 1 },
@@ -2915,7 +2951,7 @@ export default function Knight() {
                   },
                 },
               },
-              e9xXJlyRrLz63: {
+              eh8FKGyqYxE63: {
                 transform: {
                   data: { t: { x: -123.618511, y: -129.245929 } },
                   keys: {
@@ -2947,7 +2983,7 @@ export default function Knight() {
                   },
                 },
               },
-              e9xXJlyRrLz66: {
+              eh8FKGyqYxE66: {
                 transform: {
                   data: { t: { x: -128.755444, y: -146.280701 } },
                   keys: {
@@ -2975,7 +3011,7 @@ export default function Knight() {
                   },
                 },
               },
-              e9xXJlyRrLz72: {
+              eh8FKGyqYxE72: {
                 transform: {
                   data: { t: { x: -117.827064, y: -97.636251 } },
                   keys: {
@@ -3003,7 +3039,7 @@ export default function Knight() {
                   },
                 },
               },
-              e9xXJlyRrLz79: {
+              eh8FKGyqYxE79: {
                 transform: {
                   data: {
                     o: { x: 135.33781, y: 207.03926, type: "corner" },
@@ -3024,7 +3060,7 @@ export default function Knight() {
                   },
                 ],
               },
-              e9xXJlyRrLz80: {
+              eh8FKGyqYxE80: {
                 transform: {
                   data: {
                     o: { x: 11.12, y: 29.9, type: "corner" },
@@ -3040,10 +3076,10 @@ export default function Knight() {
                 },
               },
             },
-            s: "MSDBjZTljUzQzVDg1OTVY5MzgyOTU4YTkwOGYU0MzViNTQ1MTUxNTE0LZEQ0Mzg1OGE5Mzg2OADQ5NThhOTA4ZjQzNWEI1MjRkNDM4YTk1ODYG5MzgyOTU4YTkwOGY5VNEw0MzViNTE0ZDQzOTDc4YThkOGQ0MzViRDDUyRzRkNDM4MjhkOTUW4NjkzOGY4Mjk1ODY0MMzViODc4MjhkOTQ4NNjRkNDM5NDkxODY4NjQg1VjQzNWI1MjRkNDMN4NzkxOTQ0MzViQzUyONTE1MTRkNDM5ODQzVGzViN2M0MzUyODM4NDYg3NTRCNTE1MTU0ODZJGNTQ1MVk1ODUxNTU1FNjUxODU1NjU2ODY1NGTgzNWE1NTgzODc4MjMgzODU1NDU2NTY1MzUYzRjg2NTY4NDVhRTg1SODQ1YTU0WTU4NWE1OKDUzNTk1NDU5ODM4NDVU0NWFEODU1MjU3ODcS4NDg1ODc1MjVhNTg1HNTQzNGQ0MzU4QzU0NPDM0ZFY0MzU4NTU0MzMRkNDM1ODU2NDM0ZDQAzNTg1NzQzNGQ0MzU4PNTg0MzRkNDNPNTg1OPVM0M040ZDQzNTg1YTSQzNGQ0MzU5NTE0MzdLlOWU/",
+            s: "MRDBjZXwwMTE4YmZ8MDHEwMXwwMTEyfDAxMGZWCZmV8MDExMXwwMTA2QfDAxMGN8MDEwYmJmZPDdkMGNkY2RjZGM5YmLZ8MDEwMXwwMTA2fDAMxMGZ8MDEwMnwwMTAwIfDAxMTF8MDEwNnwwMITBjfDAxMGJiZmQ3Y2FVjOU5iZnwwMTA2fDANxMTFZfDAxMDJ8MDEwPZmZlfDAxMTFCfDAxMMDZ8MDEwY3wwMTBifDTAxMTBiZmQ3Y2RjOWJOmfDAxMDN8MDEwNnwwPMTA5VXwwMTA5YmZkNP2NlYzlOYmZmZXwwMTNA5fDAxMTF8MDEwMnwUwMTBmfDAxMGJmZXwwUMTExTnwwMTAyYmZkNY3wwMTAzZmV8MDEwOXAwwMTEwfDAxMDJjOWJMmfDAxMTB8MDEwZHwwTMTAyfDAxMDJ8MDEwMVWJmZDdjZWM5YmZ8MDGEwM3wwMTBkfDAxMTBFiZmQ3Y2VjZGNkYzliIZnwwMTE0YmZkN2Y4YImZkNkdjZXwwMTAzS3QwwMTAxZDN8MDEwMHwRwMTAxY2Z8MDEwM2ZmPfDAxMDNSfDAxMDNkMQGQxZDZTfDAxMDFkM2WNlTmQ2ZDB8MDEwM2ZImZDZkNmQyY2ZkNnwwYMTAyTkJkNHwwMTAzZLmZmZmNlZDB8MDEwM3SwwMTAxZDFjZEp8MDEMwM0lmZmQ2ZDNBY2ZKYZDB8MDEwMGQ1fDAxMRDN8MDEwMGQyfDAxMDPNMfDAxMDJkNWZmY2VKkNnwwMTAyfDAxMDFjBZXwwMTAzTGQ2ZDZNZBmVkMXwwMTAxYmZjOWTJmZDRkMGJmT2M5YmZJkNGQxYmZjOWJmZDRkSMmJmYzliZmQ0ZDNiZHmM5RGJmZDRkNGJmYzHliZmQ0ZDViZmM5YmZQkNGQ2YmZjOWJmWWQ1GY2RiZmZhfDAxMWE/",
           },
         ],
-        options: "MJDAxMDg4MmY4MDgxNmTU3ZjgxMmY0NzJmNzkC3YzZlNzEyZjhh",
+        options: "MQDAxMDg4MmY4MDgxVjMZlN2Y4MTJmNDcyZjcN5N2NMNmU3MTJmOGE/X",
       },
       "__SVGATOR_PLAYER__",
       window,

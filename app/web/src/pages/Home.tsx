@@ -15,9 +15,9 @@ export default function Home() {
       {/* Hero section */}
       <section className="">
         <div className="relative max-md:h-fit max-md:py-4 h-120 bg-white max-md:px-4 px-20 py-70 flex justify-between items-center overflow-hidden">
-          {/* 1. Parent Container */}
+          {/*Parent Container */}
           <div className="mx-auto flex flex-col md:flex-row items-center justify-between ">
-            {/* 2. The Knight Container (Move this ABOVE the text in the code) */}
+            {/* The Knight Container*/}
             <div
               className="
       /* Mobile: Center it and give it space */
@@ -33,7 +33,7 @@ export default function Home() {
             >
               <div
                 style={{
-                  transform: "scale(1.9)",
+                  transform: "scale(1.9) translateY(-10px)",
                   transformOrigin: "center",
                   clipPath: "inset(0% 0% 15% 0%)",
                 }}
@@ -42,7 +42,6 @@ export default function Home() {
               </div>
             </div>
 
-            {/* 3. The Text Container */}
             <div className="flex flex-col items-start text-center text-left">
               <h1 className="font-bebas font-bold text-5xl md:text-7xl lg:text-8xl max-w-[550px]">
                 Choose your next <span className="text-brand">experience.</span>
