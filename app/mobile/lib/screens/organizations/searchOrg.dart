@@ -72,6 +72,7 @@ class _SearchOrganizationState extends State<SearchOrganization> {
   int _totalResults = 0;
   final Set<String> _joinedOrgIds = {};
   final Set<String> _joiningOrgIds = {};
+  final Set<String> _leavingOrgIds = {};
 
   @override
   void initState() {
@@ -158,6 +159,41 @@ class _SearchOrganizationState extends State<SearchOrganization> {
           : msg;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(display)),
+      );
+    }
+  }
+
+  Future<void> _leaveOrg(Organization org) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Leave organization?'),
+        content: Text('Are you sure you want to leave ${org.name}?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Leave', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    setState(() => _leavingOrgIds.add(org.id));
+    final result = await getAPI.leaveOrganization(org.id);
+    if (!mounted) return;
+    setState(() => _leavingOrgIds.remove(org.id));
+    if (result['success'] == true) {
+      setState(() => _joinedOrgIds.remove(org.id));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Left ${org.name}')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result['message'] ?? 'Failed to leave organization')),
       );
     }
   }
@@ -354,7 +390,9 @@ class _SearchOrganizationState extends State<SearchOrganization> {
                     onViewPage: () => _goToOrgInfo(org),
                     isMember: _joinedOrgIds.contains(org.id),
                     isJoining: _joiningOrgIds.contains(org.id),
+                    isLeaving: _leavingOrgIds.contains(org.id),
                     onJoin: () => _joinOrg(org),
+                    onLeave: () => _leaveOrg(org),
                   );
                 },
               ),
@@ -373,14 +411,18 @@ class _OrgCard extends StatelessWidget {
   final VoidCallback onViewPage;
   final bool isMember;
   final bool isJoining;
+  final bool isLeaving;
   final VoidCallback? onJoin;
+  final VoidCallback? onLeave;
 
   const _OrgCard({
     required this.org,
     required this.onViewPage,
     this.isMember = false,
     this.isJoining = false,
+    this.isLeaving = false,
     this.onJoin,
+    this.onLeave,
   });
 
   @override
@@ -461,7 +503,7 @@ class _OrgCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 10),
                     ElevatedButton(
-                      onPressed: (isMember || isJoining)
+                      onPressed: (isJoining || isLeaving)
                           ? null
                           : () {
                               if (!AuthService.isLoggedIn) {
@@ -470,7 +512,7 @@ class _OrgCard extends StatelessWidget {
                                 );
                                 return;
                               }
-                              onJoin?.call();
+                              isMember ? onLeave?.call() : onJoin?.call();
                             },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: isMember ? Colors.grey[300] : kDark,
@@ -484,7 +526,7 @@ class _OrgCard extends StatelessWidget {
                         textStyle: const TextStyle(
                             fontSize: 13, fontWeight: FontWeight.w600),
                       ),
-                      child: isJoining
+                      child: (isJoining || isLeaving)
                           ? const SizedBox(
                               height: 14,
                               width: 14,
