@@ -78,8 +78,21 @@ class _SearchOrganizationState extends State<SearchOrganization> {
   void initState() {
     super.initState();
     _fetchOrganizations();
-
+    _fetchMemberships();
     _searchController.addListener(_onSearchChanged);
+  }
+
+  Future<void> _fetchMemberships() async {
+    if (!AuthService.isLoggedIn) return;
+    final result = await getAPI.getUserOrganizations();
+    if (!mounted) return;
+    final orgs = List<Map<String, dynamic>>.from(result['organizations'] ?? []);
+    setState(() {
+      for (final org in orgs) {
+        final id = org['id']?.toString();
+        if (id != null && id.isNotEmpty) _joinedOrgIds.add(id);
+      }
+    });
   }
 
 // Add this outside initState

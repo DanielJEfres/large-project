@@ -263,30 +263,29 @@ class getAPI {
     required List<String> tags,
   }) async {
     try {
-      final body = <String, dynamic>{
-        'title': title,
-        'location': location,
-        'description': description,
-        'startDate': startDate,
-        'isRSO': isRSO,
-        'rsvpEnabled': rsvpEnabled,
-        'createdBy': createdBy,
-        'tags': tags,
-      };
-      if (endDate != null) body['endDate'] = endDate;
-
-      final response = await http.post(
+      // Backend uses multer (multipart/form-data) for the create event route
+      final request = http.MultipartRequest(
+        'POST',
         Uri.parse('$baseUrl/events'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ${AuthService.token}',
-        },
-        body: jsonEncode(body),
       );
+      request.headers['Authorization'] = 'Bearer ${AuthService.token}';
+      request.fields['title'] = title;
+      request.fields['location'] = location;
+      request.fields['description'] = description;
+      request.fields['startDate'] = startDate;
+      request.fields['isRSO'] = isRSO.toString();
+      request.fields['rsvpEnabled'] = rsvpEnabled.toString();
+      request.fields['createdBy'] = createdBy;
+      if (endDate != null) request.fields['endDate'] = endDate;
+      // Encode tags as a JSON array string; backend will parse it
+      request.fields['tags'] = jsonEncode(tags);
+
+      final streamed = await request.send();
+      final response = await http.Response.fromStream(streamed);
       final data = jsonDecode(response.body);
       return response.statusCode == 201 || response.statusCode == 200
-          ? {'success': true, 'event': data['event'] ?? data}
-          : {'success': false, 'message': data['message'] ?? 'Failed to create event'};
+          ? {'success': true, 'event': data['event'] ?? data['Event'] ?? data}
+          : {'success': false, 'message': data['message'] ?? data['error'] ?? 'Failed to create event'};
     } catch (e) {
       return {'success': false, 'message': 'Could not connect to server.'};
     }
@@ -332,6 +331,26 @@ class getAPI {
     }
   }
 
+  // PATCH /api/users/me — update profile fields
+  static Future<Map<String, dynamic>> updateUserProfile(Map<String, String> fields) async {
+    try {
+      final response = await http.patch(
+        Uri.parse('$baseUrl/users/me'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${AuthService.token}',
+        },
+        body: jsonEncode(fields),
+      );
+      final data = jsonDecode(response.body);
+      return response.statusCode == 200
+          ? {'success': true, 'user': data['user']}
+          : {'success': false, 'message': data['message'] ?? 'Failed to update profile'};
+    } catch (e) {
+      return {'success': false, 'message': 'Could not connect to server.'};
+    }
+  }
+
   // GET /api/users/me — fetch logged-in user's profile
   static Future<Map<String, dynamic>> getUserProfile() async {
     try {
@@ -367,6 +386,71 @@ class getAPI {
           : {'success': false, 'organizations': []};
     } catch (e) {
       return {'success': false, 'organizations': []};
+    }
+  }
+
+  // GET /api/events/created-by/:userId — fetch events created by the user
+  static Future<Map<String, dynamic>> getCreatedEvents(String userId) async {
+    try {
+      final response = await http.get(Uri.parse('$baseUrl/events/created-by/$userId'));
+      final data = jsonDecode(response.body);
+      // Backend returns a plain array
+      final List events = data is List ? data : [];
+      return {'success': true, 'events': events};
+    } catch (e) {
+      return {'success': false, 'events': []};
+    }
+  }
+
+  // PUT /api/events/:eventId — update an event (multipart, same as create)
+  static Future<Map<String, dynamic>> updateEvent({
+    required String eventId,
+    required String title,
+    required String location,
+    required String description,
+    required String startDate,
+    String? endDate,
+    required bool rsvpEnabled,
+    required List<String> tags,
+  }) async {
+    try {
+      final request = http.MultipartRequest(
+        'PUT',
+        Uri.parse('$baseUrl/events/$eventId'),
+      );
+      request.headers['Authorization'] = 'Bearer ${AuthService.token}';
+      request.fields['title'] = title;
+      request.fields['location'] = location;
+      request.fields['description'] = description;
+      request.fields['startDate'] = startDate;
+      request.fields['rsvpEnabled'] = rsvpEnabled.toString();
+      if (endDate != null) request.fields['endDate'] = endDate;
+      request.fields['tags'] = jsonEncode(tags);
+
+      final streamed = await request.send();
+      final response = await http.Response.fromStream(streamed);
+      final data = jsonDecode(response.body);
+      return response.statusCode == 200
+          ? {'success': true, 'event': data['Event'] ?? data['event'] ?? data}
+          : {'success': false, 'message': data['message'] ?? 'Failed to update event'};
+    } catch (e) {
+      return {'success': false, 'message': 'Could not connect to server.'};
+    }
+  }
+
+  // DELETE /api/events/:eventId — delete an event
+  static Future<Map<String, dynamic>> deleteEvent(String eventId) async {
+    try {
+      final response = await http.delete(
+        Uri.parse('$baseUrl/events/$eventId'),
+        headers: {'Authorization': 'Bearer ${AuthService.token}'},
+      );
+      final data = jsonDecode(response.body);
+      return response.statusCode == 200
+          ? {'success': true}
+          : {'success': false, 'message': data['message'] ?? 'Failed to delete event'};
+    } catch (e) {
+      return {'success': false, 'message': 'Could not connect to server.'};
     }
   }
 }
