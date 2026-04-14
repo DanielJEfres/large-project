@@ -54,6 +54,7 @@ export default function EventDashboard() {
         const data = await res.json();
 
         const eventData = data.event;
+        console.log(eventData);
         setEvent(eventData);
       } catch (err) {
         console.error(err);
@@ -125,15 +126,98 @@ export default function EventDashboard() {
 
         {/* Bottom stuff */}
 
-        <div className="lg:col-span-2 bg-white border border-gray-100 rounded-3xl shadow-sm overflow-hidden">
-          <div className="p-8 border-b border-gray-50 flex flex-col bg-white sticky top-0">
-            <h3 className="font-bold text-xl">Details</h3>
-          </div>
-        </div>
+        <div className="grid grid-cols-1 gap-4">
+          {/* Details Section */}
+          <div className="bg-white border border-gray-100 rounded-3xl shadow-sm overflow-hidden h-full">
+            <div className="p-8 border-b border-gray-50 bg-white">
+              <h3 className="font-bold text-xl mb-6 ">Details</h3>
+              <div className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <div>
+                    <p className="text-xs text-gray-500 font-league uppercase tracking-wider font-bold">
+                      Location
+                    </p>
+                    <p className="font-medium">{event.location}</p>
+                  </div>
+                </div>
 
-        <div className="lg:col-span-2 bg-white border border-gray-100 rounded-3xl shadow-sm overflow-hidden">
-          <div className="p-8 border-b border-gray-50 flex justify-between items-center bg-white sticky top-0">
-            <h3 className="font-bold text-xl">Attendees List</h3>
+                <div className="flex items-center gap-4">
+                  <div>
+                    <p className="text-xs text-gray-500 font-league uppercase tracking-wider font-bold">
+                      Start Date
+                    </p>
+                    <p className="font-medium">
+                      {startDate.toLocaleDateString()} at{" "}
+                      {startDate.toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </p>
+                  </div>
+                </div>
+
+                {endDate && (
+                  <div className="flex items-center gap-4">
+                    <div>
+                      <p className="text-xs text-gray-500 font-league uppercase tracking-wider font-bold">
+                        End Date
+                      </p>
+                      <p className="font-medium">
+                        {endDate.toLocaleDateString()} at{" "}
+                        {endDate.toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex items-center gap-4">
+                  <div>
+                    <p className="text-xs text-gray-500 font-league uppercase tracking-wider font-bold">
+                      About
+                    </p>
+                    <p className="text-gray-600 text-sm leading-relaxed">
+                      {event.description}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white border border-gray-100 rounded-3xl shadow-sm overflow-hidden flex flex-col">
+            <div className="p-8 border-b border-gray-50 flex justify-between items-center bg-white">
+              <h3 className="font-bold text-xl">Attendees</h3>
+              <span className="bg-black text-white px-4 py-1 rounded-full text-sm font-bold">
+                {event.attendees?.length || 0}
+              </span>
+            </div>
+            <div className="px-8 max-h-[400px] overflow-y-auto pb-8">
+              {event.attendees && event.attendees.length > 0 ? (
+                <div className="space-y-4">
+                  {event.attendees.map((attendeeId) => (
+                    <div
+                      key={attendeeId}
+                      className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl"
+                    >
+                      <div className="w-10 h-10 bg-zinc-200 rounded-full flex items-center justify-center"></div>
+                      <div>
+                        <p className="text-sm font-bold">First Last</p>
+                        {/* <p className="text-xs text-gray-500 font-inter">
+                          ( role possibly )
+                        </p> */}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-400 text-center py-10">
+                  No attendees yet.
+                </p>
+              )}
+            </div>
           </div>
         </div>
 
@@ -143,7 +227,9 @@ export default function EventDashboard() {
               <div>
                 <h3 className="text-xl font-bold">Cancel</h3>
 
-                <p className="text-gray-600 ">lowkey gotta style ts later</p>
+                <p className="text-gray-600 ">
+                  Permanently delete this event and all associated data.
+                </p>
               </div>
             </div>
             <button

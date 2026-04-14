@@ -8,6 +8,7 @@ import 'package:mobile/screens/events/events.dart';
 import 'package:mobile/screens/organizations/organizations.dart';
 import 'package:mobile/screens/RsoStudent.dart';
 import 'package:mobile/screens/organizations/searchOrg.dart';
+import 'package:mobile/screens/organizations/myOrganziations.dart';
 
 class Routes {
   static const String LOGIN = '/';
@@ -17,8 +18,8 @@ class Routes {
   static const String EVENTS = '/events';
   static const String RECOMMENDATIONS = '/recommendations';
   static const String RSOSTUDENT = '/RsoStudent';
-  //static const String ORGANIZATIONPAGE = '/organizations';
-  //static const String SEARCHORGANIZATION = '/searchOrg';
+  static const String CREATEORGANIZATION = '/createOrganization';
+  static const String MYORGANIZATIONS = '/myOrganizations';
 
   static Map<String, WidgetBuilder> get getRoutes => {
     LOGIN: (context) => LoginScreen(),
@@ -28,7 +29,9 @@ class Routes {
     RECOMMENDATIONS: (context)=> Recommendations(),
     EVENTS: (context)=> EventsScreen(),
     RSOSTUDENT: (context)=> RsoStudent(),
-    //ORGANIZATIONSCREEN: (context)=> OrganizationScreen(),
+    CREATEORGANIZATION (context)=> CreateOrganizationScreen(),
+    MYORGANIZATIONS: (context)=> MyOrganizationsScreen(),
     //SEARCHORGANIZATION:(context)=> SearchOrganization(),
+
   };
 }

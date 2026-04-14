@@ -6,6 +6,7 @@ import 'create_event.dart';
 import 'tickets.dart';
 import 'profile.dart';
 
+
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
 
@@ -23,6 +24,7 @@ class _MainShellState extends State<MainShell> {
     CreateEventScreen(),
     TicketsScreen(),
     ProfileScreen(),
+
   ];
 
   @override

@@ -8,6 +8,8 @@ import 'package:mobile/screens/recommendations.dart';
 import 'package:mobile/screens/RsoStudent.dart';
 import 'package:mobile/screens/shell.dart';
 import 'package:mobile/screens/events/event_detail.dart';
+import 'package:mobile/screens/organizations/createOrganization.dart';
+import 'package:mobile/screens/organizations/myOrganizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,6 +32,9 @@ class MyApp extends StatelessWidget {
         '/RsoStudent': (context) => RsoStudent(),
         '/events': (context) => const MainShell(),
         '/event/events': (context) => const MainShell(),
+        '/createOrganization': (context) => CreateOrganizationScreen(),
+        '/myOrganizations':(context)=> MyOrganizationsScreen()
+
       },
       onGenerateRoute: (settings) {
         // /event/:id  →  EventDetailScreen

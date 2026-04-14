@@ -4,6 +4,7 @@ import '../theme/app_text_styles.dart';
 import '../utils/getAPI.dart';
 import '../utils/auth_service.dart';
 import 'tickets.dart';
+import 'organizations/myOrganizations.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -35,6 +36,82 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
   }
 
+  void _showSettingsPopup(BuildContext context) {
+    final RenderBox button =
+    context.findRenderObject() as RenderBox;
+    final RenderBox overlay =
+    Overlay.of(context).context.findRenderObject() as RenderBox;
+    final RelativeRect position = RelativeRect.fromRect(
+      Rect.fromPoints(
+        button.localToGlobal(Offset.zero, ancestor: overlay),
+        button.localToGlobal(button.size.bottomRight(Offset.zero),
+            ancestor: overlay),
+      ),
+      Offset.zero & overlay.size,
+    );
+
+    showMenu<void>(
+      context: context,
+      position: position,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      elevation: 8,
+      items: [
+        // User info header
+        PopupMenuItem(
+          enabled: false,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '${AuthService.firstName ?? ''} ${AuthService.lastName ?? ''}'.trim(),
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.black,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                AuthService.email ?? '',
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: AppColors.textMuted,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const PopupMenuDivider(),
+        // Log out
+        PopupMenuItem(
+          onTap: () async {
+            await AuthService.clear();
+            if (!mounted) return;
+            Navigator.pushNamedAndRemoveUntil(
+              context,
+              '/login',
+                  (route) => false,
+            );
+          },
+          child: const Row(
+            children: [
+              Icon(Icons.logout, size: 18, color: Colors.red),
+              SizedBox(width: 10),
+              Text(
+                'Log out',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.red,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (!AuthService.isLoggedIn) {
@@ -46,15 +123,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text('Log in to view your profile',
-                    style: AppTextStyles.body.copyWith(color: AppColors.textMuted)),
+                    style: AppTextStyles.body
+                        .copyWith(color: AppColors.textMuted)),
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () => Navigator.pushNamed(context, '/login'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.black,
                     foregroundColor: AppColors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 32, vertical: 14),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24)),
                   ),
                   child: const Text('Log in'),
                 ),
@@ -66,7 +146,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
 
     final name =
-        '${AuthService.firstName ?? ''} ${AuthService.lastName ?? ''}'.trim();
+    '${AuthService.firstName ?? ''} ${AuthService.lastName ?? ''}'.trim();
 
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -86,10 +166,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           size: 22, color: AppColors.black),
                       onPressed: () {},
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.settings_outlined,
-                          size: 22, color: AppColors.black),
-                      onPressed: () {},
+                    // Settings icon — opens popup
+                    Builder(
+                      builder: (ctx) => IconButton(
+                        icon: const Icon(Icons.settings_outlined,
+                            size: 22, color: AppColors.black),
+                        onPressed: () => _showSettingsPopup(ctx),
+                      ),
                     ),
                   ],
                 ),
@@ -130,7 +213,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
 
-              // "Attended (N)" label — tapping goes to My Events › Past tab
+              // Attended label
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: GestureDetector(
@@ -153,7 +236,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       const SizedBox(height: 6),
                       Container(
-                          height: 2, width: 80, color: AppColors.primary),
+                          height: 2,
+                          width: 80,
+                          color: AppColors.primary),
                     ],
                   ),
                 ),
@@ -170,8 +255,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 )
               else if (_attendedEvents.isEmpty)
                 Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20, vertical: 12),
                   child: Text('No attended events yet',
                       style: AppTextStyles.caption
                           .copyWith(color: AppColors.textMuted)),
@@ -184,28 +269,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: _attendedEvents.length,
                     gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
+                    const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 3,
                       crossAxisSpacing: 8,
                       mainAxisSpacing: 8,
                     ),
                     itemBuilder: (_, i) {
                       final flyer =
-                          _attendedEvents[i]['flyer']?.toString();
+                      _attendedEvents[i]['flyer']?.toString();
                       final eventId =
-                          _attendedEvents[i]['_id']?.toString();
+                      _attendedEvents[i]['_id']?.toString();
                       return GestureDetector(
                         onTap: eventId != null
                             ? () => Navigator.pushNamed(
-                                context, '/event/$eventId')
+                            context, '/event/$eventId')
                             : null,
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(8),
                           child: flyer != null
                               ? Image.network(flyer,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) =>
-                                      _thumbPlaceholder())
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) =>
+                                  _thumbPlaceholder())
                               : _thumbPlaceholder(),
                         ),
                       );
@@ -218,7 +303,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
               _buildNavRow(
                 'My Organizations',
-                onTap: () => Navigator.pushNamed(context, '/organizations'),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => MyOrganizationsScreen(),
+                  ),
+                ),
               ),
 
               const Divider(color: AppColors.inputFill, height: 1),
@@ -239,8 +329,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding:
-            const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -255,10 +344,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _thumbPlaceholder() => Container(
-        color: AppColors.inputFill,
-        child: const Center(
-          child: Icon(Icons.image_outlined,
-              size: 24, color: AppColors.textMuted),
-        ),
-      );
+    color: AppColors.inputFill,
+    child: const Center(
+      child: Icon(Icons.image_outlined,
+          size: 24, color: AppColors.textMuted),
+    ),
+  );
 }
