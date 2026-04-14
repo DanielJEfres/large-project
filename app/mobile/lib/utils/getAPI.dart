@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import 'auth_service.dart';
 
 class getAPI {
@@ -261,6 +262,7 @@ class getAPI {
     required bool rsvpEnabled,
     required String createdBy,
     required List<String> tags,
+    XFile? flyerImage,
   }) async {
     try {
       // Backend uses multer (multipart/form-data) for the create event route
@@ -277,8 +279,14 @@ class getAPI {
       request.fields['rsvpEnabled'] = rsvpEnabled.toString();
       request.fields['createdBy'] = createdBy;
       if (endDate != null) request.fields['endDate'] = endDate;
-      // Encode tags as a JSON array string; backend will parse it
       request.fields['tags'] = jsonEncode(tags);
+      if (flyerImage != null) {
+        request.files.add(await http.MultipartFile.fromPath(
+          'flyer',
+          flyerImage.path,
+          contentType: _mimeType(flyerImage.path),
+        ));
+      }
 
       final streamed = await request.send();
       final response = await http.Response.fromStream(streamed);
@@ -331,23 +339,49 @@ class getAPI {
     }
   }
 
-  // PATCH /api/users/me — update profile fields
-  static Future<Map<String, dynamic>> updateUserProfile(Map<String, String> fields) async {
+  // PATCH /api/users/me — update profile fields (and optional profile picture)
+  static Future<Map<String, dynamic>> updateUserProfile(
+    Map<String, String> fields, {
+    XFile? profilePicture,
+  }) async {
     try {
-      final response = await http.patch(
+      // Backend uses multer for profilePicture, so always send multipart
+      final request = http.MultipartRequest(
+        'PATCH',
         Uri.parse('$baseUrl/users/me'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ${AuthService.token}',
-        },
-        body: jsonEncode(fields),
       );
+      request.headers['Authorization'] = 'Bearer ${AuthService.token}';
+      fields.forEach((k, v) => request.fields[k] = v);
+      if (profilePicture != null) {
+        request.files.add(await http.MultipartFile.fromPath(
+          'profilePicture',
+          profilePicture.path,
+          contentType: _mimeType(profilePicture.path),
+        ));
+      }
+      final streamed = await request.send();
+      final response = await http.Response.fromStream(streamed);
       final data = jsonDecode(response.body);
       return response.statusCode == 200
           ? {'success': true, 'user': data['user']}
           : {'success': false, 'message': data['message'] ?? 'Failed to update profile'};
     } catch (e) {
       return {'success': false, 'message': 'Could not connect to server.'};
+    }
+  }
+
+  static http.MediaType _mimeType(String path) {
+    final ext = path.split('.').last.toLowerCase();
+    switch (ext) {
+      case 'jpg':
+      case 'jpeg':
+        return http.MediaType('image', 'jpeg');
+      case 'png':
+        return http.MediaType('image', 'png');
+      case 'webp':
+        return http.MediaType('image', 'webp');
+      default:
+        return http.MediaType('image', 'jpeg');
     }
   }
 

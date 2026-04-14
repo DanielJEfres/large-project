@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
 import '../utils/getAPI.dart';
@@ -219,7 +221,11 @@ class ProfileScreenState extends State<ProfileScreen> {
         child: _loading
             ? const Center(
                 child: CircularProgressIndicator(color: AppColors.primary))
-            : SingleChildScrollView(
+            : RefreshIndicator(
+                onRefresh: fetchData,
+                color: AppColors.primary,
+                child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -247,15 +253,38 @@ class ProfileScreenState extends State<ProfileScreen> {
                     Center(
                       child: Column(
                         children: [
-                          CircleAvatar(
-                            radius: 44,
-                            backgroundColor: AppColors.inputFill,
-                            backgroundImage:
-                                pfp != null ? NetworkImage(pfp) : null,
-                            child: pfp == null
-                                ? const Icon(Icons.person_outline,
-                                    size: 40, color: AppColors.textMuted)
-                                : null,
+                          GestureDetector(
+                            onTap: _pickAndUploadProfilePicture,
+                            child: Stack(
+                              children: [
+                                CircleAvatar(
+                                  radius: 44,
+                                  backgroundColor: AppColors.inputFill,
+                                  backgroundImage: _user?['_localPfp'] == true
+                                      ? FileImage(File(_user!['profilePicture']))
+                                      : pfp != null
+                                          ? NetworkImage(pfp) as ImageProvider
+                                          : null,
+                                  child: (pfp == null && _user?['_localPfp'] != true)
+                                      ? const Icon(Icons.person_outline,
+                                          size: 40, color: AppColors.textMuted)
+                                      : null,
+                                ),
+                                Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(4),
+                                    decoration: const BoxDecoration(
+                                      color: AppColors.black,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(Icons.camera_alt,
+                                        size: 14, color: AppColors.white),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                           const SizedBox(height: 12),
                           Text(
@@ -405,6 +434,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                   ],
                 ),
               ),
+              ),
       ),
     );
   }
@@ -425,6 +455,36 @@ class ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _pickAndUploadProfilePicture() async {
+    final picked = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 85,
+    );
+    if (picked == null || !mounted) return;
+
+    // Optimistically show the new image immediately
+    setState(() => _user = {...?_user, 'profilePicture': picked.path, '_localPfp': true});
+
+    final result = await getAPI.updateUserProfile({}, profilePicture: picked);
+    if (!mounted) return;
+
+    if (result['success'] == true) {
+      setState(() {
+        _user = {
+          ...?_user,
+          ...result['user'] as Map<String, dynamic>,
+          '_localPfp': false,
+        };
+      });
+    } else {
+      // Revert on failure
+      setState(() => _user = {...?_user, '_localPfp': false});
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result['message'] ?? 'Failed to upload photo')),
+      );
+    }
   }
 
   Future<void> _signOut() async {
