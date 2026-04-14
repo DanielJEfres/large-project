@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../components/app_bottom_nav.dart';
 import 'events/events.dart';
-import 'organizations.dart';
+import 'organizations/searchOrg.dart';
 import 'create_event.dart';
 import 'tickets.dart';
 import 'profile.dart';
@@ -15,15 +15,22 @@ class MainShell extends StatefulWidget {
 
 class _MainShellState extends State<MainShell> {
   int _currentIndex = 0;
+  final _ticketsKey = GlobalKey<TicketsScreenState>();
+  final _profileKey = GlobalKey<ProfileScreenState>();
 
-  // IndexedStack keeps all screens alive so scroll position is preserved
-  final List<Widget> _screens = [
+  late final List<Widget> _screens = [
     EventsScreen(),
-    OrganizationsScreen(),
+    SearchOrganization(),
     CreateEventScreen(),
-    TicketsScreen(),
-    ProfileScreen(),
+    TicketsScreen(key: _ticketsKey),
+    ProfileScreen(key: _profileKey),
   ];
+
+  void _onTabTapped(int i) {
+    if (i == 3) _ticketsKey.currentState?.fetchData();
+    if (i == 4) _profileKey.currentState?.fetchData();
+    setState(() => _currentIndex = i);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +41,7 @@ class _MainShellState extends State<MainShell> {
       ),
       bottomNavigationBar: AppBottomNav(
         currentIndex: _currentIndex,
-        onTap: (i) => setState(() => _currentIndex = i),
+        onTap: _onTabTapped,
       ),
     );
   }

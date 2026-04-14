@@ -105,13 +105,23 @@ export default function Navbar() {
             </Link>
 
             {/* Mobile-only,if user logged in */}
+
             {isLoggedIn && (
-              <Link to="/create" onClick={toggleMenu}>
-                <button className="w-[98%] justify-center rounded-[20px] bg-black text-white px-4 py-3 font-inter font-medium flex items-center gap-2">
-                  <Plus size={18} />
-                  Create Event
-                </button>
-              </Link>
+              <>
+                <Link to="/me" className="text-xl font-league pb-2">
+                  Profile
+                </Link>
+              </>
+            )}
+            {isLoggedIn && (
+              <>
+                <Link to="/create" onClick={toggleMenu}>
+                  <button className="w-[98%] justify-center rounded-[20px] bg-black text-white px-4 py-3 font-inter font-medium flex items-center gap-2">
+                    <Plus size={18} />
+                    Create Event
+                  </button>
+                </Link>
+              </>
             )}
           </div>
         </div>

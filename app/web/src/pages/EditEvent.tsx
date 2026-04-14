@@ -2,7 +2,7 @@ import { Check, ChevronLeft } from "lucide-react";
 import Navbar from "../components/Navbar";
 import React, { useState, useRef, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
-import { SERVER_IP } from "../config";
+import { LOCAL_IP, SERVER_IP } from "../config";
 import { useParams, useNavigate, Link } from "react-router";
 
 const CATEGORIES = [
@@ -20,14 +20,23 @@ const CATEGORIES = [
 
 const formatDisplayDate = (dateStr: string) => {
   if (!dateStr) return { day: "", time: "" };
-  const d = new Date(dateStr);
-  const day = d
+
+  // Split the string and create the date manually to force LOCAL time
+  const [datePart, timePart] = dateStr.split("T");
+  const [year, month, day] = datePart.split("-").map(Number);
+  const [hours, minutes] = timePart.split(":").map(Number);
+
+  // This constructor uses the system's local timezone
+  const d = new Date(year, month - 1, day, hours, minutes);
+
+  const dayName = d
     .toLocaleDateString("en-US", {
       weekday: "short",
       month: "short",
       day: "numeric",
     })
     .replace(",", "");
+
   const time = d
     .toLocaleTimeString("en-US", {
       hour: "numeric",
@@ -35,7 +44,14 @@ const formatDisplayDate = (dateStr: string) => {
       hour12: true,
     })
     .toLowerCase();
-  return { day, time };
+
+  return { day: dayName, time };
+};
+
+const toLocalISO = (dateStr: string) => {
+  const d = new Date(dateStr);
+  const offset = d.getTimezoneOffset() * 60000; // offset in milliseconds
+  return new Date(d.getTime() - offset).toISOString().slice(0, 16);
 };
 
 export default function EditEvent() {
@@ -43,6 +59,7 @@ export default function EditEvent() {
   const navigate = useNavigate();
   const { token } = useAuth();
   const [loading, setLoading] = useState(true);
+  const [userOrgs, setUserOrgs] = useState<{ id: string; name: string }[]>([]);
 
   const [formData, setFormData] = useState({
     eventType: "Student" as "RSO" | "Student",
@@ -50,12 +67,44 @@ export default function EditEvent() {
     description: "",
     location: "",
     link: "",
+    selectedOrgId: "", // Track the chosen organization
     selectedCategories: [] as string[],
     imagePreview: null as string | null,
     file: null as File | null,
     startDate: "",
     endDate: "",
   });
+
+  useEffect(() => {
+    const fetchMyOrgs = async () => {
+      if (!token) return;
+      try {
+        const res = await fetch(`${SERVER_IP}/api/users/me/organizations`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        if (data.organizations) {
+          setUserOrgs(data.organizations);
+
+          // SYNC: If we are editing an RSO event but the ID is empty,
+          // pick the first one (just like CreateEvent does)
+          setFormData((prev) => {
+            if (
+              prev.eventType === "RSO" &&
+              !prev.selectedOrgId &&
+              data.organizations.length > 0
+            ) {
+              return { ...prev, selectedOrgId: data.organizations[0].id };
+            }
+            return prev;
+          });
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchMyOrgs();
+  }, [token]);
 
   const startInputRef = useRef<HTMLInputElement>(null);
   const endInputRef = useRef<HTMLInputElement>(null);
@@ -76,7 +125,8 @@ export default function EditEvent() {
         });
 
         setFormData({
-          eventType: event.isRSO ? "RSO" : "Student",
+          eventType: data.event.isRSO ? "RSO" : "Student",
+          selectedOrgId: data.event.organizationId || "",
           title: event.title,
           description: event.description || "",
           location: event.location,
@@ -84,10 +134,8 @@ export default function EditEvent() {
           selectedCategories: matchedTags,
           imagePreview: event.flyer || null,
           file: null,
-          startDate: new Date(event.startDate).toISOString().slice(0, 16),
-          endDate: event.endDate
-            ? new Date(event.endDate).toISOString().slice(0, 16)
-            : "",
+          startDate: toLocalISO(event.startDate),
+          endDate: event.endDate ? toLocalISO(event.endDate) : "",
         });
       } catch (err) {
         console.error("Error fetching event:", err);
@@ -126,13 +174,40 @@ export default function EditEvent() {
   };
 
   const handleSubmit = async () => {
+    console.log(formData);
+    if (!formData.title || !formData.startDate || !formData.location) {
+      alert("Title, start date, and location are required.");
+      return;
+    }
+
+    if (formData.eventType === "RSO" && !formData.selectedOrgId) {
+      alert("Please select an organization.");
+      return;
+    }
+
     const submissionData = new FormData();
+
+    // Create a proper UTC string from the local input value
+    // This correctly shifts it +4/5 hours for the DB
+    const utcStartDate = new Date(formData.startDate).toISOString();
+    submissionData.append("startDate", utcStartDate);
+
+    if (formData.endDate) {
+      const utcEndDate = new Date(formData.endDate).toISOString();
+      submissionData.append("endDate", utcEndDate);
+    }
+
     submissionData.append("title", formData.title);
     submissionData.append("description", formData.description);
     submissionData.append("location", formData.location);
-    submissionData.append("startDate", formData.startDate);
-    if (formData.endDate) submissionData.append("endDate", formData.endDate);
+
     submissionData.append("isRSO", String(formData.eventType === "RSO"));
+
+    if (formData.eventType === "RSO") {
+      submissionData.append("organizationId", formData.selectedOrgId);
+    } else {
+      submissionData.append("organizationId", "");
+    }
 
     formData.selectedCategories.forEach((tag) => {
       submissionData.append("tags", tag);
@@ -180,7 +255,13 @@ export default function EditEvent() {
           <div className="order-2 lg:order-1 lg:col-span-8">
             <div className="flex bg-[#F6F6F6] p-1 rounded-2xl w-fit mb-8 border border-[#EBEBEB]">
               <button
-                onClick={() => setFormData((p) => ({ ...p, eventType: "RSO" }))}
+                onClick={() =>
+                  setFormData((p) => ({
+                    ...p,
+                    eventType: "RSO",
+                    selectedOrgId: p.selectedOrgId || userOrgs[0]?.id,
+                  }))
+                }
                 className={`px-4 sm:px-5 py-2 rounded-[12px] text-[13px] sm:text-[14px] font-medium flex items-center gap-2 transition-all duration-200 ${
                   formData.eventType === "RSO"
                     ? "bg-white text-black"
@@ -201,7 +282,11 @@ export default function EditEvent() {
 
               <button
                 onClick={() =>
-                  setFormData((p) => ({ ...p, eventType: "Student" }))
+                  setFormData((p) => ({
+                    ...p,
+                    eventType: "Student",
+                    selectedOrgId: "",
+                  }))
                 }
                 className={`px-4 sm:px-5 py-2 rounded-[12px] text-[13px] sm:text-[14px] font-medium flex items-center gap-2 transition-all duration-200 ${
                   formData.eventType === "Student"
@@ -367,6 +452,49 @@ export default function EditEvent() {
                 </button>
               ))}
             </div>
+
+            {/* dropdown */}
+            {formData.eventType === "RSO" && (
+              <div className="mt-10 pt-10 border-t border-gray-100 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <h2 className="text-[24px] sm:text-[28px] font-semibold mb-4 tracking-tight">
+                  Post as Organization
+                </h2>
+                <div className="relative max-w-md">
+                  <select
+                    name="selectedOrgId"
+                    value={formData.selectedOrgId}
+                    onChange={(e) =>
+                      setFormData((p) => ({
+                        ...p,
+                        selectedOrgId: e.target.value,
+                      }))
+                    }
+                    className="w-full bg-[#F6F6F6] rounded-[14px] px-5 py-4 text-[16px] outline-none border border-transparent focus:border-black transition-all appearance-none cursor-pointer"
+                    style={{
+                      backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
+                      backgroundRepeat: "no-repeat",
+                      backgroundPosition: "right 1.25rem center",
+                      backgroundSize: "1em",
+                    }}
+                  >
+                    <option value="" disabled>
+                      Select an organization
+                    </option>
+                    {userOrgs.map((org) => (
+                      <option key={org.id} value={org.id}>
+                        {org.name}
+                      </option>
+                    ))}
+                  </select>
+
+                  {userOrgs.length === 0 && (
+                    <p className="text-red-500 text-[13px] mt-2 ml-1">
+                      You must be a member of an RSO to post an RSO event.
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="order-1 lg:order-2 lg:col-span-4 flex flex-col gap-6 lg:pt-16">

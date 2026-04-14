@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
 import '../components/app_button.dart';
+import '../utils/auth_service.dart';
 
 class Recommendations extends StatefulWidget {
   @override
@@ -29,7 +30,7 @@ class _RecommendationsState extends State<Recommendations> {
       backgroundColor: AppColors.white,
       appBar: AppBar(
         backgroundColor: AppColors.white,
-        elevation: 0,
+        elevation: 100,
         leadingWidth: 70,
         toolbarHeight: 72,
         leading: Padding(
@@ -46,7 +47,11 @@ class _RecommendationsState extends State<Recommendations> {
               style: TextButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
               ),
-              onPressed: () => Navigator.pushNamed(context, '/event/events'),
+              onPressed: () async {
+                await AuthService.completeOnboarding();
+                if (!context.mounted) return;
+                Navigator.pushReplacementNamed(context, '/event/events');
+              },
               child: const Text(
                 'Skip',
                 style: TextStyle(color: AppColors.textSecondary, fontSize: 16),
@@ -114,7 +119,11 @@ class _RecommendationsState extends State<Recommendations> {
               ),
               child: AppButton(
                 label: 'Continue',
-                onPressed: () {},
+                onPressed: () async {
+                  await AuthService.completeOnboarding();
+                  if (!context.mounted) return;
+                  Navigator.pushReplacementNamed(context, '/event/events');
+                },
                 width: screenWidth * 0.85,
                 foregroundColor: AppColors.white,
               ),

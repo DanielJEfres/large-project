@@ -11,37 +11,31 @@ export default function Organizations() {
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
 
-  const { token, isLoggedIn } = useAuth();
+  const { token, isLoggedIn, joinedOrgIds, refreshMemberships } = useAuth();
 
-  const handleJoin = async (orgName: string) => {
-    if (!isLoggedIn) {
-      alert("Please log in to join organizations!");
-      return;
-    }
+  const handleJoinLeave = async (id: string, isJoining: boolean) => {
+    if (!isLoggedIn) return alert("Please log in!");
 
+    const endpoint = isJoining ? "join" : "leave"; //
     try {
-      const response = await fetch(`${LOCAL_IP}/api/organizations/join`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+      const response = await fetch(
+        `${SERVER_IP}/api/organizations/${endpoint}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ orgId: id }),
         },
-        body: JSON.stringify({ orgName }), // backend wants a { orgName } = req.body
-      });
-
-      const data = await response.json();
+      );
 
       if (response.ok) {
-        alert(`Successfully joined ${orgName}!`);
-
-        //this refreshes the list.
-        fetchOrganizations(searchQuery);
-      } else {
-        alert(data.message || "Failed to join");
+        // Update the global Set so the button changes instantly
+        await refreshMemberships();
       }
     } catch (err) {
-      console.error("Join error:", err);
-      alert("A server error occurred.");
+      console.error("Action failed:", err);
     }
   };
 
@@ -102,68 +96,78 @@ export default function Organizations() {
           {loading && organizations.length === 0 ? (
             <div className="font-league p-10">Loading organizations...</div>
           ) : (
-            organizations.map((org) => (
-              <div
-                key={org._id}
-                className="rounded-2xl  bg-[#f5f5f76e] transition-all overflow-hidden flex h-50"
-              >
-                {/* Image */}
-                <div className="w-70 bg-gray/30 flex items-center justify-center shrink-0">
-                  {org.logo ? (
-                    <img
-                      src={org.logo}
-                      alt={org.name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <Image size={40} className="text-gray/70" />
-                  )}
-                </div>
+            organizations.map((org) => {
+              const isMember = joinedOrgIds.has(org._id);
+              console.log(joinedOrgIds);
 
-                {/* The Content (Right Side) */}
-                <div className="p-6 w-2/3 flex flex-col justify-between">
-                  <div>
-                    <h2 className="text-2xl font-bebas mb-2 line-clamp-1">
-                      {org.name}
-                    </h2>
-                    <p className="text-gray text-sm mb-4 line-clamp-3">
-                      {org.description || "No description provided."}
-                    </p>
-                  </div>
-
-                  {/* Tags / Category */}
-                  <div className="flex flex-wrap gap-2 pt-2">
-                    {org.category && (
-                      <span className="flex items-center gap-1 px-3 py-1 bg-brand/40 text-xs font-bold uppercase tracking-wider text-black">
-                        {org.category}
-                      </span>
+              return (
+                <div
+                  key={org._id}
+                  className="rounded-2xl  bg-[#f5f5f76e] transition-all overflow-hidden flex h-50"
+                >
+                  {/* Image */}
+                  <div className="w-70 bg-gray/30 flex items-center justify-center shrink-0">
+                    {org.logo ? (
+                      <img
+                        src={org.logo}
+                        alt={org.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <Image size={40} className="text-gray/70" />
                     )}
                   </div>
-                </div>
 
-                {/* Buttons */}
-                <div className="flex ml-auto mr-10">
-                  <div className="flex mt-auto gap-5">
-                    <Link
-                      className="font-semibold rounded-4xl my-3 py-2 font-league flex min-w-fit "
-                      to={`/organization/${org._id}`}
-                    >
-                      <button className="flex cursor-pointer gap-2 ">
-                        More Events
-                        <ChevronRight width={17} />
+                  {/* The Content (Right Side) */}
+                  <div className="p-6 w-2/3 flex flex-col justify-between">
+                    <div>
+                      <h2 className="text-2xl font-bebas mb-2 line-clamp-1">
+                        {org.name}
+                      </h2>
+                      <p className="text-gray text-sm mb-4 line-clamp-3">
+                        {org.description || "No description provided."}
+                      </p>
+                    </div>
+
+                    {/* Tags / Category */}
+                    <div className="flex flex-wrap gap-2 pt-2">
+                      {org.category && (
+                        <span className="flex items-center gap-1 px-3 py-1 bg-brand/40 text-xs font-bold uppercase tracking-wider text-black">
+                          {org.category}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Buttons */}
+                  <div className="flex ml-auto mr-10">
+                    <div className="flex mt-auto gap-5">
+                      <Link
+                        className="font-semibold rounded-4xl my-3 py-2 font-league flex min-w-fit "
+                        to={`/organization/${org._id}`}
+                      >
+                        <button className="flex cursor-pointer gap-2 ">
+                          More Events
+                          <ChevronRight width={17} />
+                        </button>
+                      </Link>
+
+                      {/* Button shows "join" or "leave" depending if theyre a member or not */}
+                      <button
+                        onClick={() => handleJoinLeave(org._id, !isMember)}
+                        className={`font-bold min-w-[120px] px-9 rounded-4xl  my-3 mr-3 font-league cursor-pointer active:scale-95 transition-all hover:bg-brand duration-100 ${
+                          isMember
+                            ? "bg-lightgray text-black hover:bg-gray-200 "
+                            : "bg-black text-white hover:bg-zinc-800"
+                        }`}
+                      >
+                        {isMember ? "Leave" : "Join"}
                       </button>
-                    </Link>
-                    <button
-                      //User joins this particular org.
-                      onClick={() => handleJoin(org.name)}
-                      className="font-bold px-9 rounded-4xl text-white bg-black my-3 mr-3 font-league cursor-pointer active:scale-95 transition-all hover:bg-brand duration-100 "
-                    >
-                      Join
-                    </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           )}
 
           {!loading && organizations.length === 0 && (

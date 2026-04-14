@@ -2,67 +2,9 @@ import 'package:flutter/material.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
 import '../../utils/getAPI.dart';
+import '../../utils/auth_service.dart';
 import '../../components/event_card.dart';
 
-// Placeholder events shown while API loads (or when API is unreachable)
-final List<Map<String, dynamic>> _placeholderEvents = [
-  {
-    'organizationName': 'UCF SGA',
-    'title': 'Spring Hackathon 2026',
-    'location': 'Student Union Hall',
-    'startDate': '2026-04-20T10:00:00Z',
-    'isRSO': true,
-    'flyer': null,
-  },
-  {
-    'organizationName': 'ACM UCF',
-    'title': 'Figma & UI/UX Workshop',
-    'location': 'HEC 101',
-    'startDate': '2026-04-22T16:00:00Z',
-    'isRSO': true,
-    'flyer': null,
-  },
-  {
-    'organizationName': 'UCF Music Club',
-    'title': 'Open Mic Night',
-    'location': 'Student Union Pegasus Ballroom',
-    'startDate': '2026-04-25T19:00:00Z',
-    'isRSO': true,
-    'flyer': null,
-  },
-  {
-    'organizationName': 'Pre-Med Society',
-    'title': 'MCAT Study Session',
-    'location': 'Health Sciences Campus',
-    'startDate': '2026-04-27T14:00:00Z',
-    'isRSO': true,
-    'flyer': null,
-  },
-  {
-    'organizationName': 'Knight Hacks',
-    'title': 'Build Night — Mobile Apps',
-    'location': 'Engineering 2 Room 203',
-    'startDate': '2026-04-28T18:00:00Z',
-    'isRSO': true,
-    'flyer': null,
-  },
-  {
-    'organizationName': 'UCF Dance Marathon',
-    'title': 'Fundraiser Kickoff Event',
-    'location': 'Recreation & Wellness Center',
-    'startDate': '2026-05-01T11:00:00Z',
-    'isRSO': false,
-    'flyer': null,
-  },
-  {
-    'organizationName': 'Sofia Flores',
-    'title': 'Study Group — COP3502',
-    'location': 'Library Room 214',
-    'startDate': '2026-04-21T13:00:00Z',
-    'isRSO': false,
-    'flyer': null,
-  },
-];
 
 class EventsScreen extends StatefulWidget {
   @override
@@ -73,7 +15,7 @@ class _EventsScreenState extends State<EventsScreen> {
   String _activeTab = 'RSO';
   String _selectedCategory = 'All';
   String _searchQuery = '';
-  bool _loading = false;
+  bool _loading = true;
 
   List<Map<String, dynamic>> _upcomingEvents = [];
   List<Map<String, dynamic>> _trendingEvents = [];
@@ -93,9 +35,6 @@ class _EventsScreenState extends State<EventsScreen> {
   @override
   void initState() {
     super.initState();
-    // Show placeholders immediately
-    _upcomingEvents = List.from(_placeholderEvents);
-    _trendingEvents = List.from(_placeholderEvents.reversed);
     _fetchEvents();
   }
 
@@ -109,17 +48,71 @@ class _EventsScreenState extends State<EventsScreen> {
     final upcomingResult = await getAPI.getUpcomingEvents();
     final trendingResult = await getAPI.getTrendingEvents();
     if (!mounted) return;
+
     final upcoming = List<Map<String, dynamic>>.from(
       upcomingResult['events'] ?? [],
     );
     final trending = List<Map<String, dynamic>>.from(
       trendingResult['events'] ?? [],
     );
+
+    final enriched = await _enrichWithOrgNames([...upcoming, ...trending]);
+    if (!mounted) return;
+
+    final upcomingEnriched = enriched.sublist(0, upcoming.length);
+    final trendingEnriched = enriched.sublist(upcoming.length);
+
     setState(() {
-      if (upcoming.isNotEmpty) _upcomingEvents = upcoming;
-      if (trending.isNotEmpty) _trendingEvents = trending;
+      _upcomingEvents = upcomingEnriched;
+      _trendingEvents = trendingEnriched;
       _loading = false;
     });
+  }
+
+  // Fetches org names for RSO events, uses createdBy name for student events.
+  Future<List<Map<String, dynamic>>> _enrichWithOrgNames(
+    List<Map<String, dynamic>> events,
+  ) async {
+    // Collect unique org IDs from RSO events
+    final orgIds = events
+        .where((e) => e['isRSO'] == true && e['organizationId'] != null)
+        .map((e) => e['organizationId'].toString())
+        .toSet();
+
+    // Fetch all orgs in parallel
+    final orgResults = await Future.wait(
+      orgIds.map((id) => getAPI.getOrganization(id)),
+    );
+
+    // Build a lookup map: orgId -> orgName
+    final orgNames = <String, String>{};
+    for (int i = 0; i < orgIds.length; i++) {
+      final id = orgIds.elementAt(i);
+      final raw = orgResults[i]['organization'];
+      final org = raw is Map<String, dynamic> ? raw : null;
+      if (org != null && org['name'] != null) {
+        orgNames[id] = org['name'].toString();
+      }
+    }
+
+    // Inject organizationName into each event
+    return events.map((e) {
+      final enriched = Map<String, dynamic>.from(e);
+      if (e['isRSO'] == true) {
+        final orgId = e['organizationId']?.toString();
+        enriched['organizationName'] = orgId != null
+            ? orgNames[orgId] ?? 'Organization'
+            : 'Organization';
+      } else {
+        final raw = e['createdBy'];
+        final createdBy = raw is Map<String, dynamic> ? raw : null;
+        final first = createdBy?['firstName']?.toString() ?? '';
+        final last = createdBy?['lastName']?.toString() ?? '';
+        final name = '$first $last'.trim();
+        enriched['organizationName'] = name.isNotEmpty ? name : 'Student';
+      }
+      return enriched;
+    }).toList();
   }
 
   List<Map<String, dynamic>> get _forYou {
@@ -147,13 +140,14 @@ class _EventsScreenState extends State<EventsScreen> {
   }
 
   List<Map<String, dynamic>> get _searchResults {
+    final query = _searchQuery.toLowerCase();
     return _upcomingEvents.where((e) {
+      final matchesTab = _activeTab == 'RSO' ? e['isRSO'] == true : e['isRSO'] != true;
       final title = (e['title'] ?? '').toString().toLowerCase();
       final desc = (e['description'] ?? '').toString().toLowerCase();
       final org = (e['organizationName'] ?? '').toString().toLowerCase();
-      return title.contains(_searchQuery.toLowerCase()) ||
-          desc.contains(_searchQuery.toLowerCase()) ||
-          org.contains(_searchQuery.toLowerCase());
+      return matchesTab &&
+          (title.contains(query) || desc.contains(query) || org.contains(query));
     }).toList();
   }
 
@@ -313,18 +307,26 @@ class _EventsScreenState extends State<EventsScreen> {
   }
 
   Widget _buildSections() {
-    return SingleChildScrollView(
-      child: Column(
+    final loggedIn = AuthService.isLoggedIn;
+    return RefreshIndicator(
+      onRefresh: _fetchEvents,
+      color: AppColors.primary,
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 24),
-          _buildSection('FOR YOU', _loading ? [] : _forYou),
-          const SizedBox(height: 28),
+          if (loggedIn) ...[
+            _buildSection('FOR YOU', _loading ? [] : _forYou),
+            const SizedBox(height: 28),
+          ],
           _buildSection('TRENDING', _loading ? [] : _trending),
           const SizedBox(height: 28),
           _buildSection('UPCOMING EVENTS', _loading ? [] : _upcoming),
           const SizedBox(height: 32),
         ],
+        ),
       ),
     );
   }
@@ -339,7 +341,7 @@ class _EventsScreenState extends State<EventsScreen> {
         ),
         const SizedBox(height: 14),
         SizedBox(
-          height: 250,
+          height: 270,
           child: _loading
               ? _buildSkeletonRow()
               : events.isEmpty
@@ -380,7 +382,11 @@ class _EventsScreenState extends State<EventsScreen> {
 
   Widget _buildSearchResults() {
     final results = _searchResults;
-    return SingleChildScrollView(
+    return RefreshIndicator(
+      onRefresh: _fetchEvents,
+      color: AppColors.primary,
+      child: SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -404,12 +410,13 @@ class _EventsScreenState extends State<EventsScreen> {
                     crossAxisCount: 2,
                     crossAxisSpacing: 12,
                     mainAxisSpacing: 12,
-                    childAspectRatio: 0.72,
+                    mainAxisExtent: 270,
                   ),
                   itemCount: results.length,
                   itemBuilder: (_, i) => EventCard(event: results[i]),
                 ),
         ],
+      ),
       ),
     );
   }

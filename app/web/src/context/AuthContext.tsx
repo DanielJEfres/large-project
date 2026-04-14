@@ -4,6 +4,7 @@ import {
   useState,
   useEffect,
   type ReactNode,
+  useCallback,
 } from "react";
 import { SERVER_IP } from "../config";
 
@@ -21,6 +22,8 @@ type AuthContextType = {
   token: string | null;
   setUser: (user: User | null) => void;
   login: (userData: User, token: string) => void;
+  joinedOrgIds: Set<string>;
+  refreshMemberships: () => Promise<void>;
   logout: () => void;
   isLoggedIn: boolean;
   loading: boolean;
@@ -36,6 +39,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const savedUser = localStorage.getItem("user_data");
     return savedUser ? JSON.parse(savedUser) : null;
   });
+
+  const [joinedOrgIds, setJoinedOrgIds] = useState<Set<string>>(new Set());
+
+  const refreshMemberships = useCallback(async () => {
+    if (!token) return;
+    try {
+      const res = await fetch(`${SERVER_IP}/api/users/me/organizations`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (data.organizations) {
+        // Map the IDs into a Set for fast lookup
+        setJoinedOrgIds(new Set(data.organizations.map((org: any) => org.id)));
+      }
+    } catch (err) {
+      console.error("Failed to sync memberships:", err);
+    }
+  }, [token]);
+
+  // Sync memberships whenever the token changes (login/refresh)
+  useEffect(() => {
+    if (token) refreshMemberships();
+    else setJoinedOrgIds(new Set());
+  }, [token, refreshMemberships]);
 
   // 1. Silent Refresh / Auto-Login on mount
   useEffect(() => {
@@ -98,6 +125,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         user,
         token,
+        joinedOrgIds,
+        refreshMemberships,
         setUser,
         login,
         logout,

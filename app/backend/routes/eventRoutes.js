@@ -138,16 +138,23 @@ router.post('/', upload.single('flyer'), async (req, res) => {
 
         let tagNames = [];
         if (tags) {
-            tagNames = Array.isArray(tags) ? tags : [tags];
+            if (typeof tags === 'string' && tags.startsWith('[')) {
+                try { tagNames = JSON.parse(tags); } catch { tagNames = []; }
+            } else {
+                tagNames = Array.isArray(tags) ? tags : [tags];
+            }
         }
         const foundTags = await Tag.find({ name: { $in: tagNames } });
         const tagIds = foundTags.map(t => t._id);
 
         const event = await Event.create({
-            title, description, location, 
-            startDate, endDate, organizationId, 
-            createdBy, tags: tagIds, isRSO: isRSO === 'true', status, isPublic, 
-            flyer: flyerUrl, rsvpEnabled: rsvpEnabled === 'true'
+            title, description, location,
+            startDate, endDate, organizationId,
+            createdBy, tags: tagIds,
+            isRSO: isRSO === true || isRSO === 'true',
+            status, isPublic,
+            flyer: flyerUrl,
+            rsvpEnabled: rsvpEnabled === true || rsvpEnabled === 'true'
         })
         if(!event) return res.json({message: "Could Not Add Event"})
         return res.status(201).json({Event:event})
@@ -162,6 +169,12 @@ router.put('/:eventId', upload.single('flyer'), async (req, res) => {
 
     try {
         const updateData = { ...req.body };
+
+        // If organizationId is an empty string, set it to null
+        if (updateData.organizationId === "") {
+            updateData.organizationId = null;
+        }
+        
         if(req.file) {
             const flyerUrl = await uploadToS3(req.file, 'flyers')
             
@@ -175,9 +188,13 @@ router.put('/:eventId', upload.single('flyer'), async (req, res) => {
         }
 
         if (updateData.tags) {
-            const tagNames = Array.isArray(updateData.tags) ? updateData.tags : [updateData.tags];
+            let tagNames;
+            if (typeof updateData.tags === 'string' && updateData.tags.startsWith('[')) {
+                try { tagNames = JSON.parse(updateData.tags); } catch { tagNames = []; }
+            } else {
+                tagNames = Array.isArray(updateData.tags) ? updateData.tags : [updateData.tags];
+            }
             const foundTags = await Tag.find({ name: { $in: tagNames } });
-            // convert names to ObjectIds
             updateData.tags = foundTags.map(t => t._id);
         }
       
