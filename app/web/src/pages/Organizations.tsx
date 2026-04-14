@@ -11,67 +11,31 @@ export default function Organizations() {
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
 
-  const { user, token, isLoggedIn } = useAuth();
+  const { token, isLoggedIn, joinedOrgIds, refreshMemberships } = useAuth();
 
-  const handleLeave = async (id: string) => {
-    if (!isLoggedIn) return;
+  const handleJoinLeave = async (id: string, isJoining: boolean) => {
+    if (!isLoggedIn) return alert("Please log in!");
 
-    if (!window.confirm("Are you sure you want to leave this organization?"))
-      return;
-
+    const endpoint = isJoining ? "join" : "leave"; //
     try {
-      const response = await fetch(`${SERVER_IP}/api/organizations/leave`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+      const response = await fetch(
+        `${SERVER_IP}/api/organizations/${endpoint}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ orgId: id }),
         },
-        body: JSON.stringify({ orgId: id }),
-      });
-
-      const data = await response.json();
+      );
 
       if (response.ok) {
-        alert("Successfully left the organization.");
-        // Refreshes list
-        fetchOrganizations();
-      } else {
-        alert(data.message || "Failed to leave.");
+        // Update the global Set so the button changes instantly
+        await refreshMemberships();
       }
     } catch (err) {
-      console.error("Leave error:", err);
-    }
-  };
-
-  const handleJoin = async (id: string) => {
-    if (!isLoggedIn) {
-      alert("Please log in to join organizations!");
-      return;
-    }
-
-    try {
-      const response = await fetch(`${SERVER_IP}/api/organizations/join`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          // Pass token for middleware check
-          Authorization: `Bearer ${token}`,
-        },
-        // Route expects an org id
-        body: JSON.stringify({ orgId: id }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        alert("Successfully joined!");
-        //Re-fetch organizations to update the UI
-        fetchOrganizations();
-      } else {
-        alert(data.message || "Failed to join");
-      }
-    } catch (err) {
-      console.error("Join error:", err);
+      console.error("Action failed:", err);
     }
   };
 
@@ -133,11 +97,8 @@ export default function Organizations() {
             <div className="font-league p-10">Loading organizations...</div>
           ) : (
             organizations.map((org) => {
-              const membersList = org.members || [];
-
-              // Change this when we have a api call that gets a user's org
-              const isMember =
-                false || org.members?.some((m) => m.userId === user?.id);
+              const isMember = joinedOrgIds.has(org._id);
+              console.log(isMember);
 
               return (
                 <div
@@ -192,23 +153,16 @@ export default function Organizations() {
                       </Link>
 
                       {/* Button shows "join" or "leave" depending if theyre a member or not */}
-                      {isMember ? (
-                        <button
-                          //User leaves this particular org.
-                          onClick={() => handleJoin(org._id)}
-                          className="font-bold px-9 rounded-4xl text-white bg-black my-3 mr-3 font-league cursor-pointer active:scale-95 transition-all hover:bg-brand duration-100 "
-                        >
-                          Join
-                        </button>
-                      ) : (
-                        <button
-                          //User joins this particular org.
-                          onClick={() => handleJoin(org._id)}
-                          className="font-bold px-9 rounded-4xl text-white bg-black my-3 mr-3 font-league cursor-pointer active:scale-95 transition-all hover:bg-brand duration-100 "
-                        >
-                          Join
-                        </button>
-                      )}
+                      <button
+                        onClick={() => handleJoinLeave(org._id, !isMember)}
+                        className={`font-bold min-w-[120px] px-9 rounded-4xl  my-3 mr-3 font-league cursor-pointer active:scale-95 transition-all hover:bg-brand duration-100 ${
+                          isMember
+                            ? "bg-lightgray text-black hover:bg-gray-200 "
+                            : "bg-black text-white hover:bg-zinc-800"
+                        }`}
+                      >
+                        {isMember ? "Leave" : "Join"}
+                      </button>
                     </div>
                   </div>
                 </div>
