@@ -29,6 +29,21 @@ jobs:
       - name: Run tests with coverage
         run: npm run test:ci
 
+      - name: Jest summary
+        if: always()
+        run: |
+          {
+            echo "## Backend Jest results"
+            echo ""
+            echo '```text'
+            if [ -f jest.log ]; then
+              cat jest.log
+            else
+              echo "(jest.log missing — see job log above)"
+            fi
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Upload coverage report
         if: success()
         uses: actions/upload-artifact@v4
