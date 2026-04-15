@@ -27,10 +27,13 @@ jobs:
         run: npm ci
 
       - name: Run tests with coverage
-        run: npm run test:ci
+        run: |
+          set -o pipefail
+          npm run test:ci 2>&1 | tee jest.log
 
       - name: Jest summary
         if: always()
+        working-directory: app/backend
         run: |
           {
             echo "## Backend Jest results"
@@ -39,7 +42,7 @@ jobs:
             if [ -f jest.log ]; then
               cat jest.log
             else
-              echo "(jest.log missing — see job log above)"
+              echo "(jest.log missing — e.g. install failed or test step was skipped)"
             fi
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
