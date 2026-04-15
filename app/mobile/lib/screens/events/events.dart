@@ -140,13 +140,14 @@ class _EventsScreenState extends State<EventsScreen> {
   }
 
   List<Map<String, dynamic>> get _searchResults {
+    final query = _searchQuery.toLowerCase();
     return _upcomingEvents.where((e) {
+      final matchesTab = _activeTab == 'RSO' ? e['isRSO'] == true : e['isRSO'] != true;
       final title = (e['title'] ?? '').toString().toLowerCase();
       final desc = (e['description'] ?? '').toString().toLowerCase();
       final org = (e['organizationName'] ?? '').toString().toLowerCase();
-      return title.contains(_searchQuery.toLowerCase()) ||
-          desc.contains(_searchQuery.toLowerCase()) ||
-          org.contains(_searchQuery.toLowerCase());
+      return matchesTab &&
+          (title.contains(query) || desc.contains(query) || org.contains(query));
     }).toList();
   }
 
@@ -307,8 +308,12 @@ class _EventsScreenState extends State<EventsScreen> {
 
   Widget _buildSections() {
     final loggedIn = AuthService.isLoggedIn;
-    return SingleChildScrollView(
-      child: Column(
+    return RefreshIndicator(
+      onRefresh: _fetchEvents,
+      color: AppColors.primary,
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 24),
@@ -321,6 +326,7 @@ class _EventsScreenState extends State<EventsScreen> {
           _buildSection('UPCOMING EVENTS', _loading ? [] : _upcoming),
           const SizedBox(height: 32),
         ],
+        ),
       ),
     );
   }
@@ -376,7 +382,11 @@ class _EventsScreenState extends State<EventsScreen> {
 
   Widget _buildSearchResults() {
     final results = _searchResults;
-    return SingleChildScrollView(
+    return RefreshIndicator(
+      onRefresh: _fetchEvents,
+      color: AppColors.primary,
+      child: SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -406,6 +416,7 @@ class _EventsScreenState extends State<EventsScreen> {
                   itemBuilder: (_, i) => EventCard(event: results[i]),
                 ),
         ],
+      ),
       ),
     );
   }

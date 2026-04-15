@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
 import '../utils/getAPI.dart';
@@ -28,6 +30,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   TimeOfDay? _endTime;
   bool _rsvpEnabled = false;
   bool _isSubmitting = false;
+  XFile? _flyerImage;
 
   final List<String> _allTags = [
     'Music', 'Food & Drink', 'Business', 'Religion & Spirituality',
@@ -72,6 +75,14 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     setState(() => isStart ? _startTime = picked : _endTime = picked);
   }
 
+  Future<void> _pickFlyer() async {
+    final picked = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 85,
+    );
+    if (picked != null) setState(() => _flyerImage = picked);
+  }
+
   Future<void> _submit() async {
     if (_titleController.text.trim().isEmpty) {
       _showSnack('Event name is required');
@@ -101,6 +112,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       rsvpEnabled: _rsvpEnabled,
       createdBy: AuthService.userId!,
       tags: _selectedTags.toList(),
+      flyerImage: _flyerImage,
     );
 
     if (!mounted) return;
@@ -120,6 +132,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         _endTime = null;
         _selectedTags.clear();
         _rsvpEnabled = false;
+        _flyerImage = null;
       });
     } else {
       _showSnack(result['message'] ?? 'Failed to create event');
@@ -240,27 +253,30 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Flyer placeholder
-                Container(
-                  width: double.infinity,
-                  height: 160,
-                  decoration: BoxDecoration(
-                    color: AppColors.inputFill,
+                // Flyer picker
+                GestureDetector(
+                  onTap: _pickFlyer,
+                  child: ClipRRect(
                     borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Center(
-                    child: OutlinedButton(
-                      onPressed: () {},
-                      style: OutlinedButton.styleFrom(
-                        backgroundColor: AppColors.white,
-                        side: BorderSide.none,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20)),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 24, vertical: 10),
-                      ),
-                      child: const Text('Upload',
-                          style: TextStyle(color: AppColors.black)),
+                    child: Container(
+                      width: double.infinity,
+                      height: 160,
+                      color: AppColors.inputFill,
+                      child: _flyerImage != null
+                          ? Image.file(File(_flyerImage!.path),
+                              fit: BoxFit.cover)
+                          : const Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.add_photo_alternate_outlined,
+                                    size: 36, color: AppColors.textMuted),
+                                SizedBox(height: 8),
+                                Text('Upload Flyer',
+                                    style: TextStyle(
+                                        fontSize: 13,
+                                        color: AppColors.textMuted)),
+                              ],
+                            ),
                     ),
                   ),
                 ),
@@ -371,7 +387,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     Switch(
                       value: _rsvpEnabled,
                       onChanged: (v) => setState(() => _rsvpEnabled = v),
-                      activeColor: AppColors.primary,
+                      activeThumbColor: AppColors.primary,
                     ),
                   ],
                 ),

@@ -4,6 +4,8 @@ import React, { useState, useRef, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { SERVER_IP } from "../config";
 
+import { useNavigate } from "react-router-dom";
+
 const CATEGORIES = [
   "Sports",
   "Computer Science",
@@ -49,6 +51,7 @@ const formatDisplayDate = (dateStr: string) => {
 
 export default function CreateEvent() {
   const { user, token } = useAuth();
+  const navigate = useNavigate();
   const [userOrgs, setUserOrgs] = useState<{ id: string; name: string }[]>([]);
 
   const [formData, setFormData] = useState({
@@ -184,7 +187,9 @@ export default function CreateEvent() {
       const data = await response.json();
 
       if (response.ok) {
-        alert("Event created successfully!");
+        //alert("Event created successfully!");
+        navigate("/events");
+        
       } else {
         alert(`Error: ${data.error || data.message}`);
       }
