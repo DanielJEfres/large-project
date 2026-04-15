@@ -131,9 +131,12 @@ export default function Profile() {
           <div className="flex flex-col gap-6">
             <div className="flex justify-between items-end  pb-2">
               <h1 className="text-2xl font-league ">My Organizations</h1>
-              <p className="text-sm text-gray-500 cursor-pointer hover:text-black">
+              <Link
+                to="/myorgs"
+                className="text-sm text-gray-500 cursor-pointer hover:text-black"
+              >
                 View all
-              </p>
+              </Link>
             </div>
 
             <div className="flex flex-col gap-4">
@@ -178,9 +181,12 @@ export default function Profile() {
               <h1 className="text-2xl font-league">
                 Upcoming Events ({upcomingEvents.length})
               </h1>
-              <p className="text-sm text-gray-500 cursor-pointer hover:text-black">
+              <Link
+                to="/manage"
+                className="text-sm text-gray-500 cursor-pointer hover:text-black"
+              >
                 View all
-              </p>
+              </Link>
             </div>
 
             <div className="flex gap-4 flex-wrap">

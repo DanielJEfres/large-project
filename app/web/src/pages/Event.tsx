@@ -91,7 +91,7 @@ export default function Event() {
 
       <div className="font-inter px-20   ">
         {/* 2 grids */}
-        <div className="grid grid-cols-[350px_1fr] gap-10 mt-10">
+        <div className="grid grid-cols-[350px_1fr] gap-10 mt-10 pb-10">
           {/* 1st column */}
           <div className="w-full">
             {/* Add sticky, top-10, and self-start here */}

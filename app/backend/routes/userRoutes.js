@@ -111,4 +111,23 @@ router.get('/me/organizations', authenticateToken, async (req, res) => {
     }
 })
 
+// GET /api/users/:userId - Get a user's basic info (Name/PFP)
+router.get('/:userId', async (req, res) => {
+    try {
+        const user = await User.findById(req.params.userId)
+            .select('firstName lastName profilePicture'); // Only select public info
+
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        return res.status(200).json({
+            firstName: user.firstName,
+            lastName: user.lastName,
+            profilePicture: user.profilePicture,
+            fullName: `${user.firstName} ${user.lastName}`
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Error retrieving attendee info' });
+    }
+});
+
 export default router

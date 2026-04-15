@@ -7,6 +7,7 @@ import {
   Search,
   ChevronLeft,
   Hash,
+  Users,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { Link } from "react-router";
@@ -364,13 +365,14 @@ export default function Events() {
 
                           <div className="max-w-80  p-2">
                             <div className="flex justify-between items-center">
-                              <p className="font-bebas text-lg uppercase tracking-wider text-brand">
+                              <p className="font-bebas text-lg uppercase tracking-wider text-brand line-clamp-1">
                                 {event.isRSO
                                   ? orgLookup[event.organizationId]?.name ||
                                     "Loading..."
                                   : `${event.createdBy.firstName} ${event.createdBy.lastName}`}
                               </p>
-                              <span className="text-[10px] font-bold text-gray-400">
+                              <span className="gap-1 flex text-[10px] font-bold text-gray-400 items-center min-w-fit">
+                                <Users size={16} />
                                 {event.attendees.length} ATTENDING
                               </span>
                             </div>

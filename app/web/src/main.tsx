@@ -20,6 +20,7 @@ import EditEvent from "./pages/EditEvent.tsx";
 import ResetPassword from "./pages/ResetPassword.tsx";
 import NewPassword from "./pages/NewPassword.tsx";
 import Profile from "./pages/Profile.tsx";
+import MyOrgs from "./pages/MyOrgs.tsx";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -87,6 +88,11 @@ const router = createBrowserRouter([
       {
         path: "me",
         element: <Profile />,
+      },
+
+      {
+        path: "myorgs",
+        element: <MyOrgs />,
       },
     ],
   },
