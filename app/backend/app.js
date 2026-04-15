@@ -31,7 +31,7 @@ app.use((err, req, res, next) => {
   next();
 });
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'test') {
   app.use((req, res, next) => {
     console.log(`${req.method} ${req.path}`)
     next()
