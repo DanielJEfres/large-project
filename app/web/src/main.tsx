@@ -21,6 +21,7 @@ import ResetPassword from "./pages/ResetPassword.tsx";
 import NewPassword from "./pages/NewPassword.tsx";
 import Profile from "./pages/Profile.tsx";
 import MyOrgs from "./pages/MyOrgs.tsx";
+import CreateOrganization from "./pages/CreateOrganization.tsx";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -89,10 +90,13 @@ const router = createBrowserRouter([
         path: "me",
         element: <Profile />,
       },
-
       {
         path: "myorgs",
         element: <MyOrgs />,
+      },
+      {
+        path: "create-org",
+        element: <CreateOrganization />,
       },
     ],
   },

@@ -1,4 +1,11 @@
-import { Calendar, ChevronRight, Hash, MapPin, Share } from "lucide-react";
+import {
+  Calendar,
+  ChevronRight,
+  Hash,
+  Image,
+  MapPin,
+  Share,
+} from "lucide-react";
 import Navbar from "../components/Navbar";
 import { Link, useParams } from "react-router";
 import { useEffect, useState } from "react";
@@ -175,9 +182,9 @@ export default function Organization() {
 
               {/* events go here */}
 
-              <div className="p-10 flex flex-col gap-10 justify-center items-center">
+              <div className="p-10 flex flex-col gap-10 w-full max-w-5xl mx-auto">
                 {Object.keys(groupedEvents).length === 0 && (
-                  <div className="mt-20 h-30 text-gray-400">
+                  <div className="mt-20 h-30 text-gray-400 text-center">
                     <p>There's no {activeTab.toLowerCase()} events. :(</p>
                   </div>
                 )}
@@ -202,7 +209,19 @@ export default function Organization() {
                           className="w-full h-56 rounded-2xl flex overflow-hidden bg-gray-50"
                         >
                           {/* Left Image Section */}
-                          <div className="w-76 h-full bg-gray/30 relative"></div>
+                          <div className="min-w-56 h-full bg-gray-200 relative shrink-0">
+                            {event.flyer ? (
+                              <img
+                                src={event.flyer}
+                                alt={event.title}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                <Image size={32} />
+                              </div>
+                            )}
+                          </div>
 
                           {/* Content Section */}
 
@@ -237,7 +256,7 @@ export default function Organization() {
                               {event.title}
                             </h3>
 
-                            <p className="text-gray-500 text-sm font-inter line-clamp-3 mt-1">
+                            <p className="text-gray-500 text-sm font-inter line-clamp-3 mt-1 ">
                               {event.description || "No description provided."}
                             </p>
 

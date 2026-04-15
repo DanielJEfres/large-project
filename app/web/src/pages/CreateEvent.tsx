@@ -454,7 +454,7 @@ export default function CreateEvent() {
 
             <button
               onClick={handleSubmit}
-              className="cursor-pointer w-full bg-[#282828] text-white py-4 rounded-full font-bold text-[16px] hover:bg-black transition-all mt-4 lg:mt-0"
+              className=" uppercase tracking-widest font-league cursor-pointer w-full bg-[#282828] text-white py-4 rounded-full font-bold text-[16px] hover:bg-black transition-all mt-4 lg:mt-0"
             >
               Create Event
             </button>
