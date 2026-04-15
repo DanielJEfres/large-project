@@ -217,8 +217,10 @@ export default function Event() {
           <div className="w-full mb-20">
             {/* top half */}
             <div className=" h-87 flex flex-col">
-              <p className="font-bebas text-2xl font-thin tracking-wider">
-                {hostOrg?.name || "Loading..."}
+              <p
+                className={`font-bebas text-2xl font-thin tracking-wider ${!event?.isRSO ? "text-brand" : "text-black"}`}
+              >
+                {event?.isRSO ? hostOrg?.name || "Loading..." : "Student Event"}
               </p>
               <h1 className=" text-4xl font-bold">{event.title}</h1>
 
@@ -273,39 +275,41 @@ export default function Event() {
                     "No description provided for this event."}
                 </p>
               </div>
-              <div>
-                <h2 className="text-xl ">Organized By</h2>
+              {event.isRSO && (
+                <div>
+                  <h2 className="text-xl ">Organized By</h2>
 
-                <div className="mt-2 bg-lightgray h-60 flex rounded-xl overflow-hidden shadow-sm">
-                  {/* first */}
-                  <div className="h-full w-100 bg-gray "></div>
+                  <div className="mt-2 bg-lightgray h-60 flex rounded-xl overflow-hidden shadow-sm">
+                    {/* first */}
+                    <div className="h-full w-100 bg-gray "></div>
 
-                  {/* second */}
-                  <div className="px-8 pt-8 flex flex-col w-full">
-                    <p className="text-2xl font-bold font-league text-black leading-tight">
-                      {hostOrg?.name || event.createdBy.fullName}
-                    </p>
-                    <p className="text-gray-600">
-                      {hostOrg?.description || "Loading..."}
-                    </p>
+                    {/* second */}
+                    <div className="px-8 pt-8 flex flex-col w-full">
+                      <p className="text-2xl font-bold font-league text-black leading-tight">
+                        {hostOrg?.name || event.createdBy.fullName}
+                      </p>
+                      <p className="text-gray-600">
+                        {hostOrg?.description || "Loading..."}
+                      </p>
 
-                    {/* buttons */}
-                    {event.isRSO && (
-                      <div className="mt-auto ml-auto gap-7 flex flex-nowrap">
-                        <Link to={`/organization/${event.organizationId}`}>
-                          <button className="font-medium  rounded-4xl my-3 py-2 font-league flex gap-2">
-                            More Events
-                            <ChevronRight width={17} />
+                      {/* buttons */}
+                      {event.isRSO && (
+                        <div className="mt-auto ml-auto gap-7 flex flex-nowrap">
+                          <Link to={`/organization/${event.organizationId}`}>
+                            <button className="font-medium  rounded-4xl my-3 py-2 font-league flex gap-2">
+                              More Events
+                              <ChevronRight width={17} />
+                            </button>
+                          </Link>
+                          <button className="font-bold  px-7  rounded-4xl text-white bg-black my-3  py-2 font-league">
+                            Join
                           </button>
-                        </Link>
-                        <button className="font-bold  px-7  rounded-4xl text-white bg-black my-3  py-2 font-league">
-                          Join
-                        </button>
-                      </div>
-                    )}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>

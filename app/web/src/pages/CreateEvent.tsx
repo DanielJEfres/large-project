@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { SERVER_IP } from "../config";
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 const CATEGORIES = [
   "Sports",
@@ -189,7 +189,6 @@ export default function CreateEvent() {
       if (response.ok) {
         //alert("Event created successfully!");
         navigate("/events");
-        
       } else {
         alert(`Error: ${data.error || data.message}`);
       }
