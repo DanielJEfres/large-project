@@ -53,25 +53,65 @@ class TicketsScreenState extends State<TicketsScreen>
     final created =
         List<Map<String, dynamic>>.from(results[1]['events'] ?? []);
 
+    // Enrich both lists with org names so RSO events show the org name
+    final enrichedAttended = await _enrichWithOrgNames(attended);
+    final enrichedCreated = await _enrichWithOrgNames(created);
+    if (!mounted) return;
+
     final now = DateTime.now();
     setState(() {
-      _upcoming = attended.where((e) {
+      _upcoming = enrichedAttended.where((e) {
         try {
           return DateTime.parse(e['startDate'].toString()).isAfter(now);
         } catch (_) {
           return true;
         }
       }).toList();
-      _past = attended.where((e) {
+      _past = enrichedAttended.where((e) {
         try {
           return DateTime.parse(e['startDate'].toString()).isBefore(now);
         } catch (_) {
           return false;
         }
       }).toList();
-      _created = created;
+      _created = enrichedCreated;
       _loading = false;
     });
+  }
+
+  Future<List<Map<String, dynamic>>> _enrichWithOrgNames(
+      List<Map<String, dynamic>> events) async {
+    final orgIds = events
+        .where((e) => e['isRSO'] == true && e['organizationId'] != null)
+        .map((e) => e['organizationId'].toString())
+        .toSet();
+
+    if (orgIds.isEmpty) return events;
+
+    final orgResults = await Future.wait(
+      orgIds.map((id) => getAPI.getOrganization(id)),
+    );
+
+    final orgNames = <String, String>{};
+    int i = 0;
+    for (final id in orgIds) {
+      final raw = orgResults[i]['organization'];
+      final org = raw is Map<String, dynamic> ? raw : null;
+      if (org != null && org['name'] != null) {
+        orgNames[id] = org['name'].toString();
+      }
+      i++;
+    }
+
+    return events.map((e) {
+      final enriched = Map<String, dynamic>.from(e);
+      if (e['isRSO'] == true) {
+        final orgId = e['organizationId']?.toString();
+        enriched['organizationName'] =
+            orgId != null ? orgNames[orgId] ?? 'Organization' : 'Organization';
+      }
+      return enriched;
+    }).toList();
   }
 
   void _openEditModal(Map<String, dynamic> event) {
@@ -201,32 +241,52 @@ class TicketsScreenState extends State<TicketsScreen>
         ),
       );
     }
-    return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
-      itemCount: events.length,
-      separatorBuilder: (_, _) =>
-          const Divider(color: AppColors.inputFill),
-      itemBuilder: (_, i) => _EventRow(event: events[i]),
+    return RefreshIndicator(
+      onRefresh: fetchData,
+      color: AppColors.primary,
+      child: ListView.separated(
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
+        itemCount: events.length,
+        separatorBuilder: (_, _) =>
+            const Divider(color: AppColors.inputFill),
+        itemBuilder: (_, i) => _EventRow(event: events[i]),
+      ),
     );
   }
 
   Widget _buildCreatedList() {
     if (_created.isEmpty) {
-      return Center(
-        child: Text('No events created yet.',
-            style:
-                AppTextStyles.body.copyWith(color: AppColors.textMuted)),
+      return RefreshIndicator(
+        onRefresh: fetchData,
+        color: AppColors.primary,
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 60),
+              child: Center(
+                child: Text('No events created yet.',
+                    style: AppTextStyles.body
+                        .copyWith(color: AppColors.textMuted)),
+              ),
+            ),
+          ],
+        ),
       );
     }
-    return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
-      itemCount: _created.length,
-      separatorBuilder: (_, _) =>
-          const Divider(color: AppColors.inputFill),
-      itemBuilder: (_, i) => _EventRow(
-        event: _created[i],
-        showEditIcon: true,
-        onEditTap: () => _openEditModal(_created[i]),
+    return RefreshIndicator(
+      onRefresh: fetchData,
+      color: AppColors.primary,
+      child: ListView.separated(
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
+        itemCount: _created.length,
+        separatorBuilder: (_, _) =>
+            const Divider(color: AppColors.inputFill),
+        itemBuilder: (_, i) => _EventRow(
+          event: _created[i],
+          showEditIcon: true,
+          onEditTap: () => _openEditModal(_created[i]),
+        ),
       ),
     );
   }

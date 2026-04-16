@@ -8,7 +8,8 @@ import 'package:mobile/screens/events/events.dart';
 import 'package:mobile/screens/organizations/organizations.dart';
 import 'package:mobile/screens/RsoStudent.dart';
 import 'package:mobile/screens/organizations/searchOrg.dart';
-import 'package:mobile/screens/organizations/myOrganziations.dart';
+import 'package:mobile/screens/organizations/myOrganizations.dart';
+import 'package:mobile/screens/organizations/createOrganization.dart';
 
 class Routes {
   static const String LOGIN = '/';

@@ -19,6 +19,10 @@ import EventDashboard from "./pages/EventDashboard.tsx";
 import EditEvent from "./pages/EditEvent.tsx";
 import ResetPassword from "./pages/ResetPassword.tsx";
 import NewPassword from "./pages/NewPassword.tsx";
+import Profile from "./pages/Profile.tsx";
+import MyOrgs from "./pages/MyOrgs.tsx";
+import CreateOrganization from "./pages/CreateOrganization.tsx";
+import Onboarding from "./pages/Onboarding.tsx";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -83,6 +87,22 @@ const router = createBrowserRouter([
       },
       { path: "manage/event/:id", element: <EventDashboard /> },
       { path: "manage/event/:eventId/edit", element: <EditEvent /> },
+      {
+        path: "me",
+        element: <Profile />,
+      },
+      {
+        path: "myorgs",
+        element: <MyOrgs />,
+      },
+      {
+        path: "create-org",
+        element: <CreateOrganization />,
+      },
+      {
+        path: "onboarding",
+        element: <Onboarding />,
+      },
     ],
   },
 ]);

@@ -44,8 +44,10 @@ class _LoginScreenState extends State<LoginScreen> {
         if (response['isVerified'] == false) {
           // Fallback: backend returned 200 but flagged as unverified
           Navigator.pushNamed(context, '/verification', arguments: loginName.trim());
+        } else if (!AuthService.onboardingDone) {
+          Navigator.pushReplacementNamed(context, '/recommendations');
         } else {
-          Navigator.pushNamed(context, '/event/events');
+          Navigator.pushReplacementNamed(context, '/event/events');
         }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(

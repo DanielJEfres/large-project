@@ -192,11 +192,12 @@ import Event from '../models/Event.js'
 import pagination from './helpers/pagination.js'
 import authenticateToken from '../middleware/authenticateToken.js'
 import mongoose from 'mongoose'
+import { upload, uploadToS3 } from '../middleware/upload.js';
 
 const router = express.Router()
 
 //Create Organization
-router.post('/create', async(req, res) => { // Middleware -- can you create? Only if verified user.
+router.post('/create', upload.single('logo'), async(req, res) => { // Middleware -- can you create? Only if verified user.
     
     try {
 
@@ -210,6 +211,11 @@ router.post('/create', async(req, res) => { // Middleware -- can you create? Onl
         const organization = await Organization.findOne({name})
         if(organization) return res.status(400).json({message:"Organization already exits"})
 
+        let logoUrl = null;
+        if (req.file) {
+            logoUrl = await uploadToS3(req.file, 'logos');
+        }
+
         //Create new organization
         const newOrganization = await Organization.create({
             name, 
@@ -218,7 +224,7 @@ router.post('/create', async(req, res) => { // Middleware -- can you create? Onl
             knightConnectUrl,
             category,
             contactEmail,
-            logo, 
+            logo: logoUrl,
             socialLinks,
             createdBy,
             president
@@ -398,7 +404,7 @@ router.get('/', async (req, res) => {
 
             organizations = await Organization.find({
                 name: {$regex:regex}
-            }).select('name description category').skip(page?.skip).limit(page?.limit)
+            }).select('name description category logo').skip(page?.skip).limit(page?.limit)
 
         //Get All Organizations
         } else {
@@ -407,7 +413,7 @@ router.get('/', async (req, res) => {
             const filter = {}
             page = await pagination(req.query.page, req.query.limit, filter, Organization)
 
-            organizations = await Organization.find().select('name description category').skip(page?.skip).limit(page?.limit)
+            organizations = await Organization.find().select('name description category logo').skip(page?.skip).limit(page?.limit)
 
             if(!organizations) return res.status(500).json({message:" Error Getting Organizations"})
         }

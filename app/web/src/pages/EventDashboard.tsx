@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router";
-import { SERVER_IP } from "../config";
+import { LOCAL_IP, SERVER_IP } from "../config";
 import Navbar from "../components/Navbar";
 import type { UniversityEvent } from "../types/UniversityEvent";
 import {
@@ -22,6 +22,7 @@ export default function EventDashboard() {
   const [event, setEvent] = useState<UniversityEvent | null>(null);
   const [loading, setLoading] = useState(true);
   const { user, token } = useAuth();
+  const [attendeeDetails, setAttendeeDetails] = useState<any[]>([]);
 
   const handleDelete = async () => {
     if (!window.confirm("Are you sure you want to delete this event?")) return;
@@ -50,18 +51,28 @@ export default function EventDashboard() {
   useEffect(() => {
     const fetchEventData = async () => {
       try {
-        const res = await fetch(`${SERVER_IP}/api/events/${id}`);
-        const data = await res.json();
+        const response = await fetch(`${SERVER_IP}/api/events/${id}`);
+        const data = await response.json();
+        setEvent(data.event);
 
-        const eventData = data.event;
-        console.log(eventData);
-        setEvent(eventData);
+        if (data.event.attendees && data.event.attendees.length > 0) {
+          const details = await Promise.all(
+            data.event.attendees.map(async (attendeeId: string) => {
+              const res = await fetch(`${SERVER_IP}/api/users/${attendeeId}`);
+              return res.ok
+                ? await res.json()
+                : { fullName: "Unknown User", id: attendeeId };
+            }),
+          );
+          setAttendeeDetails(details);
+        }
       } catch (err) {
-        console.error(err);
+        console.error("Failed to fetch event:", err);
       } finally {
         setLoading(false);
       }
     };
+
     fetchEventData();
   }, [id]);
 
@@ -76,7 +87,7 @@ export default function EventDashboard() {
   return (
     <>
       <Navbar />
-      <div className="max-w-7xl mx-auto px-20 py-10 font-inter text-black ">
+      <div className="max-w-7xl mx-auto font-inter px-4 md:px-20 text-black ">
         <Link
           to="/manage"
           className="flex items-center text-gray-500 hover:text-black mb-8 transition-colors w-fit"
@@ -190,21 +201,22 @@ export default function EventDashboard() {
           <div className="bg-white border border-gray-100 rounded-3xl shadow-sm overflow-hidden flex flex-col">
             <div className="p-8 border-b border-gray-50 flex justify-between items-center bg-white">
               <h3 className="font-bold text-xl">Attendees</h3>
-              <span className="bg-black text-white px-4 py-1 rounded-full text-sm font-bold">
+              <span className="flex gap-2 bg-black text-white px-4 py-1 rounded-full text-sm font-bold">
+                <Users size={18} />
                 {event.attendees?.length || 0}
               </span>
             </div>
             <div className="px-8 max-h-[400px] overflow-y-auto pb-8">
               {event.attendees && event.attendees.length > 0 ? (
                 <div className="space-y-4">
-                  {event.attendees.map((attendeeId) => (
+                  {attendeeDetails.map((attendee, index) => (
                     <div
-                      key={attendeeId}
+                      key={index}
                       className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl"
                     >
                       <div className="w-10 h-10 bg-zinc-200 rounded-full flex items-center justify-center"></div>
                       <div>
-                        <p className="text-sm font-bold">First Last</p>
+                        <p className="text-sm font-bold">{attendee.fullName}</p>
                         {/* <p className="text-xs text-gray-500 font-inter">
                           ( role possibly )
                         </p> */}
@@ -221,7 +233,7 @@ export default function EventDashboard() {
           </div>
         </div>
 
-        <div className="mt-20 border border-gray-100 rounded-3xl shadow-sm  p-8">
+        <div className="mt-10 border border-gray-100 rounded-3xl shadow-sm  p-8">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="flex items-start gap-4">
               <div>
