@@ -1,9 +1,16 @@
-import { Calendar, ChevronRight, Hash, MapPin, Share } from "lucide-react";
+import {
+  Calendar,
+  ChevronRight,
+  Hash,
+  Image,
+  MapPin,
+  Share,
+} from "lucide-react";
 import Navbar from "../components/Navbar";
 import { Link, useParams } from "react-router";
 import { useEffect, useState } from "react";
 import type { Organization } from "../types/Organizations";
-import { SERVER_IP } from "../config";
+import { LOCAL_IP, SERVER_IP } from "../config";
 import type { UniversityEvent } from "../types/UniversityEvent";
 import { formatStackedDate, formatTime } from "../utils/date";
 
@@ -77,7 +84,18 @@ export default function Organization() {
 
           <div className="absolute px-20 top-30 w-full">
             <div className="flex w-full">
-              <div className="bg-gray h-50 w-50 rounded"></div>
+              <div className="bg-gray-300 h-50 w-50 rounded overflow-hidden flex items-center justify-center shrink-0">
+                {org.logo ? (
+                  <img
+                    src={org.logo}
+                    alt={`${org.name} logo`}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  /* Fallback Icon if no logo exists in DB */
+                  <Image className="text-gray-400" size={24} />
+                )}
+              </div>
 
               <div className="mt-auto ml-auto flex gap-10 ">
                 <button className=" items-center gap-3 flex font-bold w-fit px-8 py-3 rounded-4xl text-black bg-lightgray my-3 px-4 py-2 font-league">
@@ -175,9 +193,9 @@ export default function Organization() {
 
               {/* events go here */}
 
-              <div className="p-10 flex flex-col gap-10 justify-center items-center">
+              <div className="p-10 flex flex-col gap-10 w-full max-w-5xl mx-auto">
                 {Object.keys(groupedEvents).length === 0 && (
-                  <div className="mt-20 h-30 text-gray-400">
+                  <div className="mt-20 h-30 text-gray-400 text-center">
                     <p>There's no {activeTab.toLowerCase()} events. :(</p>
                   </div>
                 )}
@@ -202,7 +220,19 @@ export default function Organization() {
                           className="w-full h-56 rounded-2xl flex overflow-hidden bg-gray-50"
                         >
                           {/* Left Image Section */}
-                          <div className="w-76 h-full bg-gray/30 relative"></div>
+                          <div className="min-w-56 h-full bg-gray-200 relative shrink-0">
+                            {event.flyer ? (
+                              <img
+                                src={event.flyer}
+                                alt={event.title}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                <Image size={32} />
+                              </div>
+                            )}
+                          </div>
 
                           {/* Content Section */}
 
@@ -237,7 +267,7 @@ export default function Organization() {
                               {event.title}
                             </h3>
 
-                            <p className="text-gray-500 text-sm font-inter line-clamp-3 mt-1">
+                            <p className="text-gray-500 text-sm font-inter line-clamp-3 mt-1 ">
                               {event.description || "No description provided."}
                             </p>
 
