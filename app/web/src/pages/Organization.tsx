@@ -220,7 +220,7 @@ export default function Organization() {
                           className="w-full h-56 rounded-2xl flex overflow-hidden bg-gray-50"
                         >
                           {/* Left Image Section */}
-                          <div className="min-w-56 h-full bg-gray-200 relative shrink-0">
+                          <div className="min-w-56 max-w-56 h-full bg-gray-200 relative shrink-0">
                             {event.flyer ? (
                               <img
                                 src={event.flyer}

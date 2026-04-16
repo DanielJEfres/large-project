@@ -1,4 +1,4 @@
-import { ChevronRight, Hash, Share } from "lucide-react";
+import { ChevronRight, Hash, Image, Share } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { Link, useParams } from "react-router";
 import { useEffect, useState } from "react";
@@ -281,7 +281,32 @@ export default function Event() {
 
                   <div className="mt-2 bg-lightgray h-60 flex rounded-xl overflow-hidden shadow-sm">
                     {/* first */}
-                    <div className="h-full w-100 bg-gray "></div>
+                    <div className="h-full w-70 bg-gray-300 rounded-xl rounded-r-none overflow-hidden flex items-center justify-center shrink-0 border border-gray-100">
+                      {hostOrg?.logo ? (
+                        <img
+                          src={hostOrg.logo}
+                          alt={`${hostOrg.name} logo`}
+                          className="h-full w-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src = "";
+                            e.currentTarget.parentElement!.classList.add(
+                              "bg-gray-200",
+                            );
+                          }}
+                        />
+                      ) : (
+                        <div className="flex flex-col items-center gap-2">
+                          <Image
+                            className="text-gray-400"
+                            size={48}
+                            strokeWidth={1.5}
+                          />
+                          <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+                            No Logo
+                          </span>
+                        </div>
+                      )}
+                    </div>
 
                     {/* second */}
                     <div className="px-8 pt-8 flex flex-col w-full">
