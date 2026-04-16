@@ -34,7 +34,7 @@ router.get('/:eventId', async (req, res) => {
        
         if(!event) return res.json(500).json({message: "No Event Found"})
         
-        const eventCreator = await User.findById(event.createdBy).select('firstName lastName')
+        const eventCreator = await User.findById(event.createdBy).select('firstName lastName profilePicture');
         
         //Get tag names
         if(event.tags && event.tags.length > 0) {

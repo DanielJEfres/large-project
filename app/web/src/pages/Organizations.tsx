@@ -157,7 +157,7 @@ export default function Organizations() {
                         onClick={() => handleJoinLeave(org._id, !isMember)}
                         className={`font-bold min-w-[120px] px-9 rounded-4xl  my-3 mr-3 font-league cursor-pointer active:scale-95 transition-all hover:bg-brand duration-100 ${
                           isMember
-                            ? "bg-lightgray text-black hover:bg-gray-200 "
+                            ? "bg-lightgray text-black hover:bg-gray-200 border-2 border-[#f0f0f0]"
                             : "bg-black text-white hover:bg-zinc-800"
                         }`}
                       >

@@ -268,14 +268,12 @@ export default function Profile() {
         </div>
       </div>
 
-      {isEditModalOpen && (
+      {isEditModalOpen && myData && (
         <EditProfileModal
-          user={myData?.user}
+          user={myData} // myData is already the user object
           token={token}
           onClose={() => setIsEditModalOpen(false)}
-          onUpdate={(updatedUser) =>
-            setMyData({ ...myData, user: updatedUser })
-          }
+          onUpdate={(updatedUser) => setMyData(updatedUser)} // Directly update the user state
         />
       )}
     </>

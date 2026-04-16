@@ -13,6 +13,7 @@ export interface UniversityEvent {
     firstName: string;
     lastName: string;
     fullName?: string;
+    profilePicture?: string;
   };
   // Update this to tag once tag backend call is finished
   tags: Tag[];

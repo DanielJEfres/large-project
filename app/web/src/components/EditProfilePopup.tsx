@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { X, Upload, Loader2, User } from "lucide-react";
 import { SERVER_IP } from "../config";
+import { useAuth } from "../context/AuthContext";
 
 interface EditProfileModalProps {
   user: any;
@@ -21,6 +22,8 @@ export default function EditProfileModal({
     lastName: user?.lastName || "",
     bio: user?.bio || "",
   });
+  const { setUser } = useAuth();
+
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState(user?.profilePicture || "");
 
@@ -34,6 +37,13 @@ export default function EditProfileModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Prevents blank inputs
+    if (!formData.firstName.trim() || !formData.lastName.trim()) {
+      alert("First name and Last name cannot be blank.");
+      return;
+    }
+
     setLoading(true);
 
     const data = new FormData();
@@ -51,7 +61,18 @@ export default function EditProfileModal({
 
       if (response.ok) {
         const result = await response.json();
-        onUpdate(result.user);
+        const updatedUser = result.user;
+
+        // Update Profile.tsx local state
+        onUpdate(updatedUser);
+
+        // Update Global Auth state (Navbar/Menu)
+        // We map profilePicture to pfp to match your User type in AuthContext
+        setUser({
+          ...updatedUser,
+          pfp: updatedUser.profilePicture,
+        });
+
         onClose();
       }
     } catch (err) {

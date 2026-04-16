@@ -2,7 +2,7 @@ import { ChevronRight, Hash, Image, Share } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { Link, useParams } from "react-router";
 import { useEffect, useState } from "react";
-import { SERVER_IP } from "../config";
+import { LOCAL_IP, SERVER_IP } from "../config";
 import type { UniversityEvent } from "../types/UniversityEvent";
 import { formatStackedDate, formatTime } from "../utils/date";
 import { useOrganizations } from "../hooks/useOrganization";
@@ -229,7 +229,22 @@ export default function Event() {
 
                 <div className="mt-2">
                   <div className="flex items-center gap-2">
-                    <div className="h-7 w-7 bg-gray rounded-full"></div>
+                    <div className="h-7 w-7 bg-gray-200 rounded-full overflow-hidden flex items-center justify-center shrink-0">
+                      {event.createdBy?.profilePicture ? (
+                        <img
+                          src={event.createdBy.profilePicture}
+                          alt={event.createdBy.fullName}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-brand">
+                          <span className="text-[10px] font-bold text-white">
+                            {event.createdBy?.firstName?.[0]}
+                            {event.createdBy?.lastName?.[0]}
+                          </span>
+                        </div>
+                      )}
+                    </div>
                     <p>
                       {`${event.createdBy.firstName} ${event.createdBy.lastName}`}
                     </p>
