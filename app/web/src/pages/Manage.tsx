@@ -6,7 +6,14 @@ import { SERVER_IP } from "../config";
 import { Link, useNavigate } from "react-router";
 import { useOrganizations } from "../hooks/useOrganization";
 import { formatStackedDate } from "../utils/date";
-import { ArrowRightIcon, Calendar, Image, MapPin, Users } from "lucide-react";
+import {
+  ArrowRightIcon,
+  Calendar,
+  Image,
+  MapPin,
+  Users,
+  Pencil,
+} from "lucide-react";
 
 export default function Manage() {
   const navigate = useNavigate();
@@ -59,8 +66,8 @@ export default function Manage() {
   return (
     <>
       <Navbar />
-      <div className="font-inter px-20 pb-20">
-        <h1 className="text-5xl font-bebas mt-10 mb-8">Manage</h1>
+      <div className="font-inter px-6 md:px-20 pb-20">
+        <h1 className="text-4xl md:text-5xl font-bebas mt-10 mb-8">Manage</h1>
 
         <div className="font-inter flex gap-4 items-center mt-3">
           <div
@@ -104,54 +111,61 @@ export default function Manage() {
               <Link
                 to={`/event/${event._id}`}
                 key={event._id}
-                className="group flex "
+                className="group flex items-start"
               >
-                <div className="relative min-w-62 min-h-62 max-w-62 max-h-62 bg-gray-100 rounded-2xl overflow-hidden mb-4">
+                {/* Image stays left: 120px on mobile, 248px on desktop */}
+                <div className="relative flex-shrink-0 w-32 h-32 md:w-62 md:h-62 bg-gray-100 rounded-2xl overflow-hidden flex items-center justify-center">
                   {event.flyer ? (
                     <img
                       src={event.flyer}
-                      className="w-full h-full w-2 object-cover group-hover:scale-105 transition-transform"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-gray-300">
-                      <Image size={48} />
+                      <Image className="w-8 h-8 md:w-12 md:h-12" />
                     </div>
                   )}
                 </div>
-                <div className="flex w-full">
-                  <div className="relative flex flex-col p-6 w-full">
-                    <p className="font-bebas text-brand text-xl tracking-wide uppercase">
-                      {orgLookup[event.organizationId]?.name ||
-                        "this should say user's name  :p"}
+
+                <div className="flex w-full h-full">
+                  <div className="relative flex flex-col h-full px-4 md:p-6 w-full ">
+                    <p className="font-bebas text-brand text-sm md:text-xl tracking-wide uppercase truncate">
+                      {orgLookup[event.organizationId]?.name || "Student event"}
                     </p>
-                    <h3 className="text-lg font-bold line-clamp-1">
+                    <h3 className="text-base md:text-lg font-bold line-clamp-1">
                       {event.title}
                     </h3>
-                    <div className="mt-1 text-gray-500 font-medium text-sm flex items-center gap-1">
-                      <Calendar size={16} className="shrink-0" />
+
+                    <div className="mt-1 text-gray-500 font-medium text-xs md:text-sm flex items-center gap-1">
+                      <Calendar className="w-3.5 h-3.5 md:w-4 md:h-4 shrink-0" />
                       {formatStackedDate(event.startDate).day},{" "}
                       {formatStackedDate(event.startDate).date}
                     </div>
 
-                    <div className="mt-1 text-gray-500 font-medium text-sm flex items-center gap-1">
-                      <MapPin size={16} className="shrink-0" />
-                      <p>{event.location}</p>
+                    <div className="mt-1 text-gray-500 font-medium text-xs md:text-sm flex items-center gap-1">
+                      <MapPin className="w-3.5 h-3.5 md:w-4 md:h-4 shrink-0" />
+                      <p className="truncate">{event.location}</p>
                     </div>
 
-                    <div className="mt-auto mb-5 text-gray-500 font-medium text-sm flex items-center gap-1">
-                      <Users />
-                      <p>{event.attendees.length} are attending... </p>
+                    <div className="mt-auto text-gray-500 font-medium text-xs md:text-sm flex items-center gap-1">
+                      <Users className="w-3.5 h-3.5 md:w-6 md:h-6 shrink-0" />
+                      <p className="truncate">
+                        {event.attendees.length} are attending...
+                      </p>
                     </div>
                   </div>
+
+                  {/* Icon only on mobile, Text + Icon on Desktop */}
                   <button
                     onClick={(e) => {
                       e.preventDefault();
                       navigate(`/manage/event/${event._id}`);
                     }}
-                    className="cursor-pointer font-league self-center h-fit flex items-center gap-2 px-6 py-3 bg-gray-100 rounded-2xl hover:bg-gray-200 transition-all font-bold"
+                    className="cursor-pointer font-league self-center h-fit flex items-center justify-center gap-2 p-3 md:px-6 md:py-3 bg-gray-100 rounded-xl md:rounded-2xl hover:bg-gray-200 transition-all font-bold shrink-0"
                   >
-                    <span>Manage</span>
-                    <ArrowRightIcon size={16} />
+                    <span className="hidden md:inline">Manage</span>
+                    <ArrowRightIcon size={16} className="hidden md:block" />
+                    <Pencil size={18} className="md:hidden" />
                   </button>
                 </div>
               </Link>

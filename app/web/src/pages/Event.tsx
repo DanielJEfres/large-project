@@ -1,26 +1,26 @@
-import { ChevronRight, Hash, Share } from "lucide-react";
+import { ChevronRight, Hash, Image, Share } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { Link, useParams } from "react-router";
 import { useEffect, useState } from "react";
-import { SERVER_IP } from "../config";
+import { LOCAL_IP, SERVER_IP } from "../config";
 import type { UniversityEvent } from "../types/UniversityEvent";
 import { formatStackedDate, formatTime } from "../utils/date";
 import { useOrganizations } from "../hooks/useOrganization";
 
 import { useAuth } from "../context/AuthContext";
+import { useMembership } from "../hooks/useMembership";
 
 export default function Event() {
   const { eventId } = useParams();
   const [event, setEvent] = useState<UniversityEvent | null>(null);
   const [loading, setLoading] = useState(true);
   const { orgLookup, fetchOrgDetails } = useOrganizations();
+  const { isOrgMember, toggleOrgMembership } = useMembership();
 
   const isPastEvent = event ? new Date(event.startDate) < new Date() : false;
 
   const { user, token } = useAuth();
   const [isAttending, setIsAttending] = useState(false); // Track attendance locally
-
-  const [showMenu, setShowMenu] = useState(false);
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -229,7 +229,22 @@ export default function Event() {
 
                 <div className="mt-2">
                   <div className="flex items-center gap-2">
-                    <div className="h-7 w-7 bg-gray rounded-full"></div>
+                    <div className="h-7 w-7 bg-gray-200 rounded-full overflow-hidden flex items-center justify-center shrink-0">
+                      {event.createdBy?.profilePicture ? (
+                        <img
+                          src={event.createdBy.profilePicture}
+                          alt={event.createdBy.fullName}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-brand">
+                          <span className="text-[10px] font-bold text-white">
+                            {event.createdBy?.firstName?.[0]}
+                            {event.createdBy?.lastName?.[0]}
+                          </span>
+                        </div>
+                      )}
+                    </div>
                     <p>
                       {`${event.createdBy.firstName} ${event.createdBy.lastName}`}
                     </p>
@@ -281,7 +296,32 @@ export default function Event() {
 
                   <div className="mt-2 bg-lightgray h-60 flex rounded-xl overflow-hidden shadow-sm">
                     {/* first */}
-                    <div className="h-full w-100 bg-gray "></div>
+                    <div className="h-full w-70 bg-gray-300 rounded-xl rounded-r-none overflow-hidden flex items-center justify-center shrink-0 border border-gray-100">
+                      {hostOrg?.logo ? (
+                        <img
+                          src={hostOrg.logo}
+                          alt={`${hostOrg.name} logo`}
+                          className="h-full w-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src = "";
+                            e.currentTarget.parentElement!.classList.add(
+                              "bg-gray-200",
+                            );
+                          }}
+                        />
+                      ) : (
+                        <div className="flex flex-col items-center gap-2">
+                          <Image
+                            className="text-gray-400"
+                            size={48}
+                            strokeWidth={1.5}
+                          />
+                          <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+                            No Logo
+                          </span>
+                        </div>
+                      )}
+                    </div>
 
                     {/* second */}
                     <div className="px-8 pt-8 flex flex-col w-full">
@@ -301,8 +341,19 @@ export default function Event() {
                               <ChevronRight width={17} />
                             </button>
                           </Link>
-                          <button className="font-bold  px-7  rounded-4xl text-white bg-black my-3  py-2 font-league">
-                            Join
+                          <button
+                            onClick={() =>
+                              toggleOrgMembership(event.organizationId)
+                            }
+                            className={`font-bold px-7 rounded-4xl my-3 py-2 font-league cursor-pointer transition-all active:scale-95 ${
+                              isOrgMember(event.organizationId)
+                                ? "bg-gray-200 text-black border border-gray-300"
+                                : "bg-black text-white hover:bg-zinc-800"
+                            }`}
+                          >
+                            {isOrgMember(event.organizationId)
+                              ? "Leave"
+                              : "Join"}
                           </button>
                         </div>
                       )}

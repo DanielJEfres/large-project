@@ -100,12 +100,14 @@ export default function MyOrgs() {
   return (
     <>
       <Navbar />
-      <div className="font-inter px-20 pb-20">
-        <div className="flex mt-10 mb-8 justify-between items-center">
-          <h1 className="text-5xl font-bebas min-w-fit">YOUR ORGANIZATIONS</h1>
+      <div className="font-inter px-4 md:px-20 pb-20">
+        <div className="flex flex-col md:flex-row mt-10 mb-8 justify-between md:items-center gap-4">
+          <h1 className="text-4xl md:text-5xl font-bebas min-w-fit">
+            YOUR ORGANIZATIONS
+          </h1>
 
           <Link to="/create-org">
-            <button className="cursor-pointer rounded-2xl bg-black hover:bg-zinc-800 transition-colors text-white px-6 py-2.5 font-league font-bold flex text-md items-center gap-2">
+            <button className="w-full md:w-auto cursor-pointer rounded-2xl bg-black hover:bg-zinc-800 transition-colors text-white px-6 py-2.5 font-league font-bold flex text-md items-center justify-center gap-2">
               <Plus size={20} /> Create Organization
             </button>
           </Link>
@@ -122,15 +124,15 @@ export default function MyOrgs() {
             </p>
           </div>
         ) : (
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-4 md:gap-6">
             {orgs.map((org) => (
               <Link
                 key={org.id}
                 to={`/organization/${org.id}`}
-                className="rounded-2xl  bg-[#f5f5f76e] transition-all overflow-hidden flex h-50"
+                className="rounded-2xl bg-[#f5f5f76e] transition-all overflow-visible flex h-32 md:h-50 border border-transparent"
               >
-                {/* Image */}
-                <div className="w-70 bg-gray/30 flex items-center justify-center shrink-0">
+                {/* Image Wrapper needs overflow-hidden now instead of the whole card */}
+                <div className="w-32 md:w-70 h-full bg-gray/30 flex items-center justify-center shrink-0 rounded-l-2xl overflow-hidden">
                   {org.logo ? (
                     <img
                       src={org.logo}
@@ -138,73 +140,82 @@ export default function MyOrgs() {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <Image size={40} className="text-gray/70" />
+                    <>
+                      <Image size={30} className="md:hidden text-gray/70" />
+                      <Image
+                        size={40}
+                        className="hidden md:block text-gray/70"
+                      />
+                    </>
                   )}
                 </div>
 
                 {/* The Content (Right Side) */}
-                <div className="p-6 w-2/3 flex flex-col justify-between">
-                  <div>
-                    <h2 className="text-2xl font-bebas line-clamp-1">
+                <div className="p-3 md:p-6 flex-1 flex flex-col md:flex-row justify-between min-w-0 bg-[#f5f5f76e] rounded-r-2xl">
+                  <div className="flex-1 flex flex-col min-w-0">
+                    <h2 className="text-lg md:text-2xl font-bebas truncate">
                       {org.name}
                     </h2>
-                    <p className="text-brand tracking-wider font-bebas mb-2">
+                    <p className="text-brand tracking-wider font-bebas text-xs md:text-base mb-1 md:mb-2 uppercase">
                       {org.role}
                     </p>
-                    <p className="text-gray text-sm mb-4 line-clamp-3">
+                    <p className="text-gray text-xs md:text-sm mb-2 line-clamp-2 ">
                       {org.description || "No description provided."}
                     </p>
-                  </div>
 
-                  {/* Tags / Category */}
-                  <div className="flex flex-wrap gap-2 pt-2">
-                    {org.category && (
-                      <span className="flex items-center gap-1 px-3 py-1 bg-brand/40 text-xs font-bold uppercase tracking-wider text-black">
-                        {org.category}
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Buttons Section */}
-                <div className="flex items-center pr-10">
-                  {org.role === "admin" ? (
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        navigate(`/manage/org/${org.id}`);
-                      }}
-                      className="cursor-pointer font-league self-center h-fit flex items-center gap-2 px-6 py-3 bg-gray-100 rounded-2xl hover:bg-gray-200 transition-all font-bold"
-                    >
-                      <span>Manage</span>
-                      <ArrowRightIcon size={16} />
-                    </button>
-                  ) : (
-                    <div className="relative">
-                      <button
-                        onClick={(e) => toggleMenu(e, org.id)}
-                        className="hover:cursor-pointer flex items-center gap-2 px-8 py-2.5 bg-lightgray text-black rounded-2xl font-league font-bold hover:bg-gray-200 transition-all active:scale-95"
-                      >
-                        Joined{" "}
-                        <ChevronDown
-                          size={20}
-                          className={`transition-transform ${openMenuId === org.id ? "rotate-180" : ""}`}
-                        />
-                      </button>
-
-                      {openMenuId === org.id && (
-                        <div className="absolute right-0 mt-2 w-48 bg-white rounded-2xl border border-gray-200 z-50 overflow-hidden">
-                          <button
-                            onClick={(e) => handleLeaveOrg(e, org.id)}
-                            className="hover:cursor-pointer w-full flex items-center gap-2 px-5 py-4 text-sm  hover:bg-gray-50 font-bold font-league transition-colors"
-                          >
-                            <LogOut size={16} /> Leave
-                          </button>
-                        </div>
+                    {/* Tags / Category - Pushed to bottom with mt-auto */}
+                    <div className="hidden md:flex flex-wrap gap-2 mt-auto pt-2">
+                      {org.category && (
+                        <span className="flex items-center gap-1 px-3 py-1 bg-brand/40 text-xs font-bold uppercase tracking-wider text-black">
+                          {org.category}
+                        </span>
                       )}
                     </div>
-                  )}
+                  </div>
+
+                  {/* Buttons Section - Centered vertically */}
+                  <div className="flex md:ml-auto md:pl-10 items-center justify-end">
+                    {org.role === "admin" ? (
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          navigate(`/manage/org/${org.id}`);
+                        }}
+                        className="cursor-pointer font-league flex items-center gap-2 px-4 md:px-6 py-1.5 md:py-3 bg-gray-100 rounded-xl md:rounded-2xl hover:bg-gray-200 transition-all font-bold text-xs md:text-base"
+                      >
+                        <span>Manage</span>
+                        <ArrowRightIcon size={16} className="hidden md:block" />
+                      </button>
+                    ) : (
+                      <div
+                        className="relative"
+                        ref={openMenuId === org.id ? menuRef : null}
+                      >
+                        <button
+                          onClick={(e) => toggleMenu(e, org.id)}
+                          className="hover:cursor-pointer flex items-center gap-1 md:gap-2 px-4 md:px-8 py-1.5 md:py-2.5 bg-lightgray text-black rounded-xl md:rounded-2xl font-league font-bold hover:bg-gray-200 transition-all active:scale-95 text-xs md:text-base"
+                        >
+                          Joined{" "}
+                          <ChevronDown
+                            size={16}
+                            className={`transition-transform md:w-5 md:h-5 ${openMenuId === org.id ? "rotate-180" : ""}`}
+                          />
+                        </button>
+
+                        {openMenuId === org.id && (
+                          <div className="absolute right-0 mt-2 w-32 md:w-48 bg-white rounded-2xl border border-gray-200 z-[100] overflow-hidden shadow-xl">
+                            <button
+                              onClick={(e) => handleLeaveOrg(e, org.id)}
+                              className="hover:cursor-pointer w-full flex items-center gap-2 px-5 py-4 text-xs md:text-sm hover:bg-gray-50 font-bold font-league transition-colors text-black"
+                            >
+                              <LogOut size={16} /> Leave
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </Link>
             ))}

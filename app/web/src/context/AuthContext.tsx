@@ -34,11 +34,20 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<User | null>(() => {
-    // UI Persistence: Only used to show the name/pfp while we verify the session
+  const [user, setUserState] = useState<User | null>(() => {
     const savedUser = localStorage.getItem("user_data");
     return savedUser ? JSON.parse(savedUser) : null;
   });
+
+  // A wrapper that handles both State and LocalStorage
+  const setUser = (userData: User | null) => {
+    setUserState(userData);
+    if (userData) {
+      localStorage.setItem("user_data", JSON.stringify(userData));
+    } else {
+      localStorage.removeItem("user_data");
+    }
+  };
 
   const [joinedOrgIds, setJoinedOrgIds] = useState<Set<string>>(new Set());
 

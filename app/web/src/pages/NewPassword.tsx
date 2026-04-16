@@ -28,7 +28,7 @@ export default function NewPassword() {
 
       if (!response.ok) throw new Error("Failed to update password.");
 
-      alert("Password updated ez ( Style this later if ts works )");
+      alert("Password updated. Please log in with your new password.");
       navigate("/login");
     } catch (err: any) {
       setError(err.message);
