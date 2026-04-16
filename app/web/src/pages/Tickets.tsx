@@ -34,9 +34,12 @@ export default function Tickets() {
         return;
       }
       try {
-        const response = await fetch(`${SERVER_IP}/api/events/user/${user.id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const response = await fetch(
+          `${SERVER_IP}/api/events/user/${user.id}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
         const data = await response.json();
         setMyEvents(data);
       } catch (err) {
@@ -121,7 +124,7 @@ export default function Tickets() {
                   <p className="font-bebas text-lg uppercase tracking-wider text-brand">
                     {event.isRSO
                       ? orgLookup[event.organizationId]?.name || "Loading..."
-                      : `${event.createdBy.firstName} ${event.createdBy.lastName}`}
+                      : "Student Event"}
                   </p>
                   <p className="font-semibold text-lg leading-tight mt-1 line-clamp-2">
                     {event.title}

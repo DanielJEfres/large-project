@@ -346,7 +346,7 @@ export default function Events() {
                   </>
                 ) : (
                   <>
-                    {filteredTrending.map((event) => (
+                    {filteredTrending.map((event, index) => (
                       <Link to={`/event/${event._id}`}>
                         <div
                           key={event._id}
@@ -369,7 +369,7 @@ export default function Events() {
                                 {event.isRSO
                                   ? orgLookup[event.organizationId]?.name ||
                                     "Loading..."
-                                  : `${event.createdBy.firstName} ${event.createdBy.lastName}`}
+                                  : `#${index + 1}`}
                               </p>
                               <span className="gap-1 flex text-[10px] font-bold text-gray-400 items-center min-w-fit">
                                 <Users size={16} />
