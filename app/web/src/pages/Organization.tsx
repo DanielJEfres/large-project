@@ -7,7 +7,7 @@ import {
   Share,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
-import { Link, useParams } from "react-router";
+import { Link, useParams, useNavigate } from "react-router";
 import { useEffect, useState } from "react";
 import type { Organization } from "../types/Organizations";
 import { LOCAL_IP, SERVER_IP } from "../config";
@@ -20,6 +20,7 @@ export default function Organization() {
   const [activeTab, setActiveTab] = useState<"Upcoming" | "Past">("Upcoming");
 
   const { orgId } = useParams();
+  const navigate = useNavigate();
   const [org, setOrg] = useState<Organization | null>(null);
   const [events, setEvents] = useState<UniversityEvent[]>([]);
   const [loading, setLoading] = useState(true);
@@ -80,13 +81,18 @@ export default function Organization() {
 
       <section className="">
         <div className="relative">
-          <div className="w-full h-60 bg-gray-100"></div>
+          <div className="w-full h-40 md:h-60 bg-gray-100">
+            {/* Mobile Share Icon */}
+            <button className="md:hidden absolute top-4 right-4 z-30 p-2 bg-white/80 backdrop-blur-md rounded-full text-black">
+              <Share width={20} />
+            </button>
+          </div>
 
           {/* organization header here */}
 
-          <div className="absolute px-20 top-30 w-full">
-            <div className="flex w-full">
-              <div className="bg-gray-300 h-50 w-50 rounded overflow-hidden flex items-center justify-center shrink-0">
+          <div className="absolute px-6 md:px-20 top-20 md:top-30 w-full">
+            <div className="flex flex-col md:flex-row w-full gap-4 md:gap-0">
+              <div className="bg-gray-300 h-40 w-40 md:h-50 md:w-50 rounded overflow-hidden flex items-center justify-center shrink-0">
                 {org.logo ? (
                   <img
                     src={org.logo}
@@ -99,14 +105,15 @@ export default function Organization() {
                 )}
               </div>
 
-              <div className="mt-auto ml-auto flex gap-10 ">
-                <button className=" items-center gap-3 flex font-bold w-fit px-8 py-3 rounded-4xl text-black bg-lightgray my-3 px-4 py-2 font-league">
+              <div className="md:mt-auto md:ml-auto flex flex-col md:flex-row gap-3 md:gap-10">
+                {/* Desktop Share Button */}
+                <button className="hidden md:flex items-center gap-3 font-bold w-fit px-8 py-3 rounded-4xl text-black bg-lightgray my-3 font-league">
                   <Share width={20} />
                   Share Organization
                 </button>
                 <button
                   onClick={() => toggleOrgMembership(org._id)}
-                  className={`font-bold w-40 px-8 py-3 rounded-4xl  my-3 font-league cursor-pointer transition-all active:scale-95 ${
+                  className={`font-bold w-full md:w-40 px-8 py-3 rounded-4xl md:my-3 font-league cursor-pointer transition-all active:scale-95 ${
                     isOrgMember(org._id)
                       ? "bg-gray-200 text-black border border-gray-300"
                       : "bg-black text-white hover:bg-zinc-800"
@@ -118,14 +125,14 @@ export default function Organization() {
             </div>
 
             {/* org title */}
-            <h1 className="text-5xl font-bebas mt-6 tracking-wide">
+            <h1 className="text-4xl md:text-5xl font-bebas mt-6 tracking-wide">
               {org.name}
             </h1>
 
             {/* description */}
 
-            <div className="mt-4 ">
-              <p className="font-inter text-md text-gray-700 leading-relaxed ">
+            <div className="mt-4">
+              <p className="font-inter text-md text-gray-700 leading-relaxed">
                 {org.description}
                 <span className="text-black font-semibold cursor-pointer">
                   ...more
@@ -164,7 +171,7 @@ export default function Organization() {
             </div>
 
             {/* events header! */}
-            <div className="mt-10 ">
+            <div className="mt-10">
               <h2 className="font-bebas text-4xl mb-4">Events</h2>
 
               <div className="flex gap-4 items-center mt-3">
@@ -202,7 +209,7 @@ export default function Organization() {
 
               {/* events go here */}
 
-              <div className="p-10 flex flex-col gap-10 w-full max-w-5xl mx-auto">
+              <div className="py-10 flex flex-col gap-10 w-full max-w-5xl mx-auto">
                 {Object.keys(groupedEvents).length === 0 && (
                   <div className="mt-20 h-30 text-gray-400 text-center">
                     <p>There's no {activeTab.toLowerCase()} events. :(</p>
@@ -211,7 +218,7 @@ export default function Organization() {
                 {Object.keys(groupedEvents).map((dateKey) => (
                   <div key={dateKey} className="flex flex-col gap-4">
                     {/* Date Header for the Group */}
-                    <div className="text-lg bg-white relative w-fit flex gap-2 py-1 rounded-full -left-2.25">
+                    <div className="text-lg bg-white relative w-fit flex gap-2 py-1 rounded-full md:-left-2.25">
                       <p className="font-bold">{dateKey}</p>
                       <p className="text-gray font-semibold">
                         {
@@ -226,10 +233,11 @@ export default function Organization() {
                       {groupedEvents[dateKey].map((event) => (
                         <div
                           key={event._id}
-                          className="w-full h-56 rounded-2xl flex overflow-hidden bg-gray-50"
+                          onClick={() => navigate(`/event/${event._id}`)}
+                          className="w-full h-36 md:h-56 rounded-2xl flex flex-row overflow-hidden bg-gray-50 cursor-pointer"
                         >
                           {/* Left Image Section */}
-                          <div className="min-w-56 max-w-56 h-full bg-gray-200 relative shrink-0">
+                          <div className="w-32 md:min-w-56 md:max-w-56 h-full bg-gray-200 relative shrink-0">
                             {event.flyer ? (
                               <img
                                 src={event.flyer}
@@ -245,8 +253,8 @@ export default function Organization() {
 
                           {/* Content Section */}
 
-                          <div className="flex-col px-6 py-5 flex relative w-full ">
-                            <div className="font-inter flex text-sm gap-1  relative font-semibold  text-gray-500  rounded-full ">
+                          <div className="flex-col px-4 md:px-6 py-3 md:py-5 flex relative w-full">
+                            <div className="font-inter flex text-[10px] md:text-sm gap-1 relative font-semibold text-gray-500 rounded-full">
                               <p>{formatTime(event.startDate)}</p>
                               {event.endDate && (
                                 <>
@@ -272,43 +280,42 @@ export default function Organization() {
                                 </>
                               )}
                             </div>
-                            <h3 className="font-inter font-semibold text-lg leading-tight mt-2">
+                            <h3 className="font-inter font-semibold text-sm md:text-lg leading-tight mt-1 md:mt-2 line-clamp-1 md:line-clamp-none">
                               {event.title}
                             </h3>
 
-                            <p className="text-gray-500 text-sm font-inter line-clamp-3 mt-1 ">
+                            <p className="text-gray-500 text-[10px] md:text-sm font-inter line-clamp-2 md:line-clamp-3 mt-1">
                               {event.description || "No description provided."}
                             </p>
 
                             {/* Tags */}
-                            <div className="flex flex-wrap gap-2 mt-auto ">
+                            <div className="flex flex-wrap gap-1 md:gap-2 mt-2 md:mt-auto">
                               {event.tags.map((tag) => (
                                 <span
                                   key={tag._id}
-                                  className="flex gap-1 px-3 py-1 items-center bg-brand text-[10px] font-bold uppercase tracking-wider text-white rounded-full"
+                                  className="flex gap-1 px-2 md:px-3 py-0.5 md:py-1 items-center bg-brand text-[8px] md:text-[10px] font-bold uppercase tracking-wider text-white rounded-full"
                                 >
-                                  <Hash size={14} />
+                                  <Hash size={10} className="md:w-[14px]" />
                                   {tag.name}
                                 </span>
                               ))}
                             </div>
 
-                            <div className="font-inter mt-2 flex items-center justify-between">
-                              <div className="flex items-center gap-4 text-gray-500 text-sm ">
+                            <div className="font-inter mt-2 flex flex-row items-center justify-between gap-3">
+                              <div className="flex items-center gap-2 md:gap-4 text-gray-500 text-[10px] md:text-sm">
                                 <div className="flex items-center gap-1">
-                                  <MapPin size={14} />
-                                  <span>{event.location}</span>
+                                  <MapPin size={12} className="md:w-[14px]" />
+                                  <span className="line-clamp-1">
+                                    {event.location}
+                                  </span>
                                 </div>
                               </div>
 
-                              <Link
-                                to={`/event/${event._id}`}
-                                className="font-semibold flex items-center gap-2 hover:text-brand transition-colors"
-                              >
+                              <div className="hidden md:flex font-semibold items-center gap-2 hover:text-brand transition-colors">
                                 <button className="flex gap-2 cursor-pointer items-center">
                                   Learn More <ChevronRight width={17} />
                                 </button>
-                              </Link>
+                              </div>
                             </div>
                           </div>
                         </div>
