@@ -50,6 +50,22 @@ router.get("/getTags", async(req, res) => {
     }
 })
 
+//Get tags for user
+router.get("/:userId", async(req, res) => {
+    try {
+
+        const userId = req.params.userId
+
+        const interests = await User.findById(userId).select("interests").populate("interests firstName lastName")
+
+        return res.status(200).json({interests:interests})
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({message:"Failed to fetch interests from user"})
+    }
+})
+
 //Add Tag (User): add tag to user's tag array
 router.put("/user/:userId", async(req, res) => {
     try {
