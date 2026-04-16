@@ -24,7 +24,7 @@ const CATEGORIES = [
 ];
 
 export default function CreateOrganization() {
-  const { user, token } = useAuth();
+  const { user, token, refreshMemberships } = useAuth();
   const navigate = useNavigate();
 
   //For uploading files
@@ -84,10 +84,7 @@ export default function CreateOrganization() {
     data.append("contactEmail", formData.contactEmail);
     data.append("knightConnectUrl", formData.knightConnectUrl);
     data.append("createdBy", user?.id || "");
-    data.append("president", user?.id || "");
-    data.append("verificationStatus", "pending");
-
-    // Stringify the object so the backend receives it correctly
+    data.append("president", user?.id || ""); // Matches your backend requirement
     data.append("socialLinks", JSON.stringify(formData.socialLinks));
 
     if (logoFile) {
@@ -95,6 +92,7 @@ export default function CreateOrganization() {
     }
 
     try {
+      // Create the Organization
       const response = await fetch(`${SERVER_IP}/api/organizations/create`, {
         method: "POST",
         headers: {
@@ -103,14 +101,40 @@ export default function CreateOrganization() {
         body: data,
       });
 
+      const result = await response.json();
+
       if (response.ok) {
+        // The backend returns { Organization: { _id: "..." } }
+        const newOrgId = result.Organization._id;
+
+        // Automatically join the organization
+        // We do this so the creator is actually listed as a member/president in the DB
+        try {
+          await fetch(`${SERVER_IP}/api/organizations/join`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ orgId: newOrgId }),
+          });
+
+          // Update the global Auth state so "Joined" buttons update across the site
+          if (refreshMemberships) {
+            await refreshMemberships();
+          }
+        } catch (joinError) {
+          console.error("Auto-join failed, but org was created:", joinError);
+        }
+
+        // 5. Success! Move to the next page
         navigate("/organizations");
       } else {
-        const err = await response.json();
-        alert(err.message || "Failed to create organization");
+        alert(`Error: ${result.message || "Failed to create organization"}`);
       }
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Error creating organization:", error);
+      alert("Failed to connect to server.");
     }
   };
 

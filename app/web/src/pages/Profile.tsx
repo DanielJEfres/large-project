@@ -40,6 +40,8 @@ export default function Profile() {
         setMyData(userData.user);
         setMyOrgs(orgsData.organizations);
         setMyEvents(eventsData);
+
+        console.log(userData, orgsData.organizations);
       } catch (err: any) {
         console.error("Fetch error:", err);
         setFetchError(err.message);
