@@ -105,7 +105,7 @@ export default function Organizations() {
                   </div>
 
                   <div className="p-3 md:p-6 flex-1 flex flex-col md:flex-row justify-between min-w-0">
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-0 flex flex-col">
                       <h2 className="text-lg md:text-2xl font-bebas mb-1 md:mb-2 truncate">
                         {org.name}
                       </h2>
@@ -113,17 +113,18 @@ export default function Organizations() {
                         {org.description || "No description provided."}
                       </p>
 
-                      <div className="hidden md:flex flex-wrap gap-2 pt-2">
+                      {/* Removed 'hidden' and added responsive padding/text sizes */}
+                      <div className="mt-auto flex flex-wrap gap-2 pt-2">
                         {org.category && (
-                          <span className="flex items-center gap-1 px-3 py-1 bg-brand/40 text-xs font-bold uppercase tracking-wider text-black">
+                          <span className="flex items-center gap-1 px-2 md:px-3 py-0.5 md:py-1 bg-brand/40 text-[10px] md:text-xs font-bold uppercase tracking-wider text-black">
                             {org.category}
                           </span>
                         )}
                       </div>
                     </div>
 
-                    <div className="flex md:ml-auto md:pl-10 items-end">
-                      <div className="flex flex-row gap-3 md:gap-5 items-center w-full justify-end">
+                    <div className="relative flex md:ml-auto md:pl-10 items-end">
+                      <div className="relative flex flex-row gap-3 md:gap-5 items-center w-full justify-end">
                         {/* More Events Button - Hidden on mobile, original styles on desktop */}
                         <Link
                           className="hidden md:flex font-semibold py-2 font-league items-center min-w-fit"
@@ -141,7 +142,7 @@ export default function Organizations() {
                             e.stopPropagation(); // Prevent card click on mobile when joining
                             toggleOrgMembership(org._id);
                           }}
-                          className={`font-bold min-w-[70px] md:min-w-[120px] px-4 md:px-9 py-1.5 md:py-2 rounded-4xl font-league text-xs md:text-base cursor-pointer active:scale-95 transition-all duration-100 ${
+                          className={`absolute md:relative top-[-29px] md:top-0 font-bold min-w-[70px] md:min-w-[120px] px-4 md:px-9 py-1.5 md:py-2 rounded-4xl font-league text-xs md:text-base cursor-pointer active:scale-95 transition-all duration-100 ${
                             isMember
                               ? "bg-lightgray text-black border-2 border-[#f0f0f0]"
                               : "bg-black text-white hover:bg-zinc-800"

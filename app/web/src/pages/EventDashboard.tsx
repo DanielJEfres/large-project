@@ -87,7 +87,7 @@ export default function EventDashboard() {
   return (
     <>
       <Navbar />
-      <div className="max-w-7xl mx-auto px-20 py-10 font-inter text-black ">
+      <div className="max-w-7xl mx-auto font-inter px-4 md:px-20 text-black ">
         <Link
           to="/manage"
           className="flex items-center text-gray-500 hover:text-black mb-8 transition-colors w-fit"
@@ -233,7 +233,7 @@ export default function EventDashboard() {
           </div>
         </div>
 
-        <div className="mt-20 border border-gray-100 rounded-3xl shadow-sm  p-8">
+        <div className="mt-10 border border-gray-100 rounded-3xl shadow-sm  p-8">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="flex items-start gap-4">
               <div>
