@@ -209,12 +209,12 @@ export default function Event() {
                     </div>
 
                     {/* External Links Section */}
-                    <div className="flex flex-col">
+                    {/* <div className="flex flex-col">
                       <p className="font-league font-bold text-sm uppercase tracking-wider text-gray-500">
                         External Links
                       </p>
                       <p className=" font-medium text-black italic">None</p>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </div>
@@ -488,12 +488,12 @@ export default function Event() {
               </div>
             </section>
 
-            <section>
+            {/* <section>
               <h2 className="font-league font-bold text-sm uppercase tracking-wider text-gray-500">
                 External Links
               </h2>
               <p className="font-medium">{"None"}</p>
-            </section>
+            </section> */}
           </div>
 
           {/* Organizer Card (Mobile version) */}
