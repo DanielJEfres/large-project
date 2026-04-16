@@ -93,21 +93,14 @@ class _CreateOrganizationScreenState extends State<CreateOrganizationScreen> {
 
     if (!mounted) return;
     setState(() => _isSubmitting = false);
-
     if (result['success'] == true) {
-      _showSnack('Organization created!');
-      setState(() {
-        _nameController.clear();
-        _descController.clear();
-        _websiteController.clear();
-        _instagramController.clear();
-        _emailController.clear();
-        _selectedTags.clear();
-      });
-      if (mounted) Navigator.pop(context);
-    } else {
-      _showSnack(
-          (result['message'] as String?) ?? 'Failed to create organization');
+      if (!mounted) return;
+      Navigator.pop(context);
+
+    }
+    else {
+      setState(() => _isSubmitting = false);
+      _showSnack((result['message'] as String?) ?? 'Failed to create organization');
     }
   }
 

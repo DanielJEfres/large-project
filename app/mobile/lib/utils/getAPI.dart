@@ -261,9 +261,9 @@ class getAPI {
     required bool rsvpEnabled,
     required String createdBy,
     required List<String> tags,
+    String? organizationId, // NEW
   }) async {
     try {
-      // Backend uses multer (multipart/form-data) for the create event route
       final request = http.MultipartRequest(
         'POST',
         Uri.parse('$baseUrl/events'),
@@ -277,7 +277,7 @@ class getAPI {
       request.fields['rsvpEnabled'] = rsvpEnabled.toString();
       request.fields['createdBy'] = createdBy;
       if (endDate != null) request.fields['endDate'] = endDate;
-      // Encode tags as a JSON array string; backend will parse it
+      if (organizationId != null) request.fields['organizationId'] = organizationId; // NEW
       request.fields['tags'] = jsonEncode(tags);
 
       final streamed = await request.send();
