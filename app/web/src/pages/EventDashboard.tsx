@@ -87,10 +87,10 @@ export default function EventDashboard() {
   return (
     <>
       <Navbar />
-      <div className="max-w-7xl mx-auto font-inter px-4 md:px-20 text-black ">
+      <div className="max-w-7xl mx-auto font-inter px-4 md:px-20 mb-10 text-black ">
         <Link
           to="/manage"
-          className="flex items-center text-gray-500 hover:text-black mb-8 transition-colors w-fit"
+          className="mt-5 flex items-center text-gray-500 hover:text-black mb-8 transition-colors w-fit"
         >
           <ChevronLeft size={20} /> Back to Manage
         </Link>

@@ -61,11 +61,19 @@ export default function Login() {
 
           localStorage.removeItem("accessToken");
           setError(data.message || "Email not verified.");
-          navigate("/verify", {state : {email:unverifiedEmail}});
+          navigate("/verify", { state: { email: unverifiedEmail } });
           return;
         }
         throw new Error(data.message || "Something went wrong");
       }
+
+      // Fetch interests
+
+      const interestRes = await fetch(`${SERVER_IP}/api/tags/${data.user.id}`);
+      const interestData = await interestRes.json();
+
+      // the array is inside interestData.interests.interests
+      const userInterests = interestData.interests?.interests || [];
 
       login(
         {
@@ -75,6 +83,7 @@ export default function Login() {
           email: data.user.email,
           pfp: data.user.pfp,
           isVerified: data.user.isVerified,
+          interests: userInterests,
         },
         data.accessToken,
       );
@@ -82,7 +91,11 @@ export default function Login() {
       console.log("Login Successful");
 
       if (data.user.isVerified) {
-        navigate("/events");
+        if (userInterests.length === 0) {
+          navigate("/onboarding"); // Send to onboarding if interest array is empty
+        } else {
+          navigate("/events"); // Send to home if they already have tags
+        }
       } else {
         navigate("/verify");
       }
