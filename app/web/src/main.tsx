@@ -22,6 +22,7 @@ import NewPassword from "./pages/NewPassword.tsx";
 import Profile from "./pages/Profile.tsx";
 import MyOrgs from "./pages/MyOrgs.tsx";
 import CreateOrganization from "./pages/CreateOrganization.tsx";
+import Onboarding from "./pages/Onboarding.tsx";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -97,6 +98,10 @@ const router = createBrowserRouter([
       {
         path: "create-org",
         element: <CreateOrganization />,
+      },
+      {
+        path: "onboarding",
+        element: <Onboarding />,
       },
     ],
   },

@@ -13,8 +13,10 @@ import type { Organization } from "../types/Organizations";
 import { LOCAL_IP, SERVER_IP } from "../config";
 import type { UniversityEvent } from "../types/UniversityEvent";
 import { formatStackedDate, formatTime } from "../utils/date";
+import { useMembership } from "../hooks/useMembership";
 
 export default function Organization() {
+  const { isOrgMember, toggleOrgMembership } = useMembership();
   const [activeTab, setActiveTab] = useState<"Upcoming" | "Past">("Upcoming");
 
   const { orgId } = useParams();
@@ -102,8 +104,15 @@ export default function Organization() {
                   <Share width={20} />
                   Share Organization
                 </button>
-                <button className="font-bold w-40 px-8 py-3 rounded-4xl text-white bg-black my-3 px-4 py-2 font-league">
-                  Join
+                <button
+                  onClick={() => toggleOrgMembership(org._id)}
+                  className={`font-bold w-40 px-8 py-3 rounded-4xl  my-3 font-league cursor-pointer transition-all active:scale-95 ${
+                    isOrgMember(org._id)
+                      ? "bg-gray-200 text-black border border-gray-300"
+                      : "bg-black text-white hover:bg-zinc-800"
+                  }`}
+                >
+                  {isOrgMember(org._id) ? "Leave" : "Join"}
                 </button>
               </div>
             </div>
