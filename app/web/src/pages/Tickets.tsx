@@ -6,7 +6,7 @@ import { SERVER_IP } from "../config";
 import { Link } from "react-router";
 import { useOrganizations } from "../hooks/useOrganization";
 import { formatStackedDate } from "../utils/date";
-import { Image } from "lucide-react";
+import { Image, Ticket } from "lucide-react";
 
 export default function Tickets() {
   const [activeTab, setActiveTab] = useState<"Upcoming" | "Past">("Upcoming");
@@ -101,52 +101,73 @@ export default function Tickets() {
         </div>
         <div className="w-full h-0.5 bg-gray-200 -mt-0.5 relative z-0"></div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
-          {loading ? (
-            <p className="text-gray-400 font-league">Loading...</p>
-          ) : myEvents.length > 0 ? (
-            filteredEvents.map((event) => (
-              <Link
-                to={`/event/${event._id}`}
-                key={event._id}
-                className=" relative rounded-xl max-w-90 "
-              >
-                <div className="-z-10 w-full h-80 bg-gray-100 flex items-center justify-center rounded-2xl overflow-hidden group-hover:brightness-95 transition-all">
-                  {event.flyer ? (
-                    <img
-                      src={event.flyer}
-                      alt={event.title}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <Image size={40} className="text-gray/70" />
-                  )}
-                </div>
-                <div className=" w-full flex flex-col p-2">
-                  <p className="font-bebas text-lg uppercase tracking-wider text-brand">
-                    {event.isRSO
-                      ? orgLookup[event.organizationId]?.name || "Loading..."
-                      : "Student Event"}
-                  </p>
-                  <p className="font-semibold text-lg leading-tight mt-1 line-clamp-2">
-                    {event.title}
-                  </p>
-                  <span className="text-sm text-gray">
-                    <span>
-                      {formatStackedDate(event.startDate).day +
-                        ", " +
-                        formatStackedDate(event.startDate).date}
-                    </span>
-                  </span>
-                </div>
-              </Link>
-            ))
-          ) : (
-            <p className="text-gray-400 italic font-league">
-              You haven't joined any events yet.
+        {!user ? (
+          <div className="flex flex-col items-center justify-center py-24 px-6 text-center">
+            <div className="bg-white mb-2">
+              <Ticket size={32} className="text-gray-300" />
+            </div>
+            <h2 className="text-2xl font-bebas uppercase tracking-wide mb-2">
+              DON'T MISS OUT
+            </h2>
+            <p className="text-gray-500 font-league max-w-sm mb-8">
+              Please log in to track your registered events, access your
+              tickets, and see your history.
             </p>
-          )}
-        </div>
+            <Link
+              to="/login"
+              className="bg-black text-white px-10 py-3 rounded-full hover:scale-105 transition-all active:scale-95 font-league tracking-wider"
+            >
+              Log In
+            </Link>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
+            {loading ? (
+              <p className="text-gray-400 font-league">Loading...</p>
+            ) : myEvents.length > 0 ? (
+              filteredEvents.map((event) => (
+                <Link
+                  to={`/event/${event._id}`}
+                  key={event._id}
+                  className=" relative rounded-xl max-w-90 "
+                >
+                  <div className="-z-10 w-full h-80 bg-gray-100 flex items-center justify-center rounded-2xl overflow-hidden group-hover:brightness-95 transition-all">
+                    {event.flyer ? (
+                      <img
+                        src={event.flyer}
+                        alt={event.title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <Image size={40} className="text-gray/70" />
+                    )}
+                  </div>
+                  <div className=" w-full flex flex-col p-2">
+                    <p className="font-bebas text-lg uppercase tracking-wider text-brand">
+                      {event.isRSO
+                        ? orgLookup[event.organizationId]?.name || "Loading..."
+                        : "Student Event"}
+                    </p>
+                    <p className="font-semibold text-lg leading-tight mt-1 line-clamp-2">
+                      {event.title}
+                    </p>
+                    <span className="text-sm text-gray">
+                      <span>
+                        {formatStackedDate(event.startDate).day +
+                          ", " +
+                          formatStackedDate(event.startDate).date}
+                      </span>
+                    </span>
+                  </div>
+                </Link>
+              ))
+            ) : (
+              <p className="text-gray-400 italic font-league">
+                You haven't joined any events yet.
+              </p>
+            )}
+          </div>
+        )}
       </div>
     </>
   );

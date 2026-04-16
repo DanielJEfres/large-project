@@ -194,7 +194,7 @@ export default function MyOrgs() {
                       >
                         <button
                           onClick={(e) => toggleMenu(e, org.id)}
-                          className="hover:cursor-pointer flex items-center gap-1 md:gap-2 px-4 md:px-8 py-1.5 md:py-2.5 bg-lightgray text-black rounded-xl md:rounded-2xl font-league font-bold hover:bg-gray-200 transition-all active:scale-95 text-xs md:text-base"
+                          className="hover:cursor-pointer flex items-center gap-1 md:gap-2 px-4 md:px-8 py-1.5 md:py-2.5 bg-white border-2 border-lightgray text-black rounded-xl md:rounded-2xl font-league font-bold hover:bg-gray-200 transition-all active:scale-95 text-xs md:text-base"
                         >
                           Joined{" "}
                           <ChevronDown

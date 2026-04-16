@@ -45,7 +45,7 @@ export default function Navbar() {
                   Create Event
                 </button>
               </Link>
-              <Bell size={22} className="cursor-pointer" />
+              {/* <Bell size={22} className="cursor-pointer" /> */}
               <UserMenu />
             </>
           ) : (
