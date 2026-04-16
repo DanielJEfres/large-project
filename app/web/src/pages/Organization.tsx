@@ -145,9 +145,6 @@ export default function Organization() {
             <div className="mt-4">
               <p className="font-inter text-md text-gray-700 leading-relaxed">
                 {org.description}
-                <span className="text-black font-semibold cursor-pointer">
-                  ...more
-                </span>
               </p>
             </div>
 
@@ -291,16 +288,16 @@ export default function Organization() {
                                 </>
                               )}
                             </div>
-                            <h3 className="font-inter font-semibold text-sm md:text-lg leading-tight mt-1 md:mt-2 line-clamp-1 md:line-clamp-none">
+                            <h3 className="font-inter font-semibold text-sm md:text-lg leading-tight mt-1 md:mt-2 ">
                               {event.title}
                             </h3>
 
-                            <p className="text-gray-500 text-[10px] md:text-sm font-inter line-clamp-2 md:line-clamp-3 mt-1">
+                            <p className="text-gray-500 text-[10px] md:text-sm font-inter mt-1">
                               {event.description || "No description provided."}
                             </p>
 
                             {/* Tags */}
-                            <div className="flex flex-wrap gap-1 md:gap-2 mt-2 md:mt-auto">
+                            <div className="flex flex-wrap gap-1 md:gap-2 mt-3 md:mt-auto">
                               {event.tags.map((tag) => (
                                 <span
                                   key={tag._id}
