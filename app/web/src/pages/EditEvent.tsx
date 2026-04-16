@@ -499,7 +499,7 @@ export default function EditEvent() {
 
           <div className="order-1 lg:order-2 lg:col-span-4 flex flex-col gap-6 lg:pt-16">
             <div className="lg:sticky lg:top-10 flex flex-col gap-6">
-              <div className="relative bg-[#DEDEDE] rounded-xl aspect-[4/3] lg:aspect-[3/4] sm:aspect-[4/3] flex items-center justify-center overflow-hidden">
+              <div className="relative bg-[#DEDEDE] rounded-xl aspect-[4/3] lg:aspect-[3/4] sm:aspect-[4/3] flex items-center justify-center overflow-hidden group">
                 {formData.imagePreview ? (
                   <>
                     <img
@@ -507,9 +507,10 @@ export default function EditEvent() {
                       className="w-full h-full object-cover"
                       alt="Cover"
                     />
-                    <div className="absolute inset-0 flex items-center justify-center">
+                    {/* Overlay button that appears on hover, or stays visible */}
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity">
                       <label className="cursor-pointer bg-white text-black text-sm font-bold px-8 py-3 rounded-full hover:scale-105 transition-transform active:scale-95 shadow-lg">
-                        Upload
+                        Change
                         <input
                           type="file"
                           className="hidden"
