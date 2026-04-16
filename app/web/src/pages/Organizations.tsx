@@ -2,13 +2,48 @@ import { ChevronRight, Image, Search } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { Link } from "react-router";
 import { useEffect, useState } from "react";
-import { SERVER_IP } from "../config";
+import { LOCAL_IP, SERVER_IP } from "../config";
 import type { Organization } from "../types/Organizations";
+import { useAuth } from "../context/AuthContext";
 
 export default function Organizations() {
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
+
+  const { token, isLoggedIn } = useAuth();
+
+  const handleJoin = async (orgName: string) => {
+    if (!isLoggedIn) {
+      alert("Please log in to join organizations!");
+      return;
+    }
+
+    try {
+      const response = await fetch(`${LOCAL_IP}/api/organizations/join`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ orgName }), // backend wants a { orgName } = req.body
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert(`Successfully joined ${orgName}!`);
+
+        //this refreshes the list.
+        fetchOrganizations(searchQuery);
+      } else {
+        alert(data.message || "Failed to join");
+      }
+    } catch (err) {
+      console.error("Join error:", err);
+      alert("A server error occurred.");
+    }
+  };
 
   const fetchOrganizations = async (name = "") => {
     try {
@@ -118,7 +153,11 @@ export default function Organizations() {
                         <ChevronRight width={17} />
                       </button>
                     </Link>
-                    <button className="font-bold px-9 rounded-4xl text-white bg-black my-3 mr-3 font-league cursor-pointer active:scale-95 transition-all hover:bg-brand duration-100 ">
+                    <button
+                      //User joins this particular org.
+                      onClick={() => handleJoin(org.name)}
+                      className="font-bold px-9 rounded-4xl text-white bg-black my-3 mr-3 font-league cursor-pointer active:scale-95 transition-all hover:bg-brand duration-100 "
+                    >
                       Join
                     </button>
                   </div>

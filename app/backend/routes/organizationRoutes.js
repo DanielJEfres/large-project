@@ -13,13 +13,16 @@ members
 
 import express from 'express'
 import Organization from '../models/Organization.js'
+import User from '../models/User.js'
 import Event from '../models/Event.js'
 import pagination from './helpers/pagination.js'
+import authenticateToken from '../middleware/authenticateToken.js'
+import mongoose from 'mongoose'
 
 const router = express.Router()
 
 //Create Organization
-router.post('/create', async(req, res) => {
+router.post('/create', async(req, res) => { // Middleware -- can you create? Only if verified user.
     
     try {
 
@@ -54,6 +57,152 @@ router.post('/create', async(req, res) => {
         res.status(500).json({message:"Server error during organization creation"})
     }
 })
+
+router.post('/join', authenticateToken, async (req, res) => {
+    try {
+        const { orgId } = req.body
+        
+        if (!orgId) {
+            return res.status(400).json({ message:"No organization ID was passed" })
+        }
+        
+        const user_id = req.user.sub; // from JWT middleware
+        const org = await Organization.findById(orgId)
+        
+        if (!org) {
+            return res.status(400).json({message:"Organization does not exist in database"})
+        }
+        
+        const user = await User.findById(user_id);
+
+        if (!user) {
+            return res.status(400).json({ message: "User not found" });
+        }
+
+        const alreadyMember = org.members.some(
+            m => m.userId.toString() === user_id.toString()
+        );
+
+        if (alreadyMember) {
+            return res.status(400).json({ message: "User already in organization" });
+        }
+            
+        org.members.push({
+            userId: user_id,
+            orgRole: "member"
+        });
+        
+        user.organization.set(org.name, "member") 
+
+        await org.save();
+        await user.save();
+
+        res.status(200).json({ message: "Joined organization successfully" });
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({message:"Server error"})
+    }
+});
+
+router.post('/leave', authenticateToken, async (req, res) => {
+    try {
+        const { orgId } = req.body
+        
+        if (!orgId) {
+            return res.status(400).json({ message:"No organization ID was passed" })
+        }
+
+        const user_id = req.user.sub; // from JWT middleware
+        const org = await Organization.findById(orgId)
+        
+        if (!org) {
+            return res.status(400).json({message:"Organization does not exist in database"})
+        }
+        
+        const user = await User.findById(user_id);
+
+        if (!user) {
+            return res.status(400).json({ message: "User not found" });
+        }
+
+        const member = org.members.some(
+            m => m.userId.toString() === user_id.toString()
+        );
+
+        if (!member) {
+            return res.status(400).json({ message: "User is not in organization" });
+        }
+            
+        org.members = org.members.filter(
+            m => m.userId.toString() !== user_id.toString()
+        );
+        
+        user.organization.delete(org.name) 
+
+        await org.save();
+        await user.save();
+
+        res.status(200).json({ message: "Left organization successfully" });
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({message:"Server error"})
+    }
+});
+
+router.post('/selfpromote', authenticateToken, async (req, res) => {
+    try {
+        const { orgId } = req.body
+
+        if (!orgId) {
+            return res.status(400).json({ message:"No organization ID was passed" })
+        }
+        
+        const user_id = req.user.sub; // from JWT middleware
+        const org = await Organization.findById(orgId)
+        
+        if (!org) {
+            return res.status(400).json({message:"Organization does not exist in database"})
+        }
+        
+        const user = await User.findById(user_id);
+        console.log(user)
+        if (!user) {
+            return res.status(400).json({ message: "User not found" });
+        }
+
+        const role = user.organization?.get(org.name);
+        console.log(role)
+        if ( role == "officer" || role == "director") {
+            return res.status(400).json({ message: "User already an officer" });
+        }
+        
+        // Validate user deserves officer role, 
+        // TODO: match w UCF directory
+        
+
+        const member = org.members.find(
+            m => m.userId.toString() === user_id.toString()
+        );
+
+        if (!member) {
+            return res.status(400).json({ message: "User not in organization" });
+        }
+
+        member.orgRole = "officer"
+        user.organization.set(org.name, "officer") 
+
+        await org.save();
+        await user.save();
+
+        res.status(200).json({ message: "User promoted in organization successfully" });
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({message:"Server error"})
+    }
+});
 
 //Get all organizations OR partial search organizaitons (name, description, and category) with pagination
 router.get('/', async (req, res) => {

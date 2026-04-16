@@ -33,7 +33,6 @@ router.post('/request', async (req, res) => {
         const user = await User.findOne({ucfEmail});
         if(!user) return res.status(404).json({message: "Email verification: user with this email is not found"});
 
-        
 
         //Generate verification token
         const token = crypto.randomBytes(32).toString('hex');
@@ -45,7 +44,7 @@ router.post('/request', async (req, res) => {
         const recipient = user.ucfEmail;
         console.log(`Attempting to send mail to: ${recipient}`);
 
-        const verificationUrl = `${process.env.CLIENT_URL}/email-verification/${token}`;
+        const verificationUrl = `${process.env.API_URL}/api/email-verification/${token}`;
 
         const emailTemplate = (verificationUrl, firstName) => `
         <!DOCTYPE html>
@@ -98,14 +97,23 @@ router.post('/request', async (req, res) => {
 
         const htmlContent = emailTemplate(verificationUrl, user.firstName || 'Knight');
 
-        await transporter.sendMail({
-            from: `EventKnight <${process.env.FROM_EMAIL}>`,
-            to: user.ucfEmail,
-            replyTo: process.env.FROM_EMAIL,
-            subject: "Explore the UCF Community: Email Verification",
-            text: `Hi ${user.firstName}, please verify your EventKnight account by visiting this link: ${verificationUrl}`,
-            html: htmlContent,
-        });
+        try{
+            await transporter.sendMail(
+            {
+                from: `EventKnight <${process.env.FROM_EMAIL}>`,
+                to: user.ucfEmail,
+                replyTo: process.env.FROM_EMAIL,
+                subject: "Explore the UCF Community: Email Verification",
+                text: `Hi ${user.firstName}, please verify your EventKnight account by visiting this link: ${verificationUrl}`,
+                html: htmlContent,
+            });
+        }
+    
+        catch (mailError) 
+        {
+            console.error("Mail failed:", mailError);
+            return res.status(500).json({ message: "Failed to send email" });
+        }
 
         res.status(200).json({message: "Verification email sent"});
     }
@@ -123,20 +131,26 @@ router.get('/:token', async (req, res) => {
 
   try {
     // Find user with this token
+    
     const user = await User.findOne({ verificationToken: token });
 
     if (!user) {
       return res.status(400).json({ message: "Invalid or expired token" });
     }
+    
 
     // Update user status and clear the token
     user.isVerified = true; 
     user.verificationToken = undefined; //Clear the token for security purposes
     await user.save();
 
-    res.status(200).json({ message: "Email verified successfully! You can now log in." });
-  } catch (error) {
+    //res.status(200).json({ message: "Email verified successfully! You can now log in." });
+
+    return res.redirect(`${process.env.CLIENT_URL}`)
+  } catch (error) 
+  {
     res.status(500).json({ message: "Error verifying email", error });
+    //res.redirect(`${process.env.API_URL}/error`)
   }
 });
 

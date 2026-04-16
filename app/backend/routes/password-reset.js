@@ -124,7 +124,8 @@ router.get('/:token', async (req, res) => {
         return res.status(400).json({message: "Expired Reset Password Token"});
     }
 
-    res.status(200).json({ message: "Password reset: Token is Valid" });
+    //res.status(200).json({ message: "Password reset: Token is Valid" });
+    return res.redirect(`${process.env.CLIENT_URL}/password-reset/${token}`)
   } 
 
   catch (error) 
@@ -145,7 +146,6 @@ router.patch('/update', async(req, res) => {
         return res.status(400).json({message: "Expired Reset Password Token"});
         }
 
-
         if(!user){
             return res.status(404).json({message:"User does not have a valid Reset Password Token"});
         }
@@ -160,8 +160,6 @@ router.patch('/update', async(req, res) => {
     catch (error){
         res.status(400).json({message:"Update password failed", error: error.message})
     }
-
-
 
 });
 
