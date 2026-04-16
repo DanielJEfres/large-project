@@ -7,6 +7,7 @@ import type { Organization } from "../types/Organizations";
 import type { UniversityEvent } from "../types/UniversityEvent";
 import { Image as ImageIcon } from "lucide-react";
 import { Link } from "react-router";
+import EditProfileModal from "../components/EditProfilePopup";
 
 export default function Profile() {
   const { token, isLoggedIn, loading: authLoading, user } = useAuth(); // Get auth state
@@ -14,6 +15,8 @@ export default function Profile() {
   const [myOrgs, setMyOrgs] = useState<any[]>([]);
   const [myEvents, setMyEvents] = useState<UniversityEvent[]>([]);
   const [fetchError, setFetchError] = useState<string | null>(null);
+
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -122,7 +125,10 @@ export default function Profile() {
             <p className="font-bold text-xl">{myData.fullName}</p>
             <p className="text-gray-500 text-sm">{myData.email}</p>
 
-            <button className="hover:cursor-pointer font-league mt-4 bg-black font-bold text-white px-4 py-2 rounded-4xl">
+            <button
+              onClick={() => setIsEditModalOpen(true)}
+              className="hover:cursor-pointer font-league mt-4 bg-black font-bold text-white px-4 py-2 rounded-4xl"
+            >
               Edit Profile
             </button>
           </div>
@@ -261,6 +267,17 @@ export default function Profile() {
           </div>
         </div>
       </div>
+
+      {isEditModalOpen && (
+        <EditProfileModal
+          user={myData?.user}
+          token={token}
+          onClose={() => setIsEditModalOpen(false)}
+          onUpdate={(updatedUser) =>
+            setMyData({ ...myData, user: updatedUser })
+          }
+        />
+      )}
     </>
   );
 }
