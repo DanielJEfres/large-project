@@ -5,39 +5,15 @@ import { useEffect, useState } from "react";
 import { LOCAL_IP, SERVER_IP } from "../config";
 import type { Organization } from "../types/Organizations";
 import { useAuth } from "../context/AuthContext";
+import { useMembership } from "../hooks/useMembership";
 
 export default function Organizations() {
+  const { isOrgMember, toggleOrgMembership } = useMembership();
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
 
-  const { token, isLoggedIn, joinedOrgIds, refreshMemberships } = useAuth();
-
-  const handleJoinLeave = async (id: string, isJoining: boolean) => {
-    if (!isLoggedIn) return alert("Please log in!");
-
-    const endpoint = isJoining ? "join" : "leave"; //
-    try {
-      const response = await fetch(
-        `${SERVER_IP}/api/organizations/${endpoint}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ orgId: id }),
-        },
-      );
-
-      if (response.ok) {
-        // Update the global Set so the button changes instantly
-        await refreshMemberships();
-      }
-    } catch (err) {
-      console.error("Action failed:", err);
-    }
-  };
+  const { joinedOrgIds } = useAuth();
 
   const fetchOrganizations = async (name = "") => {
     try {
@@ -97,7 +73,7 @@ export default function Organizations() {
             <div className="font-league p-10">Loading organizations...</div>
           ) : (
             organizations.map((org) => {
-              const isMember = joinedOrgIds.has(org._id);
+              const isMember = isOrgMember(org._id);
               console.log(joinedOrgIds);
 
               return (
@@ -154,7 +130,7 @@ export default function Organizations() {
 
                       {/* Button shows "join" or "leave" depending if theyre a member or not */}
                       <button
-                        onClick={() => handleJoinLeave(org._id, !isMember)}
+                        onClick={() => toggleOrgMembership(org._id)}
                         className={`font-bold min-w-[120px] px-9 rounded-4xl  my-3 mr-3 font-league cursor-pointer active:scale-95 transition-all hover:bg-brand duration-100 ${
                           isMember
                             ? "bg-lightgray text-black hover:bg-gray-200 border-2 border-[#f0f0f0]"

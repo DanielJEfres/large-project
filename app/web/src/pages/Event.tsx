@@ -8,19 +8,19 @@ import { formatStackedDate, formatTime } from "../utils/date";
 import { useOrganizations } from "../hooks/useOrganization";
 
 import { useAuth } from "../context/AuthContext";
+import { useMembership } from "../hooks/useMembership";
 
 export default function Event() {
   const { eventId } = useParams();
   const [event, setEvent] = useState<UniversityEvent | null>(null);
   const [loading, setLoading] = useState(true);
   const { orgLookup, fetchOrgDetails } = useOrganizations();
+  const { isOrgMember, toggleOrgMembership } = useMembership();
 
   const isPastEvent = event ? new Date(event.startDate) < new Date() : false;
 
   const { user, token } = useAuth();
   const [isAttending, setIsAttending] = useState(false); // Track attendance locally
-
-  const [showMenu, setShowMenu] = useState(false);
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -341,8 +341,19 @@ export default function Event() {
                               <ChevronRight width={17} />
                             </button>
                           </Link>
-                          <button className="font-bold  px-7  rounded-4xl text-white bg-black my-3  py-2 font-league">
-                            Join
+                          <button
+                            onClick={() =>
+                              toggleOrgMembership(event.organizationId)
+                            }
+                            className={`font-bold px-7 rounded-4xl my-3 py-2 font-league cursor-pointer transition-all active:scale-95 ${
+                              isOrgMember(event.organizationId)
+                                ? "bg-gray-200 text-black border border-gray-300"
+                                : "bg-black text-white hover:bg-zinc-800"
+                            }`}
+                          >
+                            {isOrgMember(event.organizationId)
+                              ? "Leave"
+                              : "Join"}
                           </button>
                         </div>
                       )}
