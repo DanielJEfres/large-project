@@ -24,7 +24,12 @@ export default function Events() {
   const [loading, setLoading] = useState(true);
   const [trendingEvents, setTrendingEvents] = useState<UniversityEvent[]>([]);
   const [upcomingEvents, setUpcomingEvents] = useState<UniversityEvent[]>([]);
+
+  // Search States
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<UniversityEvent[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+
   const { orgLookup, fetchOrgDetails } = useOrganizations();
 
   const forYouRef = useRef<HTMLDivElement>(null);
@@ -84,6 +89,7 @@ export default function Events() {
     fetchEvents();
   }, []);
 
+  // Fetch orgs for upcoming events
   useEffect(() => {
     if (upcomingEvents.length > 0) {
       const ids = upcomingEvents.map((e) => e.organizationId);
@@ -91,6 +97,47 @@ export default function Events() {
       setLoading(false);
     }
   }, [upcomingEvents, fetchOrgDetails]);
+
+  // Search api call
+  useEffect(() => {
+    const fetchSearchResults = async () => {
+      if (!searchQuery.trim()) {
+        setSearchResults([]);
+        setIsSearching(false);
+        return;
+      }
+
+      setIsSearching(true);
+      try {
+        const response = await fetch(
+          `${SERVER_IP}/api/getEvents/searchEvent?q=${encodeURIComponent(
+            searchQuery,
+          )}`,
+        );
+        const data = await response.json();
+        if (data.events) {
+          setSearchResults(data.events);
+
+          // Fetch org details for the search results too!
+          const orgIds = data.events.map(
+            (e: UniversityEvent) => e.organizationId,
+          );
+          fetchOrgDetails(orgIds);
+        }
+      } catch (err) {
+        console.error("Failed to search events:", err);
+      } finally {
+        setIsSearching(false);
+      }
+    };
+
+    // Wait 300ms after user stops typing before making the call
+    const delayDebounceFn = setTimeout(() => {
+      fetchSearchResults();
+    }, 300);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery, fetchOrgDetails]);
 
   const filteredUpcoming = upcomingEvents.filter((event) =>
     activeTab === "RSO" ? event.isRSO : !event.isRSO,
@@ -112,13 +159,13 @@ export default function Events() {
             className="relative py-2 cursor-pointer z-10 shrink-0"
           >
             <h2
-              className={`font-bold transition-colors ${activeTab === "RSO" ? "text-black" : "text-gray-400"}`}
+              className={`font-bold transition-colors ${searchQuery.length > 0 ? "text-gray-400" : activeTab === "RSO" ? "text-black" : "text-gray-400"}`}
             >
               RSO Events
             </h2>
             <div
               className={`absolute bottom-0 left-0 h-0.5 bg-brand z-20 transition-all duration-200 
-      ${activeTab === "RSO" ? "w-full opacity-100" : "w-0 opacity-0"}`}
+      ${searchQuery.length > 0 ? "" : activeTab === "RSO" ? "w-full opacity-100" : "w-0 opacity-0"}`}
             />
           </div>
 
@@ -127,13 +174,13 @@ export default function Events() {
             className="relative py-2 cursor-pointer z-10 shrink-0"
           >
             <h2
-              className={`font-bold transition-colors ${activeTab === "Student" ? "text-black" : "text-gray-400"}`}
+              className={`font-bold transition-colors ${searchQuery.length > 0 ? "text-gray-400" : activeTab === "Student" ? "text-black" : "text-gray-400"}`}
             >
               Student Events
             </h2>
             <div
               className={`absolute bottom-0 left-0 h-0.5 bg-brand z-20 transition-all duration-200 
-      ${activeTab === "Student" ? "w-full opacity-100" : "w-0 opacity-0"}`}
+      ${searchQuery.length > 0 ? "" : activeTab === "Student" ? "w-full opacity-100" : "w-0 opacity-0"}`}
             />
           </div>
         </div>
@@ -423,18 +470,13 @@ export default function Events() {
           <div className="mt-12">
             <h2 className="text-2xl font-league mb-6">Search Results</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">
-              {upcomingEvents
-                .filter(
-                  (event) =>
-                    event.title
-                      .toLowerCase()
-                      .includes(searchQuery.toLowerCase()) ||
-                    (event.description &&
-                      event.description
-                        .toLowerCase()
-                        .includes(searchQuery.toLowerCase())),
-                )
-                .map((event) => (
+              {isSearching ? (
+                // Show Skeletons while typing/fetching
+                [...Array(3)].map((_, i) => (
+                  <EventSkeleton key={`search-skel-${i}`} variant="vertical" />
+                ))
+              ) : searchResults.length > 0 ? (
+                searchResults.map((event) => (
                   <Link
                     to={`/event/${event._id}`}
                     key={event._id}
@@ -456,7 +498,9 @@ export default function Events() {
                         {event.isRSO
                           ? orgLookup[event.organizationId]?.name ||
                             "Loading..."
-                          : `${event.createdBy.firstName} ${event.createdBy.lastName}`}
+                          : event.createdBy?.firstName
+                            ? `${event.createdBy.firstName} ${event.createdBy.lastName}`
+                            : "Student Event"}
                       </p>
 
                       <p className="font-semibold text-lg leading-tight mt-1">
@@ -467,9 +511,10 @@ export default function Events() {
                         <div className="flex items-center gap-2 text-sm">
                           <Calendar size={14} className="shrink-0" />
                           <span>
-                            {formatStackedDate(event.startDate).day +
-                              ", " +
-                              formatStackedDate(event.startDate).date}
+                            {event.startDate &&
+                              formatStackedDate(event.startDate).day +
+                                ", " +
+                                formatStackedDate(event.startDate).date}
                           </span>
                         </div>
                         <div className="flex items-center gap-2 text-sm">
@@ -481,15 +526,18 @@ export default function Events() {
                       </div>
 
                       <div className="flex flex-wrap gap-1 mt-4">
-                        {event.tags?.slice(0, 2).map((tag) => (
-                          <span
-                            key={tag.name}
-                            className="flex gap-1 items-center px-3 py-1 bg-brand text-[10px] font-bold uppercase text-white rounded-full"
-                          >
-                            <Hash size={14} />
-                            {tag.name}
-                          </span>
-                        ))}
+                        {/* Safely check if tags are populated before mapping */}
+                        {event.tags?.slice(0, 2).map((tag: any) =>
+                          tag.name ? (
+                            <span
+                              key={tag._id || tag.name}
+                              className="flex gap-1 items-center px-3 py-1 bg-brand text-[10px] font-bold uppercase text-white rounded-full"
+                            >
+                              <Hash size={14} />
+                              {tag.name}
+                            </span>
+                          ) : null,
+                        )}
                       </div>
 
                       <div className="font-league mt-auto pt-6 font-semibold flex items-center justify-end gap-2 text-black hover:text-gray-500 transition-colors">
@@ -497,7 +545,12 @@ export default function Events() {
                       </div>
                     </div>
                   </Link>
-                ))}
+                ))
+              ) : (
+                <p className="text-gray-500 font-league col-span-full">
+                  No events found matching "{searchQuery}".
+                </p>
+              )}
             </div>
           </div>
         )}

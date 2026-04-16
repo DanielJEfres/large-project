@@ -61,8 +61,10 @@ export default function Tickets() {
   return (
     <>
       <Navbar />
-      <div className="font-inter px-20 pb-20">
-        <h1 className="text-5xl font-bebas mt-10 mb-8">My Events</h1>
+      <div className="font-inter px-4 md:px-20 pb-20">
+        <h1 className="text-4xl md:text-5xl font-bebas mt-10 mb-8">
+          My Events
+        </h1>
 
         {/* events header! */}
 
