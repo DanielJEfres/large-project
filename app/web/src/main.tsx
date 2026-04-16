@@ -42,6 +42,7 @@ const router = createBrowserRouter([
       { path: "organizations", element: <Organizations /> },
       { path: "verify", element: <VerifyEmail /> },
       { path: "verify-email/:token", element: <VerifyEmail /> },
+      { path: "tickets", element: <Tickets /> },
 
       // --- PROTECTED ROUTES ---
       {
@@ -52,7 +53,6 @@ const router = createBrowserRouter([
           { path: "manage/event/:id", element: <EventDashboard /> },
           { path: "manage/event/:eventId/edit", element: <EditEvent /> },
           { path: "create", element: <CreateEvent /> },
-          { path: "tickets", element: <Tickets /> },
           { path: "me", element: <Profile /> },
           { path: "myorgs", element: <MyOrgs /> },
           { path: "create-org", element: <CreateOrganization /> },

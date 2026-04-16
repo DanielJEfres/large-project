@@ -15,6 +15,8 @@ import type { UniversityEvent } from "../types/UniversityEvent";
 import { formatStackedDate, formatTime } from "../utils/date";
 import { useMembership } from "../hooks/useMembership";
 
+import ShareModal from "../components/ShareModal";
+
 export default function Organization() {
   const { isOrgMember, toggleOrgMembership } = useMembership();
   const [activeTab, setActiveTab] = useState<"Upcoming" | "Past">("Upcoming");
@@ -24,6 +26,9 @@ export default function Organization() {
   const [org, setOrg] = useState<Organization | null>(null);
   const [events, setEvents] = useState<UniversityEvent[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // For modal
+  const [isShareOpen, setIsShareOpen] = useState(false);
 
   const now = new Date();
 
@@ -83,7 +88,10 @@ export default function Organization() {
         <div className="relative">
           <div className="w-full h-40 md:h-60 bg-gray-100">
             {/* Mobile Share Icon */}
-            <button className="md:hidden absolute top-4 right-4 z-30 p-2 bg-white/80 backdrop-blur-md rounded-full text-black">
+            <button
+              onClick={() => setIsShareOpen(true)}
+              className="md:hidden absolute top-4 right-4 z-30 p-2 bg-white/80 backdrop-blur-md rounded-full text-black"
+            >
               <Share width={20} />
             </button>
           </div>
@@ -107,7 +115,10 @@ export default function Organization() {
 
               <div className="md:mt-auto md:ml-auto flex flex-col md:flex-row gap-3 md:gap-10">
                 {/* Desktop Share Button */}
-                <button className="hidden md:flex items-center gap-3 font-bold w-fit px-8 py-3 rounded-4xl text-black bg-lightgray my-3 font-league">
+                <button
+                  onClick={() => setIsShareOpen(true)}
+                  className="hover:cursor-pointer hidden md:flex items-center gap-3 font-bold w-fit px-8 py-3 rounded-4xl text-black bg-lightgray my-3 font-league"
+                >
                   <Share width={20} />
                   Share Organization
                 </button>
@@ -327,6 +338,12 @@ export default function Organization() {
             </div>
           </div>
         </div>
+        <ShareModal
+          isOpen={isShareOpen}
+          onClose={() => setIsShareOpen(false)}
+          link={window.location.href}
+          title="Organization"
+        />
       </section>
     </>
   );

@@ -10,12 +10,17 @@ import { useOrganizations } from "../hooks/useOrganization";
 import { useAuth } from "../context/AuthContext";
 import { useMembership } from "../hooks/useMembership";
 
+import ShareModal from "../components/ShareModal";
+
 export default function Event() {
   const { eventId } = useParams();
   const [event, setEvent] = useState<UniversityEvent | null>(null);
   const [loading, setLoading] = useState(true);
   const { orgLookup, fetchOrgDetails } = useOrganizations();
   const { isOrgMember, toggleOrgMembership } = useMembership();
+
+  // For modal
+  const [isShareOpen, setIsShareOpen] = useState(false);
 
   const isPastEvent = event ? new Date(event.startDate) < new Date() : false;
 
@@ -254,7 +259,10 @@ export default function Event() {
 
               {/* buttons */}
               <div className="flex mt-auto gap-2 ">
-                <button className="cursor-pointer items-center gap-3 flex font-bold w-fit px-8 py-3 rounded-4xl text-black bg-lightgray my-3 font-league hover:bg-gray-200 transition-all">
+                <button
+                  onClick={() => setIsShareOpen(true)}
+                  className="cursor-pointer items-center gap-3 flex font-bold w-fit px-8 py-3 rounded-4xl text-black bg-lightgray my-3 font-league hover:bg-gray-200 transition-all"
+                >
                   <Share width={20} />
                   Share Event
                 </button>
@@ -336,7 +344,7 @@ export default function Event() {
                       {event.isRSO && (
                         <div className="mt-auto ml-auto gap-7 flex flex-nowrap">
                           <Link to={`/organization/${event.organizationId}`}>
-                            <button className="font-medium  rounded-4xl my-3 py-2 font-league flex gap-2">
+                            <button className="hover:cursor-pointer font-medium  rounded-4xl my-3 py-2 font-league flex gap-2">
                               More Events
                               <ChevronRight width={17} />
                             </button>
@@ -365,6 +373,13 @@ export default function Event() {
           </div>
         </div>
       </div>
+
+      <ShareModal
+        isOpen={isShareOpen}
+        onClose={() => setIsShareOpen(false)}
+        link={window.location.href}
+        title="Event"
+      />
     </>
   );
 }
