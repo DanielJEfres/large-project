@@ -10,7 +10,7 @@ import Navbar from "../components/Navbar";
 import { Link, useParams } from "react-router";
 import { useEffect, useState } from "react";
 import type { Organization } from "../types/Organizations";
-import { SERVER_IP } from "../config";
+import { LOCAL_IP, SERVER_IP } from "../config";
 import type { UniversityEvent } from "../types/UniversityEvent";
 import { formatStackedDate, formatTime } from "../utils/date";
 
@@ -84,7 +84,18 @@ export default function Organization() {
 
           <div className="absolute px-20 top-30 w-full">
             <div className="flex w-full">
-              <div className="bg-gray h-50 w-50 rounded"></div>
+              <div className="bg-gray-300 h-50 w-50 rounded overflow-hidden flex items-center justify-center shrink-0">
+                {org.logo ? (
+                  <img
+                    src={org.logo}
+                    alt={`${org.name} logo`}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  /* Fallback Icon if no logo exists in DB */
+                  <Image className="text-gray-400" size={24} />
+                )}
+              </div>
 
               <div className="mt-auto ml-auto flex gap-10 ">
                 <button className=" items-center gap-3 flex font-bold w-fit px-8 py-3 rounded-4xl text-black bg-lightgray my-3 px-4 py-2 font-league">

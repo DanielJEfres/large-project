@@ -9,7 +9,7 @@ import {
 import Navbar from "../components/Navbar";
 import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { SERVER_IP } from "../config";
+import { LOCAL_IP, SERVER_IP } from "../config";
 import { useNavigate } from "react-router";
 
 const CATEGORIES = [
@@ -27,12 +27,16 @@ export default function CreateOrganization() {
   const { user, token } = useAuth();
   const navigate = useNavigate();
 
+  //For uploading files
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>("");
+
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     category: "",
     contactEmail: "",
-    logo: "", // For now, this is a URL string to match your schema match regex
+    logo: "",
     knightConnectUrl: "",
     socialLinks: {
       instagram: "",
@@ -42,6 +46,15 @@ export default function CreateOrganization() {
       website: "",
     },
   });
+
+  //File image handler
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setLogoFile(file);
+      setPreviewUrl(URL.createObjectURL(file));
+    }
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -64,33 +77,40 @@ export default function CreateOrganization() {
       return;
     }
 
-    const submissionData = {
-      ...formData,
-      createdBy: user?.id,
-      president: user?.id, // Defaulting creator as president
-      verificationStatus: "pending",
-    };
+    const data = new FormData();
+    data.append("name", formData.name);
+    data.append("description", formData.description);
+    data.append("category", formData.category);
+    data.append("contactEmail", formData.contactEmail);
+    data.append("knightConnectUrl", formData.knightConnectUrl);
+    data.append("createdBy", user?.id || "");
+    data.append("president", user?.id || "");
+    data.append("verificationStatus", "pending");
+
+    // Stringify the object so the backend receives it correctly
+    data.append("socialLinks", JSON.stringify(formData.socialLinks));
+
+    if (logoFile) {
+      data.append("logo", logoFile);
+    }
 
     try {
       const response = await fetch(`${SERVER_IP}/api/organizations/create`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(submissionData),
+        body: data,
       });
-
-      const data = await response.json();
 
       if (response.ok) {
         navigate("/organizations");
       } else {
-        alert(`Error: ${data.message || "Failed to create organization"}`);
+        const err = await response.json();
+        alert(err.message || "Failed to create organization");
       }
     } catch (error) {
-      console.error("Error creating organization:", error);
-      alert("Failed to connect to server.");
+      console.error("Error:", error);
     }
   };
 
@@ -233,27 +253,47 @@ export default function CreateOrganization() {
 
         <div className="order-1 lg:order-2 lg:col-span-4 flex flex-col gap-6 lg:pt-16">
           <div className="lg:sticky lg:top-10 flex flex-col gap-6">
-            <div className="relative bg-[#DEDEDE] rounded-xl aspect-square flex flex-col items-center justify-center overflow-hidden p-6 text-center">
-              {formData.logo ? (
-                <img
-                  src={formData.logo}
-                  className="w-full h-full object-contain bg-white rounded-lg p-2"
-                  alt="Logo Preview"
-                  onError={(e) => (e.currentTarget.src = "")}
-                />
-              ) : (
+            {/* Image Upload Area */}
+            <div className="relative bg-[#DEDEDE] rounded-xl aspect-square flex items-center justify-center overflow-hidden">
+              {previewUrl ? (
                 <>
-                  <Upload size={48} className="text-gray-400 mb-4" />
-                  <p className="text-gray-500 text-sm font-medium px-4">
-                    Enter a valid image URL to preview your organization's logo
-                  </p>
+                  <img
+                    src={previewUrl}
+                    className="w-full h-full object-cover"
+                    alt="Preview"
+                  />
+                  <label className="absolute bottom-4 right-4 cursor-pointer bg-white/90 p-2 rounded-full shadow-md hover:scale-105 transition-all">
+                    <Upload size={20} />
+                    <input
+                      type="file"
+                      className="hidden"
+                      onChange={handleImageUpload}
+                      accept="image/*"
+                    />
+                  </label>
                 </>
+              ) : (
+                <label className="cursor-pointer flex flex-col items-center group">
+                  <Upload
+                    size={48}
+                    className="text-gray-400 mb-2 group-hover:text-black transition-colors"
+                  />
+                  <span className="text-gray-500 font-bold group-hover:text-black">
+                    Upload Logo
+                  </span>
+                  <input
+                    type="file"
+                    className="hidden"
+                    onChange={handleImageUpload}
+                    accept="image/*"
+                  />
+                </label>
               )}
             </div>
 
             <button
               onClick={handleSubmit}
-              className="cursor-pointer w-full bg-[#282828] text-white py-4 rounded-full font-bold text-[16px] hover:bg-black transition-all mt-4 lg:mt-0 uppercase tracking-widest font-league"
+              className="w-full bg-black text-white py-4 rounded-full font-bold uppercase tracking-widest font-league hover:bg-zinc-800 transition-all active:scale-95"
             >
               Create Organization
             </button>
