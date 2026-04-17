@@ -32,10 +32,10 @@ router.get('/:eventId', async (req, res) => {
         
         const event = await Event.findById(req.params.eventId)
        
-        if(!event) return res.json(500).json({message: "No Event Found"})
-        
+        if(!event) return res.status(500).json({message: "No Event Found"})
+
         const eventCreator = await User.findById(event.createdBy).select('firstName lastName profilePicture');
-        
+
         //Get tag names
         if(event.tags && event.tags.length > 0) {
             for(let tag of event.tags) {
@@ -45,7 +45,7 @@ router.get('/:eventId', async (req, res) => {
         }
 
         //Update field information
-        event.createdBy = eventCreator
+        event.createdBy = eventCreator ?? null
         event.tags = tags
 
         return res.status(200).json({event:event})
