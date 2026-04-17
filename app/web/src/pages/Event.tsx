@@ -88,7 +88,15 @@ export default function Event() {
       );
 
       if (response.ok) {
-        setIsAttending(!isAttending);
+        const attending = !isAttending;
+        setIsAttending(attending);
+        setEvent((prev) => {
+          if (!prev) return prev;
+          const attendees = attending
+            ? [...(prev.attendees ?? []), user.id]
+            : (prev.attendees ?? []).filter((id: string) => id !== user.id);
+          return { ...prev, attendees };
+        });
       } else {
         const errorData = await response.json();
         alert(errorData.message); // This is where you see "userId is required"
