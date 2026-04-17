@@ -32,16 +32,18 @@ export default function Event() {
   const [attendeeDetails, setAttendeeDetails] = useState<any[]>([]);
 
   useEffect(() => {
+    if (!event?.attendees?.length) {
+      setAttendeeDetails([]);
+      return;
+    }
     const fetchAttendeeDetails = async () => {
-      if (event?.attendees?.length) {
-        const details = await Promise.all(
-          event.attendees.map(async (id) => {
-            const res = await fetch(`${SERVER_IP}/api/users/${id}`);
-            return res.ok ? await res.json() : null;
-          }),
-        );
-        setAttendeeDetails(details.filter((d) => d !== null));
-      }
+      const details = await Promise.all(
+        event.attendees.map(async (id) => {
+          const res = await fetch(`${SERVER_IP}/api/users/${id}`);
+          return res.ok ? await res.json() : null;
+        }),
+      );
+      setAttendeeDetails(details.filter((d) => d !== null));
     };
     fetchAttendeeDetails();
   }, [event?.attendees]);
