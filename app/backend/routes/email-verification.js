@@ -125,32 +125,88 @@ router.post('/request', async (req, res) => {
 
 
 
-//This is called when users click the verify email link, that is sent to their email
-router.get('/:token', async (req, res) => {
+// Serves the confirmation page — safe for Outlook pre-fetching since it's a GET
+router.get('/:token', (req, res) => {
+  const { token } = req.params
+  const postUrl = `${process.env.API_URL}/api/email-verification/${token}`
+  const clientUrl = process.env.CLIENT_URL
+
+  res.send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verify your EventKnight account</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', sans-serif; background: #f9f9f9; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+    .card { background: #fff; border: 1px solid #e1e1e1; border-radius: 12px; padding: 48px 40px; max-width: 420px; width: 100%; text-align: center; }
+    h1 { font-size: 28px; font-weight: 700; margin-bottom: 12px; }
+    p { color: #555; margin-bottom: 28px; line-height: 1.5; }
+    button { width: 100%; padding: 14px; background: #000; color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer; }
+    button:hover { background: #222; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .msg { margin-top: 16px; font-size: 14px; }
+    .success { color: #16a34a; }
+    .error { color: #dc2626; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>⚔️ EventKnight</h1>
+    <p>Click the button below to confirm your email address and activate your account.</p>
+    <button id="btn" onclick="verify()">Confirm Email</button>
+    <p class="msg" id="msg"></p>
+  </div>
+  <script>
+    async function verify() {
+      const btn = document.getElementById('btn')
+      const msg = document.getElementById('msg')
+      btn.disabled = true
+      btn.textContent = 'Verifying...'
+      try {
+        const res = await fetch('${postUrl}', { method: 'POST' })
+        const data = await res.json()
+        if (res.ok) {
+          msg.className = 'msg success'
+          msg.textContent = 'Email verified! Redirecting to login...'
+          setTimeout(() => window.location.href = '${clientUrl}/login', 2000)
+        } else {
+          msg.className = 'msg error'
+          msg.textContent = data.message || 'Verification failed. Please try again.'
+          btn.disabled = false
+          btn.textContent = 'Confirm Email'
+        }
+      } catch {
+        msg.className = 'msg error'
+        msg.textContent = 'Server error. Please try again later.'
+        btn.disabled = false
+        btn.textContent = 'Confirm Email'
+      }
+    }
+  </script>
+</body>
+</html>`)
+})
+
+// Called when user clicks "Confirm Email" button on the verify-email frontend page
+router.post('/:token', async (req, res) => {
   const { token } = req.params;
 
   try {
-    // Find user with this token
-    
     const user = await User.findOne({ verificationToken: token });
 
     if (!user) {
       return res.status(400).json({ message: "Invalid or expired token" });
     }
-    
 
-    // Update user status and clear the token
-    user.isVerified = true; 
-    user.verificationToken = undefined; //Clear the token for security purposes
+    user.isVerified = true;
+    user.verificationToken = undefined;
     await user.save();
 
-    //res.status(200).json({ message: "Email verified successfully! You can now log in." });
-
-    return res.redirect(`${process.env.CLIENT_URL}`)
-  } catch (error) 
-  {
+    return res.status(200).json({ message: "Email verified successfully!" });
+  } catch (error) {
     res.status(500).json({ message: "Error verifying email", error });
-    //res.redirect(`${process.env.API_URL}/error`)
   }
 });
 

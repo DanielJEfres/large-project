@@ -109,7 +109,7 @@ async function seed() {
       createdBy: SYSTEM_USER_ID,
       tags: [],
       attendees: [],
-      isRSO: true,
+      isRSO: !!e.organizationId,
       flyer,
       status: deriveStatus(e.startsOn, e.endsOn),
       isPublic: true,
