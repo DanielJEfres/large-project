@@ -87,10 +87,10 @@ export default function EventDashboard() {
   return (
     <>
       <Navbar />
-      <div className="max-w-7xl mx-auto font-inter px-4 md:px-20 text-black ">
+      <div className="max-w-7xl mx-auto font-inter px-4 md:px-20 mb-10 text-black ">
         <Link
           to="/manage"
-          className="flex items-center text-gray-500 hover:text-black mb-8 transition-colors w-fit"
+          className="mt-5 flex items-center text-gray-500 hover:text-black mb-8 transition-colors w-fit"
         >
           <ChevronLeft size={20} /> Back to Manage
         </Link>
@@ -190,7 +190,8 @@ export default function EventDashboard() {
                       About
                     </p>
                     <p className="text-gray-600 text-sm leading-relaxed">
-                      {event.description}
+                      {event.description ||
+                        "No description provided for this event."}
                     </p>
                   </div>
                 </div>
@@ -214,7 +215,21 @@ export default function EventDashboard() {
                       key={index}
                       className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl"
                     >
-                      <div className="w-10 h-10 bg-zinc-200 rounded-full flex items-center justify-center"></div>
+                      {/* Profile Picture Container */}
+                      <div className="w-10 h-10 bg-zinc-200 rounded-full flex items-center justify-center overflow-hidden shrink-0 border border-gray-100">
+                        {attendee.profilePicture ? (
+                          <img
+                            src={attendee.profilePicture}
+                            alt={attendee.fullName}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          /* Fallback: Show first letter of firstName if no image */
+                          <span className="text-zinc-500 font-bold uppercase">
+                            {attendee.firstName.charAt(0)}
+                          </span>
+                        )}
+                      </div>
                       <div>
                         <p className="text-sm font-bold">{attendee.fullName}</p>
                         {/* <p className="text-xs text-gray-500 font-inter">

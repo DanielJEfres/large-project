@@ -15,6 +15,7 @@ type User = {
   email: string;
   pfp?: string;
   isVerified: boolean;
+  interests: string[];
 };
 
 type AuthContextType = {

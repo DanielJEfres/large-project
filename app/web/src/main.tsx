@@ -23,89 +23,128 @@ import Profile from "./pages/Profile.tsx";
 import MyOrgs from "./pages/MyOrgs.tsx";
 import CreateOrganization from "./pages/CreateOrganization.tsx";
 import Onboarding from "./pages/Onboarding.tsx";
+import ProtectedRoute from "./components/ProtectedRoute.tsx";
+
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
     children: [
-      {
-        index: true,
-        element: <Home />,
-      },
-      {
-        path: "login",
-        element: <Login />,
-      },
-      {
-        path: "signup",
-        element: <Signup />,
-      },
-      {
-        path: "reset",
-        element: <ResetPassword />,
-      },
-      {
-        path: "password-reset/:token",
-        element: <NewPassword />,
-      },
-      {
-        path: "events",
-        element: <Events />,
-      },
-      {
-        path: "event/:eventId",
-        element: <Event />,
-      },
-
-      {
-        path: "organizations",
-        element: <Organizations />,
-      },
-
+      // --- PUBLIC ROUTES ---
+      { index: true, element: <Home /> },
+      { path: "login", element: <Login /> },
+      { path: "signup", element: <Signup /> },
+      { path: "reset", element: <ResetPassword /> },
+      { path: "password-reset/:token", element: <NewPassword /> },
+      { path: "events", element: <Events /> },
+      { path: "event/:eventId", element: <Event /> },
       { path: "organization/:orgId", element: <Organization /> },
+      { path: "organizations", element: <Organizations /> },
+      { path: "verify", element: <VerifyEmail /> },
+      { path: "verify-email/:token", element: <VerifyEmail /> },
+      { path: "tickets", element: <Tickets /> },
 
+      // --- PROTECTED ROUTES ---
       {
-        path: "create",
-        element: <CreateEvent />,
-      },
-
-      {
-        path: "verify",
-        element: <VerifyEmail />,
-      },
-      {
-        path: "verify-email/:token",
-        element: <VerifyEmail />,
-      },
-      {
-        path: "tickets",
-        element: <Tickets />,
-      },
-      {
-        path: "manage",
-        element: <Manage />,
-      },
-      { path: "manage/event/:id", element: <EventDashboard /> },
-      { path: "manage/event/:eventId/edit", element: <EditEvent /> },
-      {
-        path: "me",
-        element: <Profile />,
-      },
-      {
-        path: "myorgs",
-        element: <MyOrgs />,
-      },
-      {
-        path: "create-org",
-        element: <CreateOrganization />,
-      },
-      {
-        path: "onboarding",
-        element: <Onboarding />,
+        element: <ProtectedRoute />, // Everything inside this group requires login
+        children: [
+          { path: "onboarding", element: <Onboarding /> },
+          { path: "manage", element: <Manage /> },
+          { path: "manage/event/:id", element: <EventDashboard /> },
+          { path: "manage/event/:eventId/edit", element: <EditEvent /> },
+          { path: "create", element: <CreateEvent /> },
+          { path: "me", element: <Profile /> },
+          { path: "myorgs", element: <MyOrgs /> },
+          { path: "create-org", element: <CreateOrganization /> },
+        ],
       },
     ],
   },
 ]);
+
+// const router = createBrowserRouter([
+//   {
+//     path: "/",
+//     element: <App />,
+//     children: [
+//       {
+//         index: true,
+//         element: <Home />,
+//       },
+//       {
+//         path: "login",
+//         element: <Login />,
+//       },
+//       {
+//         path: "signup",
+//         element: <Signup />,
+//       },
+//       {
+//         path: "reset",
+//         element: <ResetPassword />,
+//       },
+//       {
+//         path: "password-reset/:token",
+//         element: <NewPassword />,
+//       },
+//       {
+//         path: "events",
+//         element: <Events />,
+//       },
+//       {
+//         path: "event/:eventId",
+//         element: <Event />,
+//       },
+
+//       {
+//         path: "organizations",
+//         element: <Organizations />,
+//       },
+
+//       { path: "organization/:orgId", element: <Organization /> },
+
+//       {
+//         path: "create",
+//         element: <CreateEvent />,
+//       },
+
+//       {
+//         path: "verify",
+//         element: <VerifyEmail />,
+//       },
+//       {
+//         path: "verify-email/:token",
+//         element: <VerifyEmail />,
+//       },
+//       {
+//         path: "tickets",
+//         element: <Tickets />,
+//       },
+//       {
+//         path: "manage",
+//         element: <Manage />,
+//       },
+//       { path: "manage/event/:id", element: <EventDashboard /> },
+//       { path: "manage/event/:eventId/edit", element: <EditEvent /> },
+//       {
+//         path: "me",
+//         element: <Profile />,
+//       },
+//       {
+//         path: "myorgs",
+//         element: <MyOrgs />,
+//       },
+//       {
+//         path: "create-org",
+//         element: <CreateOrganization />,
+//       },
+//       {
+//         path: "onboarding",
+//         element: <Onboarding />,
+//       },
+//     ],
+//   },
+// ]);
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

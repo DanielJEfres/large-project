@@ -200,9 +200,9 @@ export default function Events() {
               className="w-full bg-lightgray py-3 pl-11 pr-4 rounded-2xl outline-none border-2 border-transparent transition-all font-league"
             />
           </div>
-          <button className="p-3 bg-lightgray rounded-2xl text-gray hover:text-black active:scale-95 transition-all">
+          {/* <button className="p-3 bg-lightgray rounded-2xl text-gray hover:text-black active:scale-95 transition-all">
             <ListFilter size={20} />
-          </button>
+          </button> */}
         </div>
 
         {searchQuery === "" ? (
