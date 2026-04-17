@@ -5,18 +5,6 @@ import { useAuth } from "../context/AuthContext";
 import { LOCAL_IP, SERVER_IP } from "../config";
 import { useParams, useNavigate, Link } from "react-router";
 
-const CATEGORIES = [
-  "Sports",
-  "Computer Science",
-  "Music",
-  "Art",
-  "Business",
-  "Volunteering",
-  "Marine Biology",
-  "Engineering",
-  "Professional Development",
-  "Fashion",
-];
 
 const formatDisplayDate = (dateStr: string) => {
   if (!dateStr) return { day: "", time: "" };
@@ -60,6 +48,14 @@ export default function EditEvent() {
   const { token } = useAuth();
   const [loading, setLoading] = useState(true);
   const [userOrgs, setUserOrgs] = useState<{ id: string; name: string }[]>([]);
+  const [availableTags, setAvailableTags] = useState<string[]>([]);
+
+  useEffect(() => {
+    fetch(`${SERVER_IP}/api/tags/getTags`)
+      .then(r => r.json())
+      .then(data => setAvailableTags((data.tags ?? []).map((t: { name: string }) => t.name)))
+      .catch(console.error)
+  }, []);
 
   const [formData, setFormData] = useState({
     eventType: "Student" as "RSO" | "Student",
@@ -117,12 +113,7 @@ export default function EditEvent() {
         const event = data.event;
 
         // Logic to match backend lowercase tags to frontend Title Case CATEGORIES
-        const matchedTags = event.tags.map((t: any) => {
-          const match = CATEGORIES.find(
-            (cat) => cat.toLowerCase() === t.name.toLowerCase(),
-          );
-          return match || t.name;
-        });
+        const matchedTags = event.tags.map((t: any) => t.name);
 
         setFormData({
           eventType: data.event.isRSO ? "RSO" : "Student",
@@ -438,11 +429,11 @@ export default function EditEvent() {
             </div>
 
             <div className="flex flex-wrap gap-2 mt-6">
-              {CATEGORIES.map((cat) => (
+              {availableTags.map((cat) => (
                 <button
                   key={cat}
                   onClick={() => toggleCategory(cat)}
-                  className={`px-5 py-2 rounded-full text-[14px] font-medium transition-all ${
+                  className={`px-5 py-2 rounded-full text-[14px] font-medium transition-all capitalize ${
                     formData.selectedCategories.includes(cat)
                       ? "bg-brand text-white"
                       : "bg-[#F0F0F0] text-black hover:bg-gray-200"
