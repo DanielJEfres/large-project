@@ -6,18 +6,6 @@ import { SERVER_IP } from "../config";
 
 import { useNavigate } from "react-router";
 
-const CATEGORIES = [
-  "Sports",
-  "Computer Science",
-  "Music",
-  "Art",
-  "Business",
-  "Volunteering",
-  "Marine Biology",
-  "Engineering",
-  "Professional Development",
-  "Fashion",
-];
 
 const formatDisplayDate = (dateStr: string) => {
   if (!dateStr) return { day: "", time: "" };
@@ -53,6 +41,14 @@ export default function CreateEvent() {
   const { user, token } = useAuth();
   const navigate = useNavigate();
   const [userOrgs, setUserOrgs] = useState<{ id: string; name: string }[]>([]);
+  const [availableTags, setAvailableTags] = useState<string[]>([]);
+
+  useEffect(() => {
+    fetch(`${SERVER_IP}/api/tags/getTags`)
+      .then(r => r.json())
+      .then(data => setAvailableTags(data.tags.map((t: { name: string }) => t.name)))
+      .catch(err => console.error('Failed to fetch tags:', err))
+  }, []);
 
   const [formData, setFormData] = useState({
     eventType: "Student" as "RSO" | "Student",
@@ -374,7 +370,7 @@ export default function CreateEvent() {
           </div>
 
           <div className="flex flex-wrap gap-2 mt-6">
-            {CATEGORIES.map((cat) => (
+            {availableTags.map((cat) => (
               <button
                 key={cat}
                 onClick={() => toggleCategory(cat)}

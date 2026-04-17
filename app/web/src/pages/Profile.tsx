@@ -3,9 +3,8 @@ import { useAuth } from "../context/AuthContext";
 import { SERVER_IP } from "../config";
 import Navbar from "../components/Navbar";
 import { formatDate } from "../utils/date";
-import type { Organization } from "../types/Organizations";
 import type { UniversityEvent } from "../types/UniversityEvent";
-import { Image as ImageIcon } from "lucide-react";
+import { Image as ImageIcon, Plus, X } from "lucide-react";
 import { Link } from "react-router";
 import EditProfileModal from "../components/EditProfilePopup";
 
@@ -17,6 +16,38 @@ export default function Profile() {
   const [fetchError, setFetchError] = useState<string | null>(null);
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [allTags, setAllTags] = useState<{ _id: string; name: string }[]>([]);
+  const [showTagPicker, setShowTagPicker] = useState(false);
+
+  useEffect(() => {
+    fetch(`${SERVER_IP}/api/tags/getTags`)
+      .then(r => r.json())
+      .then(data => setAllTags(data.tags ?? []))
+      .catch(console.error)
+  }, []);
+
+
+  const handleAddTag = async (tagName: string) => {
+    try {
+      await fetch(`${SERVER_IP}/api/tags/user/${user?.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ interests: [tagName] }),
+      });
+      setMyData((prev: any) => ({ ...prev, interests: [...(prev.interests ?? []), tagName] }));
+    } catch (err) { console.error(err) }
+  };
+
+  const handleRemoveTag = async (tagName: string) => {
+    try {
+      await fetch(`${SERVER_IP}/api/tags/user/${user?.id}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ interests: [tagName] }),
+      });
+      setMyData((prev: any) => ({ ...prev, interests: prev.interests.filter((t: any) => (typeof t === 'string' ? t : t.name) !== tagName) }));
+    } catch (err) { console.error(err) }
+  };
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -92,6 +123,9 @@ export default function Profile() {
       </div>
     );
   }
+
+  const userInterestIds = new Set((myData?.interests ?? []).map((t: any) => typeof t === 'object' ? t._id?.toString() ?? t.toString() : t.toString()));
+  const userInterestNames: string[] = allTags.filter(t => userInterestIds.has(t._id.toString())).map(t => t.name);
 
   const upcomingEvents = myEvents.filter(
     (e) => new Date(e.startDate) >= new Date(),
@@ -224,6 +258,54 @@ export default function Profile() {
               )}
             </div>
           </div>
+        </div>
+
+        {/* Interests Section */}
+        <div className="px-6 md:px-20 mt-16">
+          <div className="flex justify-between items-end pb-2 mb-6">
+            <h1 className="text-2xl font-league">Interests</h1>
+            <button
+              onClick={() => setShowTagPicker(p => !p)}
+              className="flex items-center gap-1 text-sm text-gray-500 hover:text-black cursor-pointer"
+            >
+              <Plus size={14} />
+              Add
+            </button>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            {userInterestNames.length > 0 ? (
+              userInterestNames.map((name) => (
+                <span
+                  key={name}
+                  className="flex items-center gap-1 px-4 py-1.5 bg-[#f5f5f7] rounded-full text-sm font-medium capitalize"
+                >
+                  {name}
+                  <button onClick={() => handleRemoveTag(name)} className="cursor-pointer text-gray-400 hover:text-black ml-1">
+                    <X size={12} strokeWidth={3} />
+                  </button>
+                </span>
+              ))
+            ) : (
+              <p className="text-gray-400 font-league">No interests added yet.</p>
+            )}
+          </div>
+
+          {showTagPicker && (
+            <div className="mt-4 flex flex-wrap gap-2">
+              {allTags
+                .filter(t => !userInterestNames.includes(t.name))
+                .map(t => (
+                  <button
+                    key={t._id}
+                    onClick={() => handleAddTag(t.name)}
+                    className="px-4 py-1.5 bg-white border border-gray-200 rounded-full text-sm font-medium capitalize hover:border-black hover:bg-black hover:text-white transition-all cursor-pointer"
+                  >
+                    {t.name}
+                  </button>
+                ))}
+            </div>
+          )}
         </div>
 
         {/* Past Events Section */}

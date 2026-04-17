@@ -7,32 +7,6 @@ import dotenv from 'dotenv'
 const router = express.Router();
 dotenv.config()
 
-//Endpoint for getting all interest tags, so that users can select from these fixed tags
-router.get('/', async(req, res) => {
-    try
-    {
-        const {tags} = req.body;
-        console.log(`Requested tags ${tags}`);
-
-        const existingUser = await User.findOne({ucfEmail});
-        
-        for (const tag of tags){
-            
-        }
-
-
-
-    }
-
-    catch(error)
-    {
-        res.status(500).json({"message": "Failed to fetch all tags"})
-
-    }
-
-
-
-})
 
 //Get Tags: fetches all existing tags from database
 router.get("/getTags", async(req, res) => {
@@ -69,18 +43,23 @@ router.get("/:userId", async(req, res) => {
 //Add Tag (User): add tag to user's tag array
 router.put("/user/:userId", async(req, res) => {
     try {
-        const {interests} = req.body
+        const { interests } = req.body
+
+        const lowerInterests = interests.map((n) => n.toLowerCase())
+        const tags = await Tag.find({ name: { $in: lowerInterests } }).select('_id')
+        const tagIds = tags.map(t => t._id)
+        if (tagIds.length === 0) return res.status(404).json({ message: "No matching tags found" })
 
         const user = await User.findByIdAndUpdate(
-            {_id: req.params.userId},
-            { $addToSet: { interests: { $each: interests} } },
-            {returnDocument: 'after'}
+            { _id: req.params.userId },
+            { $addToSet: { interests: { $each: tagIds } } },
+            { returnDocument: 'after' }
         )
 
         if(!user) return res.status(400).json({message:"Could not get user for interests"})
 
         return res.status(200).json({message:"interests added"})
-    
+
     } catch(error) {
         console.log(error)
         res.status(500).json({message:"Could not add interests to user"})
@@ -111,12 +90,17 @@ router.put("/event/:eventId", async(req, res) => {
 //Delete tag (User): delete tag from user's tag array
 router.delete("/user/:userId", async(req, res) => {
     try {
-        const {interests} = req.body
+        const { interests } = req.body
+
+        const lowerInterests = interests.map((n) => n.toLowerCase())
+        const tags = await Tag.find({ name: { $in: lowerInterests } }).select('_id')
+        const tagIds = tags.map(t => t._id)
+        if (tagIds.length === 0) return res.status(404).json({ message: "No matching tags found" })
 
         const user = await User.findByIdAndUpdate(
-                {_id:req.params.userId},
-                { $pull: { interests: { $in: interests } } },
-                {returnDocument: 'after'}
+                { _id: req.params.userId },
+                { $pull: { interests: { $in: tagIds } } },
+                { returnDocument: 'after' }
             )
 
         if(!user) return res.status(400).json({message:"Could not get user for interests"})
