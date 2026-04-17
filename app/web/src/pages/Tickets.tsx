@@ -109,13 +109,13 @@ export default function Tickets() {
             <h2 className="text-2xl font-bebas uppercase tracking-wide mb-2">
               DON'T MISS OUT
             </h2>
-            <p className="text-gray-500 font-league max-w-sm mb-8">
+            <p className="text-gray-500 font-inter max-w-sm text-sm mb-8">
               Please log in to track your registered events, access your
               tickets, and see your history.
             </p>
             <Link
               to="/login"
-              className="bg-black text-white px-10 py-3 rounded-full hover:scale-105 transition-all active:scale-95 font-league tracking-wider"
+              className="bg-black text-white px-10 py-3 rounded-full transition-all active:scale-95 font-league"
             >
               Log In
             </Link>

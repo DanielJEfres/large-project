@@ -27,6 +27,25 @@ export default function Event() {
   const { user, token } = useAuth();
   const [isAttending, setIsAttending] = useState(false); // Track attendance locally
 
+  // For getting attendees' information + profile pics
+
+  const [attendeeDetails, setAttendeeDetails] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchAttendeeDetails = async () => {
+      if (event?.attendees?.length) {
+        const details = await Promise.all(
+          event.attendees.map(async (id) => {
+            const res = await fetch(`${SERVER_IP}/api/users/${id}`);
+            return res.ok ? await res.json() : null;
+          }),
+        );
+        setAttendeeDetails(details.filter((d) => d !== null));
+      }
+    };
+    fetchAttendeeDetails();
+  }, [event?.attendees]);
+
   useEffect(() => {
     const fetchEvent = async () => {
       try {
@@ -95,8 +114,8 @@ export default function Event() {
       <Navbar />
 
       {/* DESKTOP ONLY SECTION */}
-      <div className="hidden lg:flex ">
-        <div className="font-inter px-20">
+      <div className="hidden lg:flex w-full">
+        <div className="font-inter max-[1230px]:px-4 px-20 w-full">
           {/* 2 grids */}
           <div className="grid grid-cols-[minmax(250px,350px)_1fr] gap-10 mt-10 pb-10">
             {/* 1st column */}
@@ -373,6 +392,44 @@ export default function Event() {
                     </div>
                   </div>
                 )}
+
+                {/* Attendees */}
+                <div className="mt-10 border-t border-gray-100 pt-10 pb-20">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-xl font-league">Attendees</h2>
+                    <span className="text-gray-400 px-4 py-1 rounded-full text-sm">
+                      {event.attendees?.length === 1
+                        ? "1 Person Is Going"
+                        : `${event.attendees?.length || 0} Others Are Going`}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-wrap gap-4">
+                    {attendeeDetails.map((attendee) => (
+                      <div
+                        key={attendee.id}
+                        className="w-fit flex items-center gap-3 p-2 bg-lightgray/30 rounded-xl hover:bg-lightgray/60 transition-colors"
+                      >
+                        <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-200 shrink-0">
+                          {attendee.profilePicture ? (
+                            <img
+                              src={attendee.profilePicture}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-[10px] font-bold">
+                              {attendee.firstName?.[0]}
+                              {attendee.lastName?.[0]}
+                            </div>
+                          )}
+                        </div>
+                        {/* <p className="text-sm font-bold truncate">
+                          {attendee.firstName}
+                        </p> */}
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -380,7 +437,7 @@ export default function Event() {
       </div>
 
       {/* MOBILE ONLY SECTION */}
-      <div className="flex lg:hidden flex-col w-full pb-20">
+      <div className="font-inter flex lg:hidden flex-col w-full pb-20">
         {/* 1. Hero Image */}
         <div className="w-full aspect-square h-90 bg-gray-200 overflow-hidden">
           {event.flyer ? (
@@ -499,7 +556,7 @@ export default function Event() {
           {/* Organizer Card (Mobile version) */}
           {event.isRSO && (
             <div className="mt-8 p-4 bg-lightgray rounded-2xl flex items-center gap-4">
-              <div className="h-14 w-14 bg-gray-300 rounded-full overflow-hidden shrink-0">
+              <div className="h-14 w-14 bg-gray-300 rounded-xl overflow-hidden shrink-0">
                 {hostOrg?.logo && (
                   <img
                     src={hostOrg.logo}
@@ -508,16 +565,57 @@ export default function Event() {
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-bold truncate">{hostOrg?.name}</p>
+                <p className="font-bold truncate font-league">
+                  {hostOrg?.name}
+                </p>
                 <Link
                   to={`/organization/${event.organizationId}`}
-                  className="text-brand text-sm font-bold"
+                  className="text-black text-sm  font-league flex gap-1 items-center"
                 >
-                  View Profile
+                  More Events
+                  <ChevronRight size={15} />
                 </Link>
               </div>
             </div>
           )}
+
+          {/* Attendees */}
+          <div className="mt-10 border-t border-gray-100 pt-10 ">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-league">Attendees</h2>
+              <span className="text-gray-400 px-4 py-1 rounded-full text-sm">
+                {event.attendees?.length === 1
+                  ? "1 Person Is Going"
+                  : `${event.attendees?.length || 0} Others Are Going`}
+              </span>
+            </div>
+
+            <div className="flex flex-wrap gap-4">
+              {attendeeDetails.map((attendee) => (
+                <div
+                  key={attendee.id}
+                  className="w-fit flex items-center gap-3 p-2 bg-lightgray/30 rounded-xl hover:bg-lightgray/60 transition-colors"
+                >
+                  <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-200 shrink-0">
+                    {attendee.profilePicture ? (
+                      <img
+                        src={attendee.profilePicture}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-[10px] font-bold">
+                        {attendee.firstName?.[0]}
+                        {attendee.lastName?.[0]}
+                      </div>
+                    )}
+                  </div>
+                  {/* <p className="text-sm font-bold truncate">
+                          {attendee.firstName}
+                        </p> */}
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
