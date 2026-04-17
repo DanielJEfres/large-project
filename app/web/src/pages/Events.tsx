@@ -260,7 +260,7 @@ export default function Events() {
                             {event.isRSO
                               ? orgLookup[event.organizationId]?.name ||
                                 "Loading..."
-                              : `${event.createdBy.firstName} ${event.createdBy.lastName}`}
+                              : event.createdBy ? `${event.createdBy.firstName} ${event.createdBy.lastName}` : 'Unknown'}
                           </p>
                           <p className="font-semibold text-lg leading-tight mt-1 line-clamp-2 ">
                             {event.title}
@@ -418,7 +418,7 @@ export default function Events() {
                             {event.isRSO
                               ? orgLookup[event.organizationId]?.name ||
                                 "Loading..."
-                              : `${event.createdBy.firstName} ${event.createdBy.lastName}`}
+                              : event.createdBy ? `${event.createdBy.firstName} ${event.createdBy.lastName}` : 'Unknown'}
                           </p>
 
                           <p className="font-semibold text-lg leading-tight mt-1">
