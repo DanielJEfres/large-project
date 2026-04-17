@@ -20,9 +20,9 @@ async function purge() {
   // Clear existing data
   // starts all deletions at the same time because they dont depend on each other
   await Promise.all([
-    Tag.deleteMany({}),
+    //Tag.deleteMany({}),
     User.deleteMany({}),
-    Organization.deleteMany({}),
+    //Organization.deleteMany({}),
     Event.deleteMany({}),
   ])
   console.log('Cleared existing data')

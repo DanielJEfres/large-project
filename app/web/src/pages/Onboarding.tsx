@@ -70,7 +70,7 @@ export default function Onboarding() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ interests: Array.from(selectedTagIds) }),
+        body: JSON.stringify({ interests: availableTags.filter(t => selectedTagIds.has(t._id)).map(t => t.name) }),
       });
 
       if (response.ok) {
