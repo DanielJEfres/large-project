@@ -18,6 +18,7 @@ export default function Profile() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [allTags, setAllTags] = useState<{ _id: string; name: string }[]>([]);
   const [showTagPicker, setShowTagPicker] = useState(false);
+  const [userInterestNames, setUserInterestNames] = useState<string[]>([]);
 
   useEffect(() => {
     fetch(`${SERVER_IP}/api/tags/getTags`)
@@ -26,26 +27,32 @@ export default function Profile() {
       .catch(console.error)
   }, []);
 
+  // Once both myData and allTags are loaded, resolve IDs to names
+  useEffect(() => {
+    if (!myData || allTags.length === 0) return;
+    const ids = new Set((myData.interests ?? []).map((t: any) => t?.toString()));
+    setUserInterestNames(allTags.filter(t => ids.has(t._id.toString())).map(t => t.name));
+  }, [myData, allTags]);
 
   const handleAddTag = async (tagName: string) => {
     try {
-      await fetch(`${SERVER_IP}/api/tags/user/${user?.id}`, {
+      const res = await fetch(`${SERVER_IP}/api/tags/user/${user?.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ interests: [tagName] }),
       });
-      setMyData((prev: any) => ({ ...prev, interests: [...(prev.interests ?? []), tagName] }));
+      if (res.ok) setUserInterestNames(prev => [...prev, tagName]);
     } catch (err) { console.error(err) }
   };
 
   const handleRemoveTag = async (tagName: string) => {
     try {
-      await fetch(`${SERVER_IP}/api/tags/user/${user?.id}`, {
+      const res = await fetch(`${SERVER_IP}/api/tags/user/${user?.id}`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ interests: [tagName] }),
       });
-      setMyData((prev: any) => ({ ...prev, interests: prev.interests.filter((t: any) => (typeof t === 'string' ? t : t.name) !== tagName) }));
+      if (res.ok) setUserInterestNames(prev => prev.filter(n => n !== tagName));
     } catch (err) { console.error(err) }
   };
 
@@ -124,8 +131,7 @@ export default function Profile() {
     );
   }
 
-  const userInterestIds = new Set((myData?.interests ?? []).map((t: any) => typeof t === 'object' ? t._id?.toString() ?? t.toString() : t.toString()));
-  const userInterestNames: string[] = allTags.filter(t => userInterestIds.has(t._id.toString())).map(t => t.name);
+
 
   const upcomingEvents = myEvents.filter(
     (e) => new Date(e.startDate) >= new Date(),
