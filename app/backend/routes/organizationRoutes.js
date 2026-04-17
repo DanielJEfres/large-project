@@ -267,17 +267,21 @@ router.get('/:orgId', async (req, res) => {
 
         const organization = await Organization.findById(orgId)
 
-        if(!organization) return res.status(500).json({messsage:"Could Not Find Organization"})
-        
+        if(!organization) return res.status(404).json({message:"Could Not Find Organization"})
+
         //Pagination
         const filter = {organizationId: orgId}
         const page = await pagination(req.query.page, req.query.limit, filter, Event)
 
-        const organizationEvents = await Event.find({ organizationId: orgId })
-            .skip(page?.skip)
-            .limit(page?.limit)
+        let eventsQuery = Event.find({ organizationId: orgId })
             .populate('tags', 'name')
-            .populate('createdBy', 'firstName lastName fullName');
+            .populate('createdBy', 'firstName lastName fullName')
+
+        if (page) {
+            eventsQuery = eventsQuery.skip(page.skip).limit(page.limit)
+        }
+
+        const organizationEvents = await eventsQuery;
 
         return res.status(200).json({
             Organization:organization,

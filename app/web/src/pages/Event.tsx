@@ -136,7 +136,7 @@ export default function Event() {
 
                 <div className="p-5 bg-lightgray rounded-b-xl">
                   {/* Manage Access Section */}
-                  {user?.id === event.createdBy._id && (
+                  {user?.id === event.createdBy?._id && (
                     <div className="mb-6 pb-6 border-b border-gray-200">
                       <p className="text-sm font-medium text-gray-600 mb-2 text-center">
                         You have manage access for this event.
@@ -260,8 +260,8 @@ export default function Event() {
                       <div className="h-7 w-7 bg-gray-200 rounded-full overflow-hidden flex items-center justify-center shrink-0">
                         {event.createdBy?.profilePicture ? (
                           <img
-                            src={event.createdBy.profilePicture}
-                            alt={event.createdBy.fullName}
+                            src={event.createdBy?.profilePicture}
+                            alt={event.createdBy?.fullName}
                             className="w-full h-full object-cover"
                           />
                         ) : (
@@ -274,7 +274,7 @@ export default function Event() {
                         )}
                       </div>
                       <p>
-                        {`${event.createdBy.firstName} ${event.createdBy.lastName}`}
+                        {event.createdBy ? `${event.createdBy.firstName} ${event.createdBy.lastName}` : 'Unknown'}
                       </p>
                     </div>
                   </div>
@@ -357,7 +357,7 @@ export default function Event() {
                       {/* second */}
                       <div className="px-8 pt-8 flex flex-col w-full">
                         <p className="text-2xl font-bold font-league text-black leading-tight">
-                          {hostOrg?.name || event.createdBy.fullName}
+                          {hostOrg?.name || event.createdBy?.fullName}
                         </p>
                         <p className="text-gray-600">
                           {hostOrg?.description || "Loading..."}
