@@ -437,7 +437,7 @@ export default function Event() {
       </div>
 
       {/* MOBILE ONLY SECTION */}
-      <div className="flex lg:hidden flex-col w-full pb-20">
+      <div className="font-inter flex lg:hidden flex-col w-full pb-20">
         {/* 1. Hero Image */}
         <div className="w-full aspect-square h-90 bg-gray-200 overflow-hidden">
           {event.flyer ? (
@@ -556,7 +556,7 @@ export default function Event() {
           {/* Organizer Card (Mobile version) */}
           {event.isRSO && (
             <div className="mt-8 p-4 bg-lightgray rounded-2xl flex items-center gap-4">
-              <div className="h-14 w-14 bg-gray-300 rounded-full overflow-hidden shrink-0">
+              <div className="h-14 w-14 bg-gray-300 rounded-xl overflow-hidden shrink-0">
                 {hostOrg?.logo && (
                   <img
                     src={hostOrg.logo}
@@ -565,12 +565,15 @@ export default function Event() {
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-bold truncate">{hostOrg?.name}</p>
+                <p className="font-bold truncate font-league">
+                  {hostOrg?.name}
+                </p>
                 <Link
                   to={`/organization/${event.organizationId}`}
-                  className="text-brand text-sm font-bold"
+                  className="text-black text-sm  font-league flex gap-1 items-center"
                 >
-                  View Profile
+                  More Events
+                  <ChevronRight size={15} />
                 </Link>
               </div>
             </div>
