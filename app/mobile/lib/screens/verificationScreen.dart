@@ -3,6 +3,7 @@ import '../utils/getAPI.dart';
 import '../theme/app_colors.dart';
 import '../components/app_button.dart';
 import '../theme/app_text_styles.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class VerificationScreen extends StatefulWidget {
   const VerificationScreen({super.key});
@@ -59,7 +60,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
     final email = _email;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.white,
       appBar: AppBar(
         backgroundColor: AppColors.transparent,
         elevation: 0,
@@ -87,10 +88,15 @@ class _VerificationScreenState extends State<VerificationScreen> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 40),
-              CircleAvatar(
-                radius: 80,
-                backgroundColor: AppColors.inputFill,
-                backgroundImage: const AssetImage('assets/img.png'),
+              ClipRect(
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  heightFactor: 0.82,
+                  child: SvgPicture.asset(
+                    'assets/knight.svg',
+                    height: 220,
+                  ),
+                ),
               ),
               const SizedBox(height: 32),
               Text(

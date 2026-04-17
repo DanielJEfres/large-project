@@ -5,6 +5,7 @@ import '../../utils/auth_service.dart';
 import '../../theme/app_text_styles.dart';
 import '../../theme/app_colors.dart';
 
+
 // ─── Models ───────────────────────────────────────────────────────────────────
 
 class SocialLinks {
@@ -84,7 +85,14 @@ class UniversityEvent {
 
 class OrganizationScreen extends StatefulWidget {
   final String orgId;
-  const OrganizationScreen({super.key, this.orgId = ''});
+  final int initialTabIndex; // 1. Add this variable
+
+  // 2. Add it to the constructor with a default of 0
+  const OrganizationScreen({
+    super.key,
+    this.orgId = '',
+    this.initialTabIndex = 0,
+  });
 
   @override
   State<OrganizationScreen> createState() => _OrganizationScreenState();
@@ -103,8 +111,13 @@ class _OrganizationScreenState extends State<OrganizationScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this)
-      ..addListener(() => setState(() {}));
+    print('initialTabIndex = ${widget.initialTabIndex}');
+    // Use widget.initialTabIndex to set the starting tab
+    _tabController = TabController(
+      length: 2,
+      vsync: this,
+      initialIndex: widget.initialTabIndex, // Add this line!
+    )..addListener(() => setState(() {}));
     _fetchData();
   }
 
@@ -220,6 +233,7 @@ class _OrganizationScreenState extends State<OrganizationScreen>
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -258,6 +272,7 @@ class _OrganizationScreenState extends State<OrganizationScreen>
     );
   }
 
+  //BUTTON TO CREATE ORGANZIATION HAS TO GO WHERE THE USER IS RSO VERIFIED AND THE CORRECT PAGE
   Widget _buildTopNav() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
@@ -268,21 +283,43 @@ class _OrganizationScreenState extends State<OrganizationScreen>
             icon: const Icon(Icons.arrow_back_ios_new, size: 20),
             onPressed: () => Navigator.pop(context),
           ),
-          IconButton(
-            icon: const Icon(Icons.reply_outlined, size: 24),
-            onPressed: () {},
+          Row(
+            children: [
+              GestureDetector(
+                onTap: () => Navigator.pushNamed(context, '/createOrganization'),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: AppColors.black,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.add, size: 16, color: AppColors.white),
+                      SizedBox(width: 4),
+                      Text('New Org', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.white)),
+                    ],
+                  ),
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.reply_outlined, size: 24),
+                onPressed: () {},
+              ),
+            ],
           ),
         ],
       ),
     );
   }
-
+//////////////////////////////////////////////////////////////////////
   Widget _buildBannerHeader() {
     return Stack(
       alignment: Alignment.topCenter,
       clipBehavior: Clip.none,
       children: [
-        Container(height: 100, width: double.infinity, color: const Color(0xFFF2F2F2)),
+        Container(height: 100, width: double.infinity, color: Colors.white),
         Container(
           margin: const EdgeInsets.only(top: 80),
           width: double.infinity,

@@ -9,11 +9,11 @@ class getAPI {
 
   //Sign up path connection
   static Future<Map<String, dynamic>> signUp(
-    String first,
-    String last,
-    String email,
-    String password,
-  ) async {
+      String first,
+      String last,
+      String email,
+      String password,
+      ) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/auth/signup'),
@@ -37,9 +37,9 @@ class getAPI {
 
   //log In connection
   static Future<Map<String, dynamic>> login(
-    String email,
-    String password,
-  ) async {
+      String email,
+      String password,
+      ) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/auth/login'),
@@ -211,10 +211,10 @@ class getAPI {
       final data = jsonDecode(response.body);
       return response.statusCode == 200
           ? {
-              "success": true,
-              "organization": data['Organization'],
-              "events": data['Events'] ?? [],
-            }
+        "success": true,
+        "organization": data['Organization'],
+        "events": data['Events'] ?? [],
+      }
           : {"success": false, "organization": null, "events": []};
     } catch (e) {
       return {"success": false, "organization": null, "events": []};
@@ -262,10 +262,10 @@ class getAPI {
     required bool rsvpEnabled,
     required String createdBy,
     required List<String> tags,
+    String? organizationId, // NEW
     XFile? flyerImage,
   }) async {
     try {
-      // Backend uses multer (multipart/form-data) for the create event route
       final request = http.MultipartRequest(
         'POST',
         Uri.parse('$baseUrl/events'),
@@ -279,6 +279,7 @@ class getAPI {
       request.fields['rsvpEnabled'] = rsvpEnabled.toString();
       request.fields['createdBy'] = createdBy;
       if (endDate != null) request.fields['endDate'] = endDate;
+      if (organizationId != null) request.fields['organizationId'] = organizationId; // NEW
       request.fields['tags'] = jsonEncode(tags);
       if (flyerImage != null) {
         request.files.add(await http.MultipartFile.fromPath(
@@ -414,25 +415,41 @@ class getAPI {
           'Authorization': 'Bearer ${AuthService.token}',
         },
       );
-      final data = jsonDecode(response.body);
-      return response.statusCode == 200
-          ? {'success': true, 'organizations': data['organizations'] ?? []}
-          : {'success': false, 'organizations': []};
-    } catch (e) {
-      return {'success': false, 'organizations': []};
-    }
-  }
 
-  // GET /api/events/created-by/:userId — fetch events created by the user
-  static Future<Map<String, dynamic>> getCreatedEvents(String userId) async {
-    try {
-      final response = await http.get(Uri.parse('$baseUrl/events/created-by/$userId'));
+      print('getUserOrganizations status: ${response.statusCode}');
+      print('getUserOrganizations body: ${response.body}');
+
       final data = jsonDecode(response.body);
-      // Backend returns a plain array
-      final List events = data is List ? data : [];
-      return {'success': true, 'events': events};
+
+      if (response.statusCode == 200) {
+        final rawOrgs = List<Map<String, dynamic>>.from(data['organizations'] ?? []);
+
+        final normalized = rawOrgs.map((org) {
+          final map = Map<String, dynamic>.from(org);
+
+          // Try to find the ID from any possible field
+          map['_id'] ??= org['id'] ??
+              org['organizationId'] ??
+              (org['organization'] is Map ? org['organization']['_id'] : null);
+
+          // If org is nested under 'organization', pull up name/logo/role too
+          if (org['organization'] is Map) {
+            final nested = org['organization'] as Map;
+            map['name'] ??= nested['name'];
+            map['logo'] ??= nested['logo'];
+          }
+
+          return map;
+        }).toList();
+
+        print('Normalized orgs: $normalized');
+        return {'success': true, 'organizations': normalized};
+      }
+
+      return {'success': false, 'organizations': []};
     } catch (e) {
-      return {'success': false, 'events': []};
+      print('getUserOrganizations ERROR: $e');
+      return {'success': false, 'organizations': []};
     }
   }
 
@@ -471,6 +488,17 @@ class getAPI {
       return {'success': false, 'message': 'Could not connect to server.'};
     }
   }
+  // GET /api/events/created-by/:userId — fetch events created by the user
+  static Future<Map<String, dynamic>> getCreatedEvents(String userId) async {
+    try {
+      final response = await http.get(Uri.parse('$baseUrl/events/created-by/$userId'));
+      final data = jsonDecode(response.body);
+      final List events = data is List ? data : [];
+      return {'success': true, 'events': events};
+    } catch (e) {
+      return {'success': false, 'events': []};
+    }
+  }
 
   // DELETE /api/events/:eventId — delete an event
   static Future<Map<String, dynamic>> deleteEvent(String eventId) async {
@@ -483,6 +511,45 @@ class getAPI {
       return response.statusCode == 200
           ? {'success': true}
           : {'success': false, 'message': data['message'] ?? 'Failed to delete event'};
+    } catch (e) {
+      return {'success': false, 'message': 'Could not connect to server.'};
+    }
+  }
+
+  // POST /api/organizations/create — create a new organization
+  static Future<Map<String, dynamic>> createOrganization({
+    required String name,
+    required String description,
+    required String createdBy,
+    String? contactEmail,
+    String? website,
+    String? instagram,
+    List<String> tags = const [],
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/organizations/create'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${AuthService.token}',
+        },
+        body: jsonEncode({
+          'name': name,
+          'description': description,
+          'createdBy': createdBy,
+          if (contactEmail != null && contactEmail.isNotEmpty)
+            'contactEmail': contactEmail,
+          'socialLinks': {
+            if (website != null && website.isNotEmpty) 'website': website,
+            if (instagram != null && instagram.isNotEmpty) 'instagram': instagram,
+          },
+          if (tags.isNotEmpty) 'category': tags.first,
+        }),
+      );
+      final data = jsonDecode(response.body);
+      return response.statusCode == 201
+          ? {'success': true, 'organization': data['Organization']}
+          : {'success': false, 'message': data['message'] ?? 'Failed to create organization'};
     } catch (e) {
       return {'success': false, 'message': 'Could not connect to server.'};
     }

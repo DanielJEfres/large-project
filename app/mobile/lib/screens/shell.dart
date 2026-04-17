@@ -6,6 +6,7 @@ import 'create_event.dart';
 import 'tickets.dart';
 import 'profile.dart';
 
+
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
 
@@ -15,22 +16,16 @@ class MainShell extends StatefulWidget {
 
 class _MainShellState extends State<MainShell> {
   int _currentIndex = 0;
-  final _ticketsKey = GlobalKey<TicketsScreenState>();
-  final _profileKey = GlobalKey<ProfileScreenState>();
 
-  late final List<Widget> _screens = [
+  // IndexedStack keeps all screens alive so scroll position is preserved
+  final List<Widget> _screens = [
     EventsScreen(),
     SearchOrganization(),
     CreateEventScreen(),
-    TicketsScreen(key: _ticketsKey),
-    ProfileScreen(key: _profileKey),
-  ];
+    TicketsScreen(),
+    ProfileScreen(),
 
-  void _onTabTapped(int i) {
-    if (i == 3) _ticketsKey.currentState?.fetchData();
-    if (i == 4) _profileKey.currentState?.fetchData();
-    setState(() => _currentIndex = i);
-  }
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +36,7 @@ class _MainShellState extends State<MainShell> {
       ),
       bottomNavigationBar: AppBottomNav(
         currentIndex: _currentIndex,
-        onTap: _onTabTapped,
+        onTap: (i) => setState(() => _currentIndex = i),
       ),
     );
   }

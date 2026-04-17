@@ -1,10 +1,10 @@
-
 // ─── Data Model ───────────────────────────────────────────────────────────────
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../components/app_bottom_nav.dart';
 import 'organizations.dart';
+import 'createOrganization.dart';
 import '../../utils/getAPI.dart';
 import '../../utils/auth_service.dart';
 import '../../theme/app_text_styles.dart';
@@ -78,24 +78,10 @@ class _SearchOrganizationState extends State<SearchOrganization> {
   void initState() {
     super.initState();
     _fetchOrganizations();
-    _fetchMemberships();
     _searchController.addListener(_onSearchChanged);
+    _fetchMyOrgIds();
   }
 
-  Future<void> _fetchMemberships() async {
-    if (!AuthService.isLoggedIn) return;
-    final result = await getAPI.getUserOrganizations();
-    if (!mounted) return;
-    final orgs = List<Map<String, dynamic>>.from(result['organizations'] ?? []);
-    setState(() {
-      for (final org in orgs) {
-        final id = org['id']?.toString();
-        if (id != null && id.isNotEmpty) _joinedOrgIds.add(id);
-      }
-    });
-  }
-
-// Add this outside initState
   Timer? _debounce;
 
   void _onSearchChanged() {
@@ -113,7 +99,22 @@ class _SearchOrganizationState extends State<SearchOrganization> {
     super.dispose();
   }
 
-
+  // --- ADD THIS FUNCTION ---
+  Future<void> _fetchMyOrgIds() async {
+    if (!AuthService.isLoggedIn) return;
+    try {
+      final result = await getAPI.getUserOrganizations();
+      if (result['success'] == true) {
+        final List<dynamic> raw = result['organizations'] ?? [];
+        setState(() {
+          // Extract IDs and add them to our Set
+          _joinedOrgIds.addAll(raw.map((e) => e['_id'].toString()));
+        });
+      }
+    } catch (e) {
+      print("Error fetching joined IDs: $e");
+    }
+  }
 
   Future<void> _fetchOrganizations({String? query}) async {
     setState(() {
@@ -122,7 +123,6 @@ class _SearchOrganizationState extends State<SearchOrganization> {
     });
 
     try {
-      // Pass name only when there's an actual query
       final result = await getAPI.getOrganizations(
         name: (query != null && query.isNotEmpty) ? query : null,
       );
@@ -131,7 +131,6 @@ class _SearchOrganizationState extends State<SearchOrganization> {
         final List<dynamic> raw = result['organizations'] ?? [];
         final orgs = raw.map((e) => Organization.fromJson(e)).toList();
 
-        // Client-side category filter (the backend filters by name only)
         final filtered = _selectedCategory == 'All'
             ? orgs
             : orgs.where((o) => o.category == _selectedCategory).toList();
@@ -215,7 +214,10 @@ class _SearchOrganizationState extends State<SearchOrganization> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => OrganizationScreen(orgId: org.id), // pass the id
+        builder: (_) => OrganizationScreen(
+          orgId: org.id,
+          initialTabIndex: 0, // Search usually stays on 'Events' (0)
+        ),
       ),
     );
   }
@@ -237,7 +239,6 @@ class _SearchOrganizationState extends State<SearchOrganization> {
             setState(() => _selectedCategory = 'All');
           }
           Navigator.pop(context);
-          // Re-fetch with the new category applied
           _fetchOrganizations(query: _searchController.text.trim());
         },
       ),
@@ -258,7 +259,13 @@ class _SearchOrganizationState extends State<SearchOrganization> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('ORGANIZATIONS', style: AppTextStyles.h2),
+                  // ── Title + New Org button ──
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('ORGANIZATIONS', style: AppTextStyles.h2),
+                    ],
+                  ),
                   const SizedBox(height: 14),
 
                   // ── Search bar ──
@@ -285,7 +292,8 @@ class _SearchOrganizationState extends State<SearchOrganization> {
                                 size: 20,
                               ),
                               border: InputBorder.none,
-                              contentPadding: EdgeInsets.symmetric(vertical: 14),
+                              contentPadding:
+                              EdgeInsets.symmetric(vertical: 14),
                             ),
                           ),
                         ),
@@ -300,7 +308,8 @@ class _SearchOrganizationState extends State<SearchOrganization> {
                             color: AppColors.inputFill,
                             borderRadius: BorderRadius.circular(24),
                           ),
-                          child: const Icon(Icons.tune, color: AppColors.textMuted),
+                          child: const Icon(Icons.tune,
+                              color: AppColors.textMuted),
                         ),
                       ),
                     ],
@@ -313,24 +322,30 @@ class _SearchOrganizationState extends State<SearchOrganization> {
                     child: ListView.separated(
                       scrollDirection: Axis.horizontal,
                       itemCount: _allCategories.length,
-                      separatorBuilder: (_, _) => const SizedBox(width: 8),
+                      separatorBuilder: (_, __) =>
+                      const SizedBox(width: 8),
                       itemBuilder: (_, i) {
                         final cat = _allCategories[i];
                         final isSelected = cat == _selectedCategory;
                         return GestureDetector(
                           onTap: () {
                             setState(() => _selectedCategory = cat);
-                            _fetchOrganizations(query: _searchController.text.trim());
+                            _fetchOrganizations(
+                                query: _searchController.text.trim());
                           },
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16),
                             decoration: BoxDecoration(
-                              color: isSelected ? AppColors.primary : Colors.transparent,
+                              color: isSelected
+                                  ? AppColors.primary
+                                  : Colors.transparent,
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(
                                 color: isSelected
                                     ? AppColors.primary
-                                    : AppColors.textMuted.withValues(alpha: 0.35),
+                                    : AppColors.textMuted
+                                    .withValues(alpha: 0.35),
                               ),
                             ),
                             alignment: Alignment.center,
@@ -338,8 +353,12 @@ class _SearchOrganizationState extends State<SearchOrganization> {
                               cat,
                               style: TextStyle(
                                 fontSize: 13,
-                                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                                color: isSelected ? AppColors.white : AppColors.textSecondary,
+                                fontWeight: isSelected
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                                color: isSelected
+                                    ? AppColors.white
+                                    : AppColors.textSecondary,
                               ),
                             ),
                           ),
@@ -373,11 +392,13 @@ class _SearchOrganizationState extends State<SearchOrganization> {
                         color: kGray, size: 40),
                     const SizedBox(height: 8),
                     Text(_errorMessage!,
-                        style: const TextStyle(color: kGray)),
+                        style:
+                        const TextStyle(color: kGray)),
                     const SizedBox(height: 12),
                     ElevatedButton(
                       onPressed: () => _fetchOrganizations(
-                          query: _searchController.text.trim()),
+                          query: _searchController.text
+                              .trim()),
                       style: ElevatedButton.styleFrom(
                           backgroundColor: kDark,
                           foregroundColor: kWhite),
@@ -392,18 +413,22 @@ class _SearchOrganizationState extends State<SearchOrganization> {
                     style: TextStyle(color: kGray)),
               )
                   : ListView.separated(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 20),
                 itemCount: _organizations.length,
-                separatorBuilder: (_, __) =>
-                const Divider(height: 1, color: kBorderGray),
+                separatorBuilder: (_, __) => const Divider(
+                    height: 1, color: kBorderGray),
                 itemBuilder: (_, index) {
                   final org = _organizations[index];
                   return _OrgCard(
                     org: org,
                     onViewPage: () => _goToOrgInfo(org),
-                    isMember: _joinedOrgIds.contains(org.id),
-                    isJoining: _joiningOrgIds.contains(org.id),
-                    isLeaving: _leavingOrgIds.contains(org.id),
+                    isMember:
+                    _joinedOrgIds.contains(org.id),
+                    isJoining:
+                    _joiningOrgIds.contains(org.id),
+                    isLeaving:
+                    _leavingOrgIds.contains(org.id),
                     onJoin: () => _joinOrg(org),
                     onLeave: () => _leaveOrg(org),
                   );
@@ -445,7 +470,6 @@ class _OrgCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Thumbnail placeholder
           Container(
             width: 64,
             height: 64,
@@ -456,7 +480,6 @@ class _OrgCard extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 14),
-
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -469,18 +492,15 @@ class _OrgCard extends StatelessWidget {
                       color: AppColors.black),
                 ),
                 const SizedBox(height: 4),
-
-                // Show description as a subtitle if available
                 if (org.description.isNotEmpty)
                   Text(
                     org.description,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: AppTextStyles.caption.copyWith(fontSize: 13, color: AppColors.textMuted),
+                    style: AppTextStyles.caption
+                        .copyWith(fontSize: 13, color: AppColors.textMuted),
                   ),
                 const SizedBox(height: 6),
-
-                // Category tag
                 if (org.category.isNotEmpty)
                   Container(
                     padding: const EdgeInsets.symmetric(
@@ -496,7 +516,6 @@ class _OrgCard extends StatelessWidget {
                     ),
                   ),
                 const SizedBox(height: 10),
-
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -519,17 +538,23 @@ class _OrgCard extends StatelessWidget {
                       onPressed: (isJoining || isLeaving)
                           ? null
                           : () {
-                              if (!AuthService.isLoggedIn) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('You need to be logged in to join an organization.')),
-                                );
-                                return;
-                              }
-                              isMember ? onLeave?.call() : onJoin?.call();
-                            },
+                        if (!AuthService.isLoggedIn) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text(
+                                    'You need to be logged in to join an organization.')),
+                          );
+                          return;
+                        }
+                        isMember
+                            ? onLeave?.call()
+                            : onJoin?.call();
+                      },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: isMember ? Colors.grey[300] : kDark,
-                        foregroundColor: isMember ? Colors.black54 : kWhite,
+                        backgroundColor:
+                        isMember ? Colors.grey[300] : kDark,
+                        foregroundColor:
+                        isMember ? Colors.black54 : kWhite,
                         padding: const EdgeInsets.symmetric(
                             horizontal: 22, vertical: 9),
                         minimumSize: Size.zero,
@@ -541,10 +566,11 @@ class _OrgCard extends StatelessWidget {
                       ),
                       child: (isJoining || isLeaving)
                           ? const SizedBox(
-                              height: 14,
-                              width: 14,
-                              child: CircularProgressIndicator(strokeWidth: 2, color: kWhite),
-                            )
+                        height: 14,
+                        width: 14,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: kWhite),
+                      )
                           : Text(isMember ? 'Joined' : 'Join'),
                     ),
                   ],
@@ -559,9 +585,6 @@ class _OrgCard extends StatelessWidget {
 }
 
 // ─── Filters Bottom Sheet ─────────────────────────────────────────────────────
-// (unchanged — keeping your existing FiltersBottomSheet exactly as-is)
-
-
 
 class FiltersBottomSheet extends StatefulWidget {
   final List<String> categories;
@@ -649,7 +672,8 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
                           color: isSelected ? kYellow : kLightGray,
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                              color: isSelected ? kYellow : kBorderGray),
+                              color:
+                              isSelected ? kYellow : kBorderGray),
                         ),
                         child: Text(
                           cat,
@@ -672,7 +696,8 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
               contentPadding: EdgeInsets.zero,
               title: const Text('Sort by',
                   style: TextStyle(fontSize: 15, color: kDark)),
-              trailing: const Icon(Icons.chevron_right, color: kGray),
+              trailing:
+              const Icon(Icons.chevron_right, color: kGray),
               onTap: () {},
             ),
             SafeArea(

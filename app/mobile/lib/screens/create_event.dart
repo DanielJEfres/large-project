@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../theme/app_colors.dart';
@@ -7,6 +6,8 @@ import '../utils/getAPI.dart';
 import '../utils/auth_service.dart';
 import '../components/app_button.dart';
 import '../components/app_text_field.dart';
+import 'dart:io';
+
 
 class CreateEventScreen extends StatefulWidget {
   const CreateEventScreen({super.key});
@@ -16,9 +17,14 @@ class CreateEventScreen extends StatefulWidget {
 }
 
 class _CreateEventScreenState extends State<CreateEventScreen> {
-  // Step 1: pick type. Step 2: fill form.
+  // Step 1: pick type. Step 1b (RSO only): pick org. Step 2: fill form.
   bool _typeSelected = false;
   bool _isRSO = false;
+
+  // RSO org selection
+  List<Map<String, dynamic>> _rsoOrganizations = [];
+  bool _loadingOrgs = false;
+  Map<String, dynamic>? _selectedOrg;
 
   // Form fields
   final _titleController = TextEditingController();
@@ -47,6 +53,17 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     _locationController.dispose();
     _descController.dispose();
     super.dispose();
+  }
+
+  Future<void> _fetchUserRSOOrgs() async {
+    setState(() => _loadingOrgs = true);
+    final result = await getAPI.getUserOrganizations();
+    if (!mounted) return;
+    setState(() {
+      _rsoOrganizations =
+      List<Map<String, dynamic>>.from(result['organizations'] ?? []);
+      _loadingOrgs = false;
+    });
   }
 
   DateTime? _combineDateAndTime(DateTime? date, TimeOfDay? time) {
@@ -92,6 +109,10 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       _showSnack('Start date is required');
       return;
     }
+    if (_isRSO && _selectedOrg == null) {
+      _showSnack('Please select an RSO organization');
+      return;
+    }
     if (!AuthService.isLoggedIn) {
       _showSnack('You must be logged in to create an event');
       return;
@@ -101,6 +122,11 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
     final startDt = _combineDateAndTime(_startDate, _startTime);
     final endDt = _combineDateAndTime(_endDate, _endTime);
+
+    // Extract org ID from the selected org map
+    final orgId = _selectedOrg?['_id']?.toString() ??
+        _selectedOrg?['id']?.toString() ??
+        _selectedOrg?['organizationId']?.toString();
 
     final result = await getAPI.createEvent(
       title: _titleController.text.trim(),
@@ -112,6 +138,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       rsvpEnabled: _rsvpEnabled,
       createdBy: AuthService.userId!,
       tags: _selectedTags.toList(),
+      organizationId: orgId,
       flyerImage: _flyerImage,
     );
 
@@ -120,9 +147,9 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
     if (result['success'] == true) {
       _showSnack('Event created!');
-      // Reset form
       setState(() {
         _typeSelected = false;
+        _selectedOrg = null;
         _titleController.clear();
         _locationController.clear();
         _descController.clear();
@@ -176,7 +203,11 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SafeArea(
-        child: _typeSelected ? _buildForm() : _buildTypePicker(),
+        child: !_typeSelected
+            ? _buildTypePicker()
+            : (_isRSO && _selectedOrg == null)
+            ? _buildOrgPicker()
+            : _buildForm(),
       ),
     );
   }
@@ -205,10 +236,14 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 label: 'RSO Event',
                 icon: Icons.school_outlined,
                 selected: false,
-                onTap: () => setState(() {
-                  _isRSO = true;
-                  _typeSelected = true;
-                }),
+                onTap: () {
+                  setState(() {
+                    _isRSO = true;
+                    _typeSelected = true;
+                    _selectedOrg = null;
+                  });
+                  _fetchUserRSOOrgs();
+                },
               ),
               const SizedBox(width: 16),
               _TypeCard(
@@ -228,6 +263,135 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     );
   }
 
+  // ─── Step 1b: RSO Org Picker ──────────────────────────────────────────────
+
+  Widget _buildOrgPicker() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Top nav
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          child: Row(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+                onPressed: () => setState(() {
+                  _typeSelected = false;
+                  _selectedOrg = null;
+                }),
+              ),
+              Text('Select an RSO',
+                  style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600)),
+            ],
+          ),
+        ),
+        const Divider(height: 1, color: AppColors.inputFill),
+        Expanded(
+          child: _loadingOrgs
+              ? const Center(
+            child: CircularProgressIndicator(color: AppColors.primary),
+          )
+              : _rsoOrganizations.isEmpty
+              ? Center(
+            child: Padding(
+              padding: const EdgeInsets.all(32),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.group_off_outlined,
+                      size: 48, color: AppColors.textMuted),
+                  const SizedBox(height: 16),
+                  Text(
+                    "You're not part of any RSO yet.",
+                    style: AppTextStyles.body
+                        .copyWith(color: AppColors.textMuted),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Join or create an organization first.',
+                    style: AppTextStyles.caption
+                        .copyWith(color: AppColors.textMuted),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          )
+              : ListView.separated(
+            padding: const EdgeInsets.symmetric(
+                horizontal: 20, vertical: 16),
+            itemCount: _rsoOrganizations.length,
+            separatorBuilder: (_, __) => const SizedBox(height: 12),
+            itemBuilder: (_, i) {
+              final org = _rsoOrganizations[i];
+              final name =
+                  org['name']?.toString() ?? 'Organization';
+              final role = org['role']?.toString() ?? '';
+              final logo = org['logo']?.toString();
+
+              return GestureDetector(
+                onTap: () => setState(() => _selectedOrg = org),
+                child: Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: AppColors.inputFill,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Colors.transparent,
+                      width: 2,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: logo != null
+                            ? Image.network(
+                          logo,
+                          width: 56,
+                          height: 56,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) =>
+                              _logoPlaceholder(),
+                        )
+                            : _logoPlaceholder(),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment:
+                          CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              name,
+                              style: AppTextStyles.body.copyWith(
+                                  fontWeight: FontWeight.w600),
+                            ),
+                            if (role.isNotEmpty)
+                              Text(
+                                role,
+                                style: AppTextStyles.caption
+                                    .copyWith(
+                                    color: AppColors.textMuted),
+                              ),
+                          ],
+                        ),
+                      ),
+                      const Icon(Icons.chevron_right,
+                          color: AppColors.textMuted, size: 20),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
   // ─── Step 2: Form ─────────────────────────────────────────────────────────
 
   Widget _buildForm() {
@@ -240,10 +404,46 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             children: [
               IconButton(
                 icon: const Icon(Icons.arrow_back_ios_new, size: 20),
-                onPressed: () => setState(() => _typeSelected = false),
+                onPressed: () => setState(() {
+                  // RSO goes back to org picker; student goes back to type picker
+                  if (_isRSO) {
+                    _selectedOrg = null;
+                  } else {
+                    _typeSelected = false;
+                  }
+                }),
               ),
-              Text('Creating an Event',
-                  style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600)),
+              Expanded(
+                child: Row(
+                  children: [
+                    Text('Creating an Event',
+                        style: AppTextStyles.body
+                            .copyWith(fontWeight: FontWeight.w600)),
+                    if (_isRSO && _selectedOrg != null) ...[
+                      const SizedBox(width: 6),
+                      Flexible(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            _selectedOrg!['name']?.toString() ?? 'RSO',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
             ],
           ),
         ),
@@ -416,8 +616,10 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     if (date == null) {
       text = label;
     } else {
-      final months = ['Jan','Feb','Mar','Apr','May','Jun',
-                      'Jul','Aug','Sep','Oct','Nov','Dec'];
+      final months = [
+        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      ];
       final dateStr = '${months[date.month - 1]} ${date.day}';
       final timeStr = time != null
           ? ' · ${time.hourOfPeriod}:${time.minute.toString().padLeft(2, '0')} ${time.period.name.toUpperCase()}'
@@ -450,6 +652,14 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       ),
     );
   }
+
+  Widget _logoPlaceholder() => Container(
+    width: 56,
+    height: 56,
+    color: Colors.grey.shade300,
+    child: const Icon(Icons.group_outlined,
+        size: 24, color: AppColors.textMuted),
+  );
 }
 
 // ─── Type Card ────────────────────────────────────────────────────────────────
@@ -475,7 +685,9 @@ class _TypeCard extends StatelessWidget {
         width: 140,
         height: 120,
         decoration: BoxDecoration(
-          color: selected ? AppColors.primary.withValues(alpha: 0.1) : AppColors.white,
+          color: selected
+              ? AppColors.primary.withValues(alpha: 0.1)
+              : AppColors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: selected ? AppColors.primary : const Color(0xFFE0E0E0),
